@@ -1,5 +1,7 @@
 # agd-memory
 
+![agd-memory architecture](image.png)
+
 Per-project persistent memory for [Claude Code](https://claude.com/claude-code),
 stored in [AGD format](https://github.com/Pinperepette/agd) with selective
 retrieval and graph traversal.
