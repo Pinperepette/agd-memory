@@ -1,0 +1,13 @@
+{
+  "name": "agd-memory",
+  "version": "0.1.0",
+  "description": "Per-project persistent memory for Claude Code, stored in AGD format with selective retrieval (TOC + targeted block fetch). 6-15x fewer tokens than loading the whole memory file.",
+  "author": {
+    "name": "pinperepette",
+    "email": "pinperepette@gmail.com"
+  },
+  "homepage": "https://github.com/Pinperepette/agd-memory",
+  "repository": "https://github.com/Pinperepette/agd-memory",
+  "license": "MIT",
+  "keywords": ["memory", "agd", "mcp", "claude-code", "selective-retrieval"]
+}

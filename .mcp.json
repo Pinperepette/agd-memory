@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agd-memory": {
+      "command": "python3.12",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp_servers/server.py"]
+    }
+  }
+}

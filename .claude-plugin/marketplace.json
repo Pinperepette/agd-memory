@@ -1,0 +1,14 @@
+{
+  "name": "agd-memory",
+  "owner": {
+    "name": "pinperepette",
+    "url": "https://github.com/Pinperepette"
+  },
+  "plugins": [
+    {
+      "name": "agd-memory",
+      "source": ".",
+      "description": "Per-project persistent memory in AGD format. Skill + SessionStart hook + MCP server, all driven by the agd CLI."
+    }
+  ]
+}
