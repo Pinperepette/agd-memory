@@ -1,0 +1,138 @@
+{
+  "model": "claude-haiku-4-5",
+  "n_instances": 8,
+  "n_rows": 24,
+  "n_errors": 0,
+  "errors": [],
+  "per_adapter": [
+    {
+      "adapter": "preload-bm25",
+      "n": 8,
+      "raf_median": 127.65,
+      "raf_p95": 764.59,
+      "raf_mean": 283.5,
+      "function_overlap_mean": 0.438,
+      "file_overlap_mean": 0.75,
+      "line_jaccard_mean": 0.006,
+      "off_target_mean": 0.25,
+      "tool_calls_mean": 1,
+      "loaded_tokens_mean": 80049,
+      "essential_tokens_mean": 574,
+      "total_cost_usd": 0.8325,
+      "elapsed_s_mean": 9.13
+    },
+    {
+      "adapter": "grep-agent",
+      "n": 8,
+      "raf_median": 8.57,
+      "raf_p95": 46.25,
+      "raf_mean": 17.93,
+      "function_overlap_mean": 0.5,
+      "file_overlap_mean": 0.625,
+      "line_jaccard_mean": 0.336,
+      "off_target_mean": 0.12,
+      "tool_calls_mean": 15.1,
+      "loaded_tokens_mean": 4877,
+      "essential_tokens_mean": 574,
+      "total_cost_usd": 0.7929,
+      "elapsed_s_mean": 26.05
+    },
+    {
+      "adapter": "agd-graph",
+      "n": 8,
+      "raf_median": 7.43,
+      "raf_p95": 92.09,
+      "raf_mean": 25.14,
+      "function_overlap_mean": 0.688,
+      "file_overlap_mean": 0.875,
+      "line_jaccard_mean": 0.431,
+      "off_target_mean": 0.25,
+      "tool_calls_mean": 13.1,
+      "loaded_tokens_mean": 5544,
+      "essential_tokens_mean": 574,
+      "total_cost_usd": 0.8139,
+      "elapsed_s_mean": 32.61
+    }
+  ],
+  "raf_cdf": [
+    {
+      "raf_le": 2,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.0,
+      "agd-graph": 0.0
+    },
+    {
+      "raf_le": 5,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.375,
+      "agd-graph": 0.375
+    },
+    {
+      "raf_le": 10,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.5,
+      "agd-graph": 0.625
+    },
+    {
+      "raf_le": 50,
+      "preload-bm25": 0.0,
+      "grep-agent": 1.0,
+      "agd-graph": 0.875
+    },
+    {
+      "raf_le": 200,
+      "preload-bm25": 0.625,
+      "grep-agent": 1.0,
+      "agd-graph": 1.0
+    }
+  ],
+  "per_task_winners": [
+    {
+      "instance_id": "psf__requests-1921",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 12.93,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 2.76,
+      "winner_function_overlap": 0.5
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 7.0,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-6028",
+      "winner_adapter": null,
+      "note": "no adapter produced a non-zero function_overlap"
+    },
+    {
+      "instance_id": "psf__requests-1766",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 4.39,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-2931",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 3.47,
+      "winner_function_overlap": 0.5
+    },
+    {
+      "instance_id": "psf__requests-1142",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 48.26,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-1724",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 7.86,
+      "winner_function_overlap": 0.5
+    }
+  ]
+}

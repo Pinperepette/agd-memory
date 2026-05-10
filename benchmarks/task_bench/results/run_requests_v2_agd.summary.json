@@ -1,0 +1,96 @@
+{
+  "model": "claude-haiku-4-5",
+  "n_instances": 8,
+  "n_rows": 8,
+  "n_errors": 0,
+  "errors": [],
+  "per_adapter": [
+    {
+      "adapter": "agd-graph",
+      "n": 8,
+      "raf_median": 7.43,
+      "raf_p95": 92.09,
+      "raf_mean": 25.14,
+      "function_overlap_mean": 0.688,
+      "file_overlap_mean": 0.875,
+      "line_jaccard_mean": 0.431,
+      "off_target_mean": 0.25,
+      "tool_calls_mean": 13.1,
+      "loaded_tokens_mean": 5544,
+      "essential_tokens_mean": 574,
+      "total_cost_usd": 0.8139,
+      "elapsed_s_mean": 32.61
+    }
+  ],
+  "raf_cdf": [
+    {
+      "raf_le": 2,
+      "agd-graph": 0.0
+    },
+    {
+      "raf_le": 5,
+      "agd-graph": 0.375
+    },
+    {
+      "raf_le": 10,
+      "agd-graph": 0.625
+    },
+    {
+      "raf_le": 50,
+      "agd-graph": 0.875
+    },
+    {
+      "raf_le": 200,
+      "agd-graph": 1.0
+    }
+  ],
+  "per_task_winners": [
+    {
+      "instance_id": "psf__requests-1921",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 12.93,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 4.71,
+      "winner_function_overlap": 0.5
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 7.0,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-6028",
+      "winner_adapter": null,
+      "note": "no adapter produced a non-zero function_overlap"
+    },
+    {
+      "instance_id": "psf__requests-1766",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 4.97,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-2931",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 3.47,
+      "winner_function_overlap": 0.5
+    },
+    {
+      "instance_id": "psf__requests-1142",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 120.05,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "psf__requests-1724",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 7.86,
+      "winner_function_overlap": 0.5
+    }
+  ]
+}

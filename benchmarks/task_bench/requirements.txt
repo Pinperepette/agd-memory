@@ -1,0 +1,3 @@
+anthropic>=0.40
+datasets>=2.18
+tiktoken>=0.7

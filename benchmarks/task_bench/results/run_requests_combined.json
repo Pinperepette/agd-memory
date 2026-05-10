@@ -1,0 +1,1446 @@
+{
+  "model": "claude-haiku-4-5",
+  "token_budget": 80000,
+  "adapters": [
+    "preload-bm25",
+    "grep-agent",
+    "agd-graph"
+  ],
+  "n_instances": 8,
+  "results": [
+    {
+      "instance_id": "psf__requests-1921",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 10.87,
+      "loaded_tokens": 80192,
+      "essential_tokens": 194,
+      "raf": 413.36,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 99713,
+        "output_tokens": 1642,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::merge_setting"
+        ],
+        "model_functions": [
+          "requests/sessions.py::merge_setting"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 76,
+        "files_loaded": 42,
+        "top_scores": [
+          {
+            "path": "requests/sessions.py",
+            "score": 46.87
+          },
+          {
+            "path": "requests/models.py",
+            "score": 41.88
+          },
+          {
+            "path": "test_requests.py",
+            "score": 40.01
+          },
+          {
+            "path": "requests/adapters.py",
+            "score": 39.4
+          },
+          {
+            "path": "requests/cookies.py",
+            "score": 33.53
+          },
+          {
+            "path": "requests/api.py",
+            "score": 31.23
+          },
+          {
+            "path": "requests/packages/urllib3/util.py",
+            "score": 31.19
+          },
+          {
+            "path": "requests/utils.py",
+            "score": 30.81
+          },
+          {
+            "path": "requests/packages/urllib3/contrib/ntlmpool.py",
+            "score": 30.39
+          },
+          {
+            "path": "requests/packages/urllib3/request.py",
+            "score": 28.36
+          }
+        ]
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 15
+    },
+    {
+      "instance_id": "psf__requests-1921",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 27.71,
+      "loaded_tokens": 4834,
+      "essential_tokens": 194,
+      "raf": 24.92,
+      "tool_calls": 18,
+      "api": {
+        "input_tokens": 91265,
+        "output_tokens": 2288,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.455,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::merge_setting"
+        ],
+        "model_functions": [
+          "requests/sessions.py::merge_setting"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 17,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 19
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 6.3,
+      "loaded_tokens": 80052,
+      "essential_tokens": 985,
+      "raf": 81.27,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 99614,
+        "output_tokens": 514,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::<line16>",
+          "requests/sessions.py::request"
+        ],
+        "model_functions": [
+          "requests/sessions.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 83,
+        "files_loaded": 32,
+        "top_scores": [
+          {
+            "path": "requests/packages/chardet/hebrewprober.py",
+            "score": 47.25
+          },
+          {
+            "path": "requests/cookies.py",
+            "score": 37.86
+          },
+          {
+            "path": "requests/models.py",
+            "score": 36.55
+          },
+          {
+            "path": "test_requests.py",
+            "score": 36.52
+          },
+          {
+            "path": "requests/utils.py",
+            "score": 36.08
+          },
+          {
+            "path": "requests/packages/urllib3/connectionpool.py",
+            "score": 35.96
+          },
+          {
+            "path": "requests/adapters.py",
+            "score": 35.93
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 32.01
+          },
+          {
+            "path": "requests/packages/urllib3/util/retry.py",
+            "score": 31.0
+          },
+          {
+            "path": "requests/packages/urllib3/contrib/pyopenssl.py",
+            "score": 30.36
+          }
+        ]
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 14
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 14.78,
+      "loaded_tokens": 2718,
+      "essential_tokens": 985,
+      "raf": 2.76,
+      "tool_calls": 10,
+      "api": {
+        "input_tokens": 30083,
+        "output_tokens": 1321,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::<line16>",
+          "requests/sessions.py::request"
+        ],
+        "model_functions": [
+          "requests/sessions.py::request"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 10,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 12
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 13.44,
+      "loaded_tokens": 79867,
+      "essential_tokens": 695,
+      "raf": 114.92,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100962,
+        "output_tokens": 1729,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::prepare_url"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_url"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 35,
+        "files_loaded": 25,
+        "top_scores": [
+          {
+            "path": "requests/help.py",
+            "score": 76.77
+          },
+          {
+            "path": "requests/models.py",
+            "score": 72.04
+          },
+          {
+            "path": "requests/utils.py",
+            "score": 59.62
+          },
+          {
+            "path": "tests/test_requests.py",
+            "score": 52.03
+          },
+          {
+            "path": "requests/exceptions.py",
+            "score": 46.02
+          },
+          {
+            "path": "tests/test_utils.py",
+            "score": 45.59
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 43.82
+          },
+          {
+            "path": "requests/cookies.py",
+            "score": 43.68
+          },
+          {
+            "path": "docs/conf.py",
+            "score": 42.62
+          },
+          {
+            "path": "setup.py",
+            "score": 38.86
+          }
+        ]
+      },
+      "patch_first_line": "diff --git a/requests/models.py b/requests/models.py",
+      "patch_lines": 22
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 60.33,
+      "loaded_tokens": 8295,
+      "essential_tokens": 695,
+      "raf": 11.94,
+      "tool_calls": 27,
+      "api": {
+        "input_tokens": 185011,
+        "output_tokens": 5274,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "requests/models.py::prepare_url"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "psf__requests-6028",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 10.94,
+      "loaded_tokens": 80029,
+      "essential_tokens": 206,
+      "raf": 388.49,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 101112,
+        "output_tokens": 1333,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "requests/sessions.py"
+        ],
+        "gold_files": [
+          "requests/utils.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/utils.py::prepend_scheme_if_needed"
+        ],
+        "model_functions": [
+          "requests/sessions.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 35,
+        "files_loaded": 29,
+        "top_scores": [
+          {
+            "path": "requests/help.py",
+            "score": 103.02
+          },
+          {
+            "path": "requests/models.py",
+            "score": 52.84
+          },
+          {
+            "path": "requests/utils.py",
+            "score": 50.8
+          },
+          {
+            "path": "tests/test_requests.py",
+            "score": 45.36
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 42.72
+          },
+          {
+            "path": "docs/conf.py",
+            "score": 42.53
+          },
+          {
+            "path": "tests/test_utils.py",
+            "score": 42.05
+          },
+          {
+            "path": "requests/__init__.py",
+            "score": 41.81
+          },
+          {
+            "path": "setup.py",
+            "score": 38.78
+          },
+          {
+            "path": "requests/adapters.py",
+            "score": 37.38
+          }
+        ]
+      },
+      "patch_first_line": "diff --git a/requests/sessions.py b/requests/sessions.py",
+      "patch_lines": 12
+    },
+    {
+      "instance_id": "psf__requests-6028",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 39.17,
+      "loaded_tokens": 8760,
+      "essential_tokens": 206,
+      "raf": 42.52,
+      "tool_calls": 26,
+      "api": {
+        "input_tokens": 226586,
+        "output_tokens": 3214,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/utils.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "requests/utils.py::prepend_scheme_if_needed"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "psf__requests-1766",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 6.75,
+      "loaded_tokens": 80019,
+      "essential_tokens": 570,
+      "raf": 140.38,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 95881,
+        "output_tokens": 660,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.05,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/auth.py"
+        ],
+        "model_files": [
+          "requests/auth.py"
+        ],
+        "gold_functions": [
+          "requests/auth.py::sha_utf8"
+        ],
+        "model_functions": [
+          "requests/auth.py::sha_utf8"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 76,
+        "files_loaded": 27,
+        "top_scores": [
+          {
+            "path": "requests/utils.py",
+            "score": 51.41
+          },
+          {
+            "path": "requests/packages/urllib3/util.py",
+            "score": 44.25
+          },
+          {
+            "path": "docs/conf.py",
+            "score": 38.22
+          },
+          {
+            "path": "test_requests.py",
+            "score": 37.79
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 37.72
+          },
+          {
+            "path": "requests/packages/urllib3/packages/ssl_match_hostname/_implementation.py",
+            "score": 34.63
+          },
+          {
+            "path": "requests/packages/urllib3/connectionpool.py",
+            "score": 33.45
+          },
+          {
+            "path": "requests/auth.py",
+            "score": 33.35
+          },
+          {
+            "path": "requests/packages/urllib3/poolmanager.py",
+            "score": 31.83
+          },
+          {
+            "path": "requests/cookies.py",
+            "score": 29.38
+          }
+        ]
+      },
+      "patch_first_line": "--- a/requests/auth.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "psf__requests-1766",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 8.04,
+      "loaded_tokens": 2501,
+      "essential_tokens": 570,
+      "raf": 4.39,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 14925,
+        "output_tokens": 682,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/auth.py"
+        ],
+        "model_files": [
+          "requests/auth.py"
+        ],
+        "gold_functions": [
+          "requests/auth.py::sha_utf8"
+        ],
+        "model_functions": [
+          "requests/auth.py::sha_utf8"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/requests/auth.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "psf__requests-2931",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 7.78,
+      "loaded_tokens": 80096,
+      "essential_tokens": 794,
+      "raf": 100.88,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100426,
+        "output_tokens": 784,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::_encode_params",
+          "requests/models.py::prepare_url"
+        ],
+        "model_functions": [
+          "requests/models.py::_encode_params"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 84,
+        "files_loaded": 34,
+        "top_scores": [
+          {
+            "path": "test_requests.py",
+            "score": 36.25
+          },
+          {
+            "path": "requests/__init__.py",
+            "score": 27.87
+          },
+          {
+            "path": "requests/models.py",
+            "score": 27.37
+          },
+          {
+            "path": "requests/utils.py",
+            "score": 25.16
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 24.18
+          },
+          {
+            "path": "requests/api.py",
+            "score": 19.17
+          },
+          {
+            "path": "requests/packages/urllib3/poolmanager.py",
+            "score": 18.78
+          },
+          {
+            "path": "requests/exceptions.py",
+            "score": 18.71
+          },
+          {
+            "path": "requests/packages/__init__.py",
+            "score": 18.43
+          },
+          {
+            "path": "requests/auth.py",
+            "score": 18.03
+          }
+        ]
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 9
+    },
+    {
+      "instance_id": "psf__requests-2931",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 25.05,
+      "loaded_tokens": 4131,
+      "essential_tokens": 794,
+      "raf": 5.2,
+      "tool_calls": 14,
+      "api": {
+        "input_tokens": 61566,
+        "output_tokens": 2480,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::_encode_params",
+          "requests/models.py::prepare_url"
+        ],
+        "model_functions": [
+          "requests/models.py::_encode_params"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 13,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 13
+    },
+    {
+      "instance_id": "psf__requests-1142",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 6.89,
+      "loaded_tokens": 80112,
+      "essential_tokens": 84,
+      "raf": 953.71,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 93830,
+        "output_tokens": 786,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::prepare_content_length"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_body"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 70,
+        "files_loaded": 41,
+        "top_scores": [
+          {
+            "path": "requests/models.py",
+            "score": 30.13
+          },
+          {
+            "path": "requests/packages/urllib3/request.py",
+            "score": 26.44
+          },
+          {
+            "path": "requests/adapters.py",
+            "score": 25.02
+          },
+          {
+            "path": "test_requests.py",
+            "score": 23.1
+          },
+          {
+            "path": "requests/api.py",
+            "score": 21.85
+          },
+          {
+            "path": "requests/utils.py",
+            "score": 19.54
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 19.4
+          },
+          {
+            "path": "requests/packages/urllib3/util.py",
+            "score": 19.39
+          },
+          {
+            "path": "requests/auth.py",
+            "score": 17.42
+          },
+          {
+            "path": "requests/cookies.py",
+            "score": 17.4
+          }
+        ]
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 16
+    },
+    {
+      "instance_id": "psf__requests-1142",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 20.47,
+      "loaded_tokens": 4054,
+      "essential_tokens": 84,
+      "raf": 48.26,
+      "tool_calls": 12,
+      "api": {
+        "input_tokens": 47827,
+        "output_tokens": 1765,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.692,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::prepare_content_length"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_content_length"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 11,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 25
+    },
+    {
+      "instance_id": "psf__requests-1724",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 10.11,
+      "loaded_tokens": 80025,
+      "essential_tokens": 1067,
+      "raf": 75.0,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 96195,
+        "output_tokens": 1509,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "requests/models.py"
+        ],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::<line15>",
+          "requests/sessions.py::request"
+        ],
+        "model_functions": [
+          "requests/models.py::<line21>",
+          "requests/models.py::prepare"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 75,
+        "files_loaded": 31,
+        "top_scores": [
+          {
+            "path": "requests/adapters.py",
+            "score": 96.33
+          },
+          {
+            "path": "test_requests.py",
+            "score": 95.13
+          },
+          {
+            "path": "requests/sessions.py",
+            "score": 87.71
+          },
+          {
+            "path": "requests/packages/urllib3/connectionpool.py",
+            "score": 85.35
+          },
+          {
+            "path": "requests/models.py",
+            "score": 73.52
+          },
+          {
+            "path": "requests/packages/urllib3/request.py",
+            "score": 71.73
+          },
+          {
+            "path": "requests/api.py",
+            "score": 69.1
+          },
+          {
+            "path": "requests/packages/urllib3/poolmanager.py",
+            "score": 64.76
+          },
+          {
+            "path": "requests/packages/urllib3/util.py",
+            "score": 58.87
+          },
+          {
+            "path": "requests/packages/urllib3/contrib/ntlmpool.py",
+            "score": 55.74
+          }
+        ]
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 21
+    },
+    {
+      "instance_id": "psf__requests-1724",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 12.86,
+      "loaded_tokens": 3722,
+      "essential_tokens": 1067,
+      "raf": 3.49,
+      "tool_calls": 9,
+      "api": {
+        "input_tokens": 44882,
+        "output_tokens": 1134,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "requests/models.py"
+        ],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::<line15>",
+          "requests/sessions.py::request"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_method"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 9,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "psf__requests-1921",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 13.89,
+      "loaded_tokens": 2508,
+      "essential_tokens": 194,
+      "raf": 12.93,
+      "tool_calls": 7,
+      "api": {
+        "input_tokens": 26303,
+        "output_tokens": 1101,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::merge_setting"
+        ],
+        "model_functions": [
+          "requests/sessions.py::merge_setting"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 7,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='requests/sessions.py')",
+          "agd_get(ids=['requests-sessions-py--f-merge_setting'])",
+          "agd_get(ids=['requests-sessions-py--c-session--m-prepare_request'])",
+          "read_window(path='requests/sessions.py', start_line=34, end_line=62)",
+          "agd_search(query='def to_key_val_list')",
+          "agd_get(ids=['requests-utils-py--f-to_key_val_list'])",
+          "submit_patch(diff=\u2026494c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 14
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 20.16,
+      "loaded_tokens": 4644,
+      "essential_tokens": 985,
+      "raf": 4.71,
+      "tool_calls": 13,
+      "api": {
+        "input_tokens": 66464,
+        "output_tokens": 1488,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.4,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::<line16>",
+          "requests/sessions.py::request"
+        ],
+        "model_functions": [
+          "requests/sessions.py::request"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 13,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='requests/sessions.py')",
+          "agd_search(query='builtin_str(method)')",
+          "agd_get(ids=['requests-sessions-py--c-session--m-request'])",
+          "agd_search(query='builtin_str')",
+          "agd_search(query='from requests.compat import builtin_str')",
+          "agd_toc(file='requests/compat.py')",
+          "agd_search(query='builtin_str = str')",
+          "read_window(path='requests/sessions.py', start_line=1, end_line=30)",
+          "read_window(path='requests/compat.py', start_line=1, end_line=100)",
+          "read_window(path='requests/compat.py', start_line=100, end_line=160)",
+          "read_window(path='requests/sessions.py', start_line=415, end_line=435)",
+          "agd_get(ids=['requests-utils-py--f-to_native_string'])",
+          "submit_patch(diff=\u2026309c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 17.59,
+      "loaded_tokens": 4862,
+      "essential_tokens": 695,
+      "raf": 7.0,
+      "tool_calls": 7,
+      "api": {
+        "input_tokens": 38718,
+        "output_tokens": 1842,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.462,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::prepare_url"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_url"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 7,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='requests/models.py')",
+          "agd_get(ids=['requests-models-py--c-preparedrequest--m-prepare_url', 're\u2026)",
+          "read_window(path='requests/models.py', start_line=400, end_line=420)",
+          "read_window(path='requests/models.py', start_line=1, end_line=50)",
+          "read_window(path='requests/models.py', start_line=351, end_line=360)",
+          "read_window(path='requests/models.py', start_line=360, end_line=445)",
+          "submit_patch(diff=\u20261068c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 22
+    },
+    {
+      "instance_id": "psf__requests-6028",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 40.05,
+      "loaded_tokens": 8276,
+      "essential_tokens": 206,
+      "raf": 40.17,
+      "tool_calls": 26,
+      "api": {
+        "input_tokens": 205082,
+        "output_tokens": 3057,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "requests/adapters.py"
+        ],
+        "gold_files": [
+          "requests/utils.py"
+        ],
+        "model_files": [
+          "requests/adapters.py"
+        ],
+        "gold_functions": [
+          "requests/utils.py::prepend_scheme_if_needed"
+        ],
+        "model_functions": [
+          "requests/adapters.py::proxy_manager_for"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 22,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='requests/adapters.py')",
+          "agd_toc(file='requests/auth.py')",
+          "agd_search(query='proxy authentication 407')",
+          "agd_search(query='proxy_headers')",
+          "agd_search(query='HTTPProxyAuth')",
+          "agd_search(query='Proxy-Authorization')",
+          "agd_get(ids=['requests-adapters-py--c-httpadapter--m-proxy_headers', 're\u2026)",
+          "agd_get(ids=['requests-auth-py--f-_basic_auth_str'])",
+          "agd_search(query='rebuild_proxies')",
+          "agd_get(ids=['requests-sessions-py--c-sessionredirectmixin--m-rebuild_pr\u2026)",
+          "agd_get(ids=['requests-adapters-py--c-httpadapter--m-send'])",
+          "agd_get(ids=['requests-adapters-py--c-httpadapter--m-add_headers'])",
+          "agd_get(ids=['requests-adapters-py--c-httpadapter--m-proxy_manager_for'])",
+          "agd_search(query='test_proxy_auth')",
+          "agd_get(ids=['tests-test_requests-py--c-testrequests--m-test_proxy_auth'\u2026)",
+          "agd_search(query='get_auth_from_url')",
+          "agd_get(ids=['requests-utils-py--f-get_auth_from_url'])",
+          "read_window(path='requests/adapters.py', start_line=167, end_line=210)",
+          "agd_search(query='proxy_from_url import')",
+          "read_window(path='requests/adapters.py', start_line=1, end_line=60)",
+          "agd_search(query='urldefragauth')",
+          "agd_get(ids=['requests-utils-py--f-urldefragauth'])",
+          "read_window(path='requests/adapters.py', start_line=192, end_line=203)",
+          "read_window(path='requests/adapters.py', start_line=181, end_line=191)",
+          "read_window(path='requests/adapters.py', start_line=160, end_line=203)",
+          "submit_patch(diff=\u2026448c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/adapters.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "psf__requests-1766",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 43.15,
+      "loaded_tokens": 2832,
+      "essential_tokens": 570,
+      "raf": 4.97,
+      "tool_calls": 7,
+      "api": {
+        "input_tokens": 19299,
+        "output_tokens": 811,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/auth.py"
+        ],
+        "model_files": [
+          "requests/auth.py"
+        ],
+        "gold_functions": [
+          "requests/auth.py::sha_utf8"
+        ],
+        "model_functions": [
+          "requests/auth.py::sha_utf8"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_search(query='qop')",
+          "agd_search(query='Digest Auth')",
+          "agd_get(ids=['requests-auth-py--c-httpdigestauth'])",
+          "agd_toc(file='requests/auth.py')",
+          "read_window(path='requests/auth.py', start_line=140, end_line=160)",
+          "agd_search(query='qop=')",
+          "submit_patch(diff=\u2026372c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/auth.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "psf__requests-2931",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 13.49,
+      "loaded_tokens": 2757,
+      "essential_tokens": 794,
+      "raf": 3.47,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 18496,
+        "output_tokens": 1012,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::_encode_params",
+          "requests/models.py::prepare_url"
+        ],
+        "model_functions": [
+          "requests/models.py::_encode_params"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_search(query='to_native_string')",
+          "agd_search(query='binary payload')",
+          "agd_get(ids=['requests-utils-py--f-to_native_string', 'requests-models-p\u2026)",
+          "read_window(path='requests/models.py', start_line=52, end_line=110)",
+          "read_window(path='requests/utils.py', start_line=686, end_line=702)",
+          "submit_patch(diff=\u2026334c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "psf__requests-1142",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 33.0,
+      "loaded_tokens": 10084,
+      "essential_tokens": 84,
+      "raf": 120.05,
+      "tool_calls": 18,
+      "api": {
+        "input_tokens": 164222,
+        "output_tokens": 2853,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.846,
+        "off_target_files": [],
+        "gold_files": [
+          "requests/models.py"
+        ],
+        "model_files": [
+          "requests/models.py"
+        ],
+        "gold_functions": [
+          "requests/models.py::prepare_content_length"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_content_length"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 18,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc()",
+          "agd_search(query='content-length', ignore_case=True)",
+          "agd_get(ids=['requests-models-py--c-preparedrequest--m-prepare_content_l\u2026)",
+          "agd_get(ids=['requests-models-py--c-preparedrequest--m-prepare'])",
+          "agd_toc(file='requests/models.py')",
+          "agd_backlinks(id='requests-models-py--c-preparedrequest--m-prepare_body')",
+          "agd_get(ids=['requests-models-py--c-request--m-prepare'])",
+          "agd_search(query='def request', ignore_case=True)",
+          "agd_get(ids=['requests-sessions-py--c-session--m-request'])",
+          "read_window(path='requests/models.py', start_line=332, end_line=395)",
+          "agd_get(ids=['requests-api-py--f-get'])",
+          "agd_search(query='def get', ignore_case=True)",
+          "agd_toc(file='requests/sessions.py')",
+          "agd_get(ids=['requests-sessions-py--c-session--m-get'])",
+          "read_window(path='requests/models.py', start_line=1, end_line=50)",
+          "read_window(path='requests/models.py', start_line=360, end_line=400)",
+          "read_window(path='requests/models.py', start_line=332, end_line=405)",
+          "submit_patch(diff=\u2026879c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/models.py",
+      "patch_lines": 22
+    },
+    {
+      "instance_id": "psf__requests-1724",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 79.53,
+      "loaded_tokens": 8385,
+      "essential_tokens": 1067,
+      "raf": 7.86,
+      "tool_calls": 21,
+      "api": {
+        "input_tokens": 198456,
+        "output_tokens": 3200,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.206,
+        "off_target_files": [
+          "requests/models.py"
+        ],
+        "gold_files": [
+          "requests/sessions.py"
+        ],
+        "model_files": [
+          "requests/models.py",
+          "requests/sessions.py"
+        ],
+        "gold_functions": [
+          "requests/sessions.py::<line15>",
+          "requests/sessions.py::request"
+        ],
+        "model_functions": [
+          "requests/models.py::prepare_method",
+          "requests/sessions.py::<line19>",
+          "requests/sessions.py::prepare_request",
+          "requests/sessions.py::request"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 21,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='requests/sessions.py')",
+          "agd_get(ids=['requests-sessions-py--c-session--m-prepare_request'])",
+          "read_window(path='requests/sessions.py', start_line=245, end_line=260)",
+          "agd_search(query='method.upper()')",
+          "agd_get(ids=['requests-models-py--c-preparedrequest--m-prepare_method'])",
+          "agd_get(ids=['requests-sessions-py--c-session--m-request'])",
+          "agd_toc(file='requests/api.py')",
+          "agd_search(query='from __future__ import')",
+          "agd_search(query='import sys')",
+          "read_window(path='requests/sessions.py', start_line=1, end_line=50)",
+          "read_window(path='requests/compat.py', start_line=1, end_line=50)",
+          "read_window(path='requests/compat.py', start_line=50, end_line=150)",
+          "read_window(path='requests/sessions.py', start_line=255, end_line=270)",
+          "read_window(path='requests/sessions.py', start_line=310, end_line=325)",
+          "read_window(path='requests/models.py', start_line=1, end_line=40)",
+          "read_window(path='requests/sessions.py', start_line=1, end_line=30)",
+          "agd_search(query='builtin_str')",
+          "agd_get(ids=['requests-utils-py--f-to_native_string'])",
+          "read_window(path='requests/sessions.py', start_line=14, end_line=26)",
+          "read_window(path='requests/models.py', start_line=304, end_line=315)",
+          "submit_patch(diff=\u20261647c)"
+        ]
+      },
+      "patch_first_line": "--- a/requests/sessions.py",
+      "patch_lines": 42
+    }
+  ],
+  "adapters_note": "agd-graph rows are v2 (with file-scoped TOC, read_window, lineno=)"
+}
