@@ -19,6 +19,8 @@ The `agd` CLI binary is located via $AGD_BIN, defaulting to
 from __future__ import annotations
 
 import asyncio
+import contextlib
+import fcntl
 import json
 import os
 import subprocess
@@ -30,6 +32,40 @@ from mcp.types import TextContent, Tool
 
 
 AGD_BIN = Path(os.environ.get("AGD_BIN", str(Path.home() / ".cargo/bin/agd")))
+
+
+def _reject_unfencable(content: str) -> str | None:
+    """Return None if `content` is safe to embed in a `~~~`-fenced AGD body.
+    Otherwise return a human-readable reason. The AGD format closes a fence
+    at the first line equal exactly to `~~~`, so any standalone `~~~` line
+    inside the body would corrupt the file on round-trip."""
+    for i, line in enumerate(content.split("\n"), start=1):
+        if line == "~~~":
+            return (
+                f"content contains a standalone `~~~` line (line {i}) which "
+                "would close the fence prematurely and corrupt the file. "
+                "Reword the body so no line is exactly `~~~` (e.g. add "
+                "leading whitespace, or use a different separator)."
+            )
+    return None
+
+
+@contextlib.contextmanager
+def _exclusive_lock(path: Path):
+    """Hold an exclusive flock on a sibling lockfile for the duration of
+    the read-modify-write cycle. Prevents lost updates when several MCP
+    server processes (one per Claude Code session) call save() at once."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lockfile = path.with_suffix(path.suffix + ".lock")
+    fd = os.open(str(lockfile), os.O_RDWR | os.O_CREAT, 0o644)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+        finally:
+            os.close(fd)
 
 
 def memory_path() -> Path:
@@ -257,62 +293,61 @@ async def _call_tool(name: str, arguments: dict | None) -> list[TextContent]:
         block_id = arguments["id"].lstrip("#")
         content = arguments["content"]
 
-        # Build attrs: include desc only if explicitly given. When updating
-        # an existing entry without a new desc, preserve the previous one
-        # by reading it back via JSON parse.
+        reason = _reject_unfencable(content)
+        if reason is not None:
+            return [TextContent(type="text", text=f"save rejected: {reason}")]
+
         desc = arguments.get("desc")
         attrs = {}
         if desc:
             attrs["desc"] = desc
 
-        existing_ids_raw = _run([str(AGD_BIN), "ids", str(mem)]).strip().splitlines()
-        # ids output is "id\tdesc" or just "id" — split to get just the id
-        existing_ids = [line.split("\t", 1)[0] for line in existing_ids_raw]
+        with _exclusive_lock(mem):
+            existing_ids_raw = _run([str(AGD_BIN), "ids", str(mem)]).strip().splitlines()
+            existing_ids = [line.split("\t", 1)[0] for line in existing_ids_raw]
 
-        # If we're replacing and no new desc was passed, preserve the existing one.
-        if block_id in existing_ids and not desc:
-            try:
-                existing_json = _run([str(AGD_BIN), "get", str(mem), f"#{block_id}", "--json"])
-                existing_block = json.loads(existing_json)
-                if isinstance(existing_block, list) and existing_block:
-                    existing_block = existing_block[0]
-                old_desc = (existing_block.get("attrs") or {}).get("desc")
-                if old_desc:
-                    attrs["desc"] = old_desc
-            except Exception:
-                pass
+            if block_id in existing_ids and not desc:
+                try:
+                    existing_json = _run([str(AGD_BIN), "get", str(mem), f"#{block_id}", "--json"])
+                    existing_block = json.loads(existing_json)
+                    if isinstance(existing_block, list) and existing_block:
+                        existing_block = existing_block[0]
+                    old_desc = (existing_block.get("attrs") or {}).get("desc")
+                    if old_desc:
+                        attrs["desc"] = old_desc
+                except Exception:
+                    pass
 
-        block = {
-            "kind": kind,
-            "attrs": attrs,
-            "id": block_id,
-            "content": {"type": "fenced", "value": content},
-        }
+            block = {
+                "kind": kind,
+                "attrs": attrs,
+                "id": block_id,
+                "content": {"type": "fenced", "value": content},
+            }
 
-        if block_id in existing_ids:
-            op = {"op": "replace", "id": block_id, "with": block}
-            verb = "updated"
-        else:
-            kind_short = kind.removeprefix("x-")
-            heading_id = f"h-{kind_short}"
-            if heading_id in existing_ids:
-                op = {"op": "insert_after", "id": heading_id, "block": block}
+            if block_id in existing_ids:
+                op = {"op": "replace", "id": block_id, "with": block}
+                verb = "updated"
             else:
-                # Fallback: append after root
-                op = {"op": "insert_after", "id": "root", "block": block}
-            verb = "added"
+                kind_short = kind.removeprefix("x-")
+                heading_id = f"h-{kind_short}"
+                if heading_id in existing_ids:
+                    op = {"op": "insert_after", "id": heading_id, "block": block}
+                else:
+                    op = {"op": "insert_after", "id": "root", "block": block}
+                verb = "added"
 
-        try:
-            _run([str(AGD_BIN), "edit", str(mem), "--op", json.dumps(op), "-i"])
-            return [TextContent(
-                type="text",
-                text=f"{verb} #{block_id} ({kind}) in {mem.name}",
-            )]
-        except subprocess.CalledProcessError as e:
-            return [TextContent(
-                type="text",
-                text=f"save failed: {e.stderr.strip()}",
-            )]
+            try:
+                _run([str(AGD_BIN), "edit", str(mem), "--op", json.dumps(op), "-i"])
+                return [TextContent(
+                    type="text",
+                    text=f"{verb} #{block_id} ({kind}) in {mem.name}",
+                )]
+            except subprocess.CalledProcessError as e:
+                return [TextContent(
+                    type="text",
+                    text=f"save failed: {e.stderr.strip()}",
+                )]
 
     return [TextContent(type="text", text=f"unknown tool: {name}")]
 
