@@ -1,313 +1,314 @@
 # agd-memory benchmarks
 
-Benchmark per l'**addressable memory layer** del plugin
-[agd-memory](../README.md). La domanda non è "AGD batte markdown sui
-tokens": è **"quando posso indirizzare un blocco di memoria per
-nome, quanto risparmio rispetto al caricarmi tutto?"**
+Benchmarks for the **addressable memory layer** behind the
+[agd-memory](../README.md) plugin. The question this folder answers
+is not "does AGD beat markdown on token count": it is **"when I can
+address a memory block by name, how much do I save versus loading
+the whole file?"**
 
-Quattro misure complementari:
+Four complementary measures:
 
-1. **Token shipped** (S0–S5): quanti token finiscono nel prompt.
-2. **Backlink fan-in** (S6): quando il graph esplode contro di te.
-3. **Soldi reali** (S7): chiamate Anthropic API vere, con prompt
-   cache, su Haiku 4.5.
-4. **Latenza CLI**: il costo di parsing di `agd` rispetto a I/O.
+1. **Tokens shipped** (S0–S5): how many tokens enter the prompt.
+2. **Backlink fan-in** (S6): when the graph turns against you.
+3. **Real dollars** (S7): actual Anthropic API calls, prompt cache
+   on, Haiku 4.5.
+4. **CLI latency**: parsing overhead of `agd` versus raw I/O.
 
-I numeri vengono dall'esecuzione effettiva. Niente formule, niente
-mock: `agd` lanciato come subprocess, stdout tokenizzato; per S7,
-`messages.create` chiamata vera, `usage` letto dalla risposta.
+The numbers come from real execution. No formulas, no mocking:
+`agd` is invoked as a subprocess and its stdout is tokenized; for
+S7, `messages.create` is called for real and `usage` is read off
+the response.
 
 ## TL;DR
 
-Su un corpus sintetico di 200 blocchi (~18k token whole-doc):
+On a synthetic 200-block corpus (~18k tokens whole-doc):
 
-| metrica | numero | dove |
+| metric | result | section |
 |---|---:|---|
-| TOC + 1 blocco vs whole-doc, in token | **7,9× meno** | §S1 |
-| 10 agenti shared-TOC vs naive, in token | **45,7× meno** | §S2 |
-| Filtro `--kind x-project`, in token | **25,1× meno** | §S4 |
-| Selective vs whole-doc cached, in **dollari reali** (5 turni Haiku) | **2,15× meno** | §S7 |
-| Backlink explosion: anchor con 200 fan-in | **81% del file** | §S6 |
+| TOC + 1 block vs whole-doc, in tokens | **7.9× cheaper** | §S1 |
+| 10 agents shared-TOC vs naive, in tokens | **45.7× cheaper** | §S2 |
+| `--kind x-project` filter, in tokens | **25.1× cheaper** | §S4 |
+| Selective vs whole-doc cached, in **real dollars** (5-turn Haiku) | **2.15× cheaper** | §S7 |
+| Backlink explosion: anchor with 200 fan-in | **81% of the file** | §S6 |
 
-**Tre cose da dire chiare prima di citare i numeri:**
+**Three caveats to read before quoting any number:**
 
-1. **Sul file reale** (31 blocchi, MDF2) il rapporto TOC/whole è
-   **6,4×**, non 8×. I sintetici hanno varianza zero — il reale ha
-   `desc=` lunghi che gonfiano il TOC. §S0.
-2. **Token ≠ soldi.** S3 dice 3,4× a token grezzi; con prompt cache
-   reale il vantaggio scende a **2,15×** in $ (§S7). Comunica i
-   numeri token solo quando hai detto "non incluso prompt cache".
-3. **Multi-agente non è gratis.** Il 45,7× di S2 richiede che il
-   parent orchestri esplicitamente le slice. Subagent Claude Code
-   di default girano "independent" (~7,5×), non "shared" (45×).
+1. **On the real file** (31 blocks, MDF2) the TOC/whole ratio is
+   **6.4×**, not 8×. Synthetic corpora have zero variance — real
+   ones have long `desc=` fields that inflate the TOC. See §S0.
+2. **Tokens ≠ dollars.** S3 reports 3.4× in raw tokens; with real
+   prompt caching the dollar advantage drops to **2.15×** (§S7).
+   Always state which axis you are quoting.
+3. **Multi-agent is not free.** The 45.7× of S2 requires the
+   parent to orchestrate slices explicitly. Default Claude Code
+   subagents run "independent" (~7.5×), not "shared" (45×).
 
-## S0 — sintetico vs reale
+## S0 — synthetic vs real
 
-| corpus | blocchi | whole-doc | TOC | rapporto |
+| corpus | blocks | whole-doc | TOC | ratio |
 |---|---:|---:|---:|---:|
-| sintetico mem-50 | 50 | 4.446 | 541 | **8,2×** |
-| reale memory.agd MDF2 | 31 | 4.790 | 748 | **6,4×** |
+| synthetic mem-50 | 50 | 4,446 | 541 | **8.2×** |
+| real memory.agd (MDF2) | 31 | 4,790 | 748 | **6.4×** |
 
-Il sintetico è ~28% più ottimista. Quando si pubblica un numero su
-file reali, **5–7×** è la fascia onesta a parità di size.
+The synthetic is ~28% more optimistic. When publishing a number
+measured on real files, **5–7×** is the honest band at this size.
 
-## S1 — agente singolo, quattro size
+## S1 — single agent, four sizes
 
-| blocchi | whole-doc | TOC | TOC + 1 | TOC + 3 | rapporto TOC | rapporto TOC+3 |
+| blocks | whole-doc | TOC | TOC + 1 | TOC + 3 | TOC ratio | TOC+3 ratio |
 |---:|---:|---:|---:|---:|---:|---:|
-| 10 | 915 | 104 | 172 | 381 | 8,8× | 2,4× |
-| 50 | 4.446 | 541 | 650 | 770 | 8,2× | 5,8× |
-| 200 | 18.245 | 2.233 | 2.313 | 2.535 | 8,2× | 7,2× |
-| 1.000 | 90.428 | 11.152 | 11.246 | 11.394 | 8,1× | **7,9×** |
+| 10 | 915 | 104 | 172 | 381 | 8.8× | 2.4× |
+| 50 | 4,446 | 541 | 650 | 770 | 8.2× | 5.8× |
+| 200 | 18,245 | 2,233 | 2,313 | 2,535 | 8.2× | 7.2× |
+| 1,000 | 90,428 | 11,152 | 11,246 | 11,394 | 8.1× | **7.9×** |
 
-Più grande il file, più conviene la lettura selettiva. A 1k blocchi
-prendere un blocco specifico costa lo 0,18% in più del solo TOC.
+The bigger the file, the better selective retrieval looks. At 1k
+blocks, fetching one specific block on top of the TOC costs 0.18%
+more than the TOC alone.
 
-## S2 — N agenti paralleli
+## S2 — N parallel agents
 
-Corpus 200 blocchi. Ogni agente prende 1–3 blocchi a caso.
+200-block corpus. Each agent picks 1–3 random blocks.
 
-| agenti | naive | independent | shared TOC | shared vs naive |
+| agents | naive | independent | shared TOC | shared vs naive |
 |---:|---:|---:|---:|---:|
-| 1 | 18.245 | 2.346 | 2.346 | 7,8× |
-| 3 | 54.735 | 7.247 | 2.781 | 19,7× |
-| 5 | 91.225 | 12.086 | 3.154 | 28,9× |
-| 10 | 182.450 | 24.093 | 3.996 | **45,7×** |
-| 20 | 364.900 | 48.217 | 5.790 | **63,0×** |
+| 1 | 18,245 | 2,346 | 2,346 | 7.8× |
+| 3 | 54,735 | 7,247 | 2,781 | 19.7× |
+| 5 | 91,225 | 12,086 | 3,154 | 28.9× |
+| 10 | 182,450 | 24,093 | 3,996 | **45.7×** |
+| 20 | 364,900 | 48,217 | 5,790 | **63.0×** |
 
-**Nota architetturale.** "Shared TOC" = il padre legge il TOC una
-volta e dispatcha ai figli solo le slice di blocchi che servono.
-**Non è il default di Claude Code.** Lanciando `Agent` tool ognuno
-ha il proprio contesto e fa retrieval indipendente — quindi sei
-sulla riga "independent" (7,5×), non "shared" (45×). Per arrivare a
-45× serve scrivere apposta l'orchestrazione parent-figli.
+**Architectural note.** "Shared TOC" = the parent reads the TOC
+once and dispatches only the relevant block slices to each child.
+**This is not Claude Code's default.** When you launch the `Agent`
+tool, each child gets its own context and runs retrieval
+independently — so out of the box you sit on the "independent"
+row (7.5×), not the "shared" row (45×). Reaching 45× requires
+hand-written parent-child orchestration.
 
-## S3 — sessione multi-turn (token grezzi)
+## S3 — multi-turn session (raw tokens)
 
-20 turni sullo stesso corpus 200, ogni turno 1–2 blocchi diversi.
+20 turns on the same 200-block corpus, each turn needing 1–2
+different blocks.
 
-| turni | whole-doc tenuto | selective cumulativo | per-turn medio | rapporto token |
+| turns | whole-doc kept | selective cumulative | per-turn avg | token ratio |
 |---:|---:|---:|---:|---:|
-| 20 | 18.245 | 5.297 | 153 | **3,4×** |
+| 20 | 18,245 | 5,297 | 153 | **3.4×** |
 
-**In token grezzi** selective vince 3,4×. **In dollari reali** vince
-2,15× (vedi §S7). Cita sempre la metrica giusta per il contesto.
+**In raw tokens** selective wins 3.4×. **In real dollars** it wins
+2.15× (see §S7). Always quote the right metric for the question.
 
-## S4 — filtro per `--kind`
+## S4 — `--kind` scoping
 
-| contesto | kinds | whole-doc | TOC scoped | rapporto |
+| context | kinds | whole-doc | scoped TOC | ratio |
 |---|---|---:|---:|---:|
-| blog-write | `x-user,x-feedback` | 18.245 | 1.157 | 15,8× |
-| code-review | `x-feedback,x-reference` | 18.245 | 1.340 | 13,6× |
-| project-status | `x-project` | 18.245 | 726 | **25,1×** |
+| blog-write | `x-user,x-feedback` | 18,245 | 1,157 | 15.8× |
+| code-review | `x-feedback,x-reference` | 18,245 | 1,340 | 13.6× |
+| project-status | `x-project` | 18,245 | 726 | **25.1×** |
 
-Filtro per categoria = modo più economico per scoprare una sessione
-prima ancora di entrare nel contenuto.
+`--kind` filtering is the cheapest way to scope a session before
+even looking at content.
 
-## S5 — addressable memory: cosa vuol dire pagare l'indirizzabilità
+## S5 — addressable memory: what does it cost?
 
-Il pitch di AGD non è "sostituire markdown". È: **se serve poter
-chiamare un blocco per nome e ottenerlo isolato dal resto, qual è
-il costo di quella capacità?**
+The pitch for AGD is not "replace markdown". It is: **when you
+need to call a memory block by name and get it isolated from the
+rest, what does that capability cost?**
 
-Stesso contenuto del corpus 200, tre rappresentazioni:
+Same content as the 200-block corpus, three representations:
 
-| formato | whole-doc | id-list | fetch selettivo | indirizzabile? |
+| format | whole-doc | id-list | selective fetch | addressable? |
 |---|---:|---:|---:|:---:|
-| **Markdown** | **14.342** | — | 14.342 (= whole) | ✗ |
-| **AGD** | 18.245 | 2.233 | 2.340 | ✓ |
-| **XML** | 20.163 | 2.229 | 2.345 | ✓ |
+| **Markdown** | **14,342** | — | 14,342 (= whole) | ✗ |
+| **AGD** | 18,245 | 2,233 | 2,340 | ✓ |
+| **XML** | 20,163 | 2,229 | 2,345 | ✓ |
 
-**Lettura corretta.** Markdown è il **27% più piccolo** sul
-whole-doc — è il formato vincente *se* la memoria è abbastanza
-piccola da starci tutta in contesto e non hai bisogno di
-indirizzarla. Sopra una certa size questo non è più vero, e
-markdown collassa: senza ID per blocco, l'unica strategia è
-caricare tutto.
+**The honest reading.** Markdown is **27% smaller** on whole-doc
+load — it is the winning format *if* the memory fits in context
+and you do not need to address it. Past a certain size that breaks:
+without per-block IDs, the only strategy is loading everything.
 
-AGD e XML sono entrambi indirizzabili. La differenza tra i due è
-del **10,5% sul whole-doc** (markup tag) e **trascurabile sul
-fetch selettivo** (~5 token su ~2.300). Il vantaggio di AGD su XML
-in tokens è marginale — la differenza vera è in **scrittura
-umana**: prefisso di riga + ID tra parentesi quadre vs aprire e
-chiudere tag.
+AGD and XML are both addressable. The gap between them is **10.5%
+on whole-doc** (tag overhead) and **negligible on selective fetch**
+(~5 tokens out of ~2,300). AGD's token edge over XML is marginal —
+the actual difference is **human ergonomics**: line prefix + ID in
+brackets vs open/close tags everywhere.
 
-**Quindi: AGD non vince contro markdown. Vince contro "memoria non
-indirizzabile". Markdown smette di essere un'alternativa quando il
-file diventa troppo grande per stargli dentro.**
+**So: AGD does not beat markdown on tokens. It beats "non-addressable
+memory". Markdown stops being an alternative once the file no
+longer fits in context.**
 
 ## S6 — backlink explosion
 
-`agd get '#anchor' --with-backlinks` restituisce l'anchor più tutti
-i blocchi che dichiarano `refs="#anchor"`. Pattern utile, ma scala
-linearmente nel fan-in. Cosa succede su un anchor "popolare"?
+`agd get '#anchor' --with-backlinks` returns the anchor plus every
+block declaring `refs="#anchor"`. Useful pattern, but it scales
+linearly in fan-in. What happens on a popular anchor?
 
-| inbound refs | anchor da solo | anchor + backlinks | fan-in vs anchor | % del whole-doc |
+| inbound refs | anchor alone | anchor + backlinks | fan-in vs anchor | % of whole-doc |
 |---:|---:|---:|---:|---:|
 | 5 | 33 | 505 | 15× | **3%** |
-| 50 | 33 | 4.804 | 146× | **26%** |
-| 200 | 33 | 19.246 | 583× | **81%** |
+| 50 | 33 | 4,804 | 146× | **26%** |
+| 200 | 33 | 19,246 | 583× | **81%** |
 
-A 200 backlink stai praticamente caricando il file intero via la
-porta di servizio. Il vantaggio "selettivo" è scomparso.
+At 200 backlinks you are loading the file via the side door. The
+"selective" advantage is gone.
 
-**Implicazione pratica.** Per anchor con fan-in alto serve un
-meccanismo `--limit` o paginazione (oggi assente). Senza, il pattern
-"scope query con `--with-backlinks`" diventa pericoloso man mano
-che la memoria cresce e certi blocchi diventano hub.
+**Practical implication.** High-fan-in anchors need a `--limit` or
+pagination mechanism (currently absent). Without it, the "scope
+query with `--with-backlinks`" pattern becomes dangerous as the
+memory grows and certain blocks become hubs.
 
-## S7 — soldi reali con Anthropic API
+## S7 — real money via Anthropic API
 
-`scripts/bench_cost.py` fa chiamate API vere a `claude-haiku-4-5`
-con prompt caching attivo, registra `cache_creation_input_tokens`,
-`cache_read_input_tokens`, `input_tokens`, `output_tokens` dal
-campo `usage` della risposta, e li prezza al listino pubblico
-(input $1/M, cache write $1,25/M, cache read $0,10/M, output $5/M).
+`scripts/bench_cost.py` makes real API calls to `claude-haiku-4-5`
+with prompt caching on, records `cache_creation_input_tokens`,
+`cache_read_input_tokens`, `input_tokens`, `output_tokens` from
+the response `usage` field, and prices them at the published list
+(input $1/M, cache write $1.25/M, cache read $0.10/M, output
+$5/M).
 
-5 turni sullo stesso corpus 200, stesse domande in entrambe le
-strategie:
+5 turns on the 200-block corpus, same questions on both sides:
 
-### Strategia A — whole-doc cached
+### Strategy A — whole-doc cached
 
-| turno | input | cache write | cache read | output | $ |
+| turn | input | cache write | cache read | output | $ |
 |---:|---:|---:|---:|---:|---:|
-| 1 | 45 | **20.041** | 0 | 120 | $0,0257 |
-| 2 | 45 | 0 | 20.041 | 119 | $0,0026 |
-| 3 | 45 | 0 | 20.041 | 120 | $0,0026 |
-| 4 | 45 | 0 | 20.041 | 120 | $0,0026 |
-| 5 | 45 | 0 | 20.041 | 120 | $0,0026 |
-| **tot** | 225 | 20.041 | 80.164 | 599 | **$0,0363** |
+| 1 | 45 | **20,041** | 0 | 120 | $0.0257 |
+| 2 | 45 | 0 | 20,041 | 119 | $0.0026 |
+| 3 | 45 | 0 | 20,041 | 120 | $0.0026 |
+| 4 | 45 | 0 | 20,041 | 120 | $0.0026 |
+| 5 | 45 | 0 | 20,041 | 120 | $0.0026 |
+| **total** | 225 | 20,041 | 80,164 | 599 | **$0.0363** |
 
-Latenza media: **1,85 s/turno**.
+Average latency: **1.85 s/turn**.
 
-### Strategia B — selective uncached
+### Strategy B — selective uncached
 
-| turno | input | output | $ |
+| turn | input | output | $ |
 |---:|---:|---:|---:|
-| 1 | 2.923 | 66 | $0,0033 |
-| 2 | 2.922 | 98 | $0,0034 |
-| 3 | 2.882 | 86 | $0,0033 |
-| 4 | 2.931 | 119 | $0,0035 |
-| 5 | 2.876 | 97 | $0,0034 |
-| **tot** | 14.534 | 466 | **$0,0169** |
+| 1 | 2,923 | 66 | $0.0033 |
+| 2 | 2,922 | 98 | $0.0034 |
+| 3 | 2,882 | 86 | $0.0033 |
+| 4 | 2,931 | 119 | $0.0035 |
+| 5 | 2,876 | 97 | $0.0034 |
+| **total** | 14,534 | 466 | **$0.0169** |
 
-Latenza media: **1,87 s/turno**.
+Average latency: **1.87 s/turn**.
 
-### Verdetto onesto
+### The honest verdict
 
-| dimensione | whole-doc cached | selective uncached | rapporto |
+| dimension | whole-doc cached | selective uncached | ratio |
 |---|---:|---:|---:|
-| token shipped (visibili al modello) | 100.205 | 14.534 | 6,9× |
-| **dollari reali** | $0,0363 | $0,0169 | **2,15×** |
-| latenza media | 1,85 s | 1,87 s | ≈ |
+| tokens shipped (visible to model) | 100,205 | 14,534 | 6.9× |
+| **real dollars** | $0.0363 | $0.0169 | **2.15×** |
+| average latency | 1.85 s | 1.87 s | ≈ |
 
-Il prompt cache **claws back ~70%** del vantaggio in token: in $
-selective vince ancora ma di poco più del doppio, non di un fattore
-sette.
+The prompt cache **claws back ~70%** of the token-level advantage.
+In dollars, selective still wins, but by just over 2× — not by 7×.
 
-**Crossover.** Estrapolando linearmente (write una volta, reads
-costanti, selective lineare in N), su questo corpus la strategia
-A diventa più economica della B intorno al **turno ~30**, *a patto
-che la cache resti calda*. La cache TTL default è 5 minuti: se
-intervalli tra turni superano i 5 min, A paga di nuovo il write
-(~$0,025) e B torna a vincere indefinitamente.
+**Crossover.** Linearly extrapolating (one write, constant reads,
+linear selective), Strategy A becomes cheaper than B around
+**turn ~30**, *as long as the cache stays warm*. Default cache TTL
+is 5 minutes: if turn intervals exceed 5 min, A pays the write
+again (~$0.025) and B wins indefinitely.
 
-**Latenza.** Identica entro il rumore. Per Haiku 4.5 a queste size
-di prompt il tempo è dominato dalla generazione output, non dal
-processing input. Su Sonnet/Opus o su contesti molto più grandi
-(>50k token) la differenza si vedrebbe.
+**Latency.** Identical within noise. For Haiku 4.5 at these prompt
+sizes, time is dominated by output generation, not input
+processing. On Sonnet/Opus or much larger contexts (>50k tokens)
+the gap would show up.
 
-## Concurrency model — cosa intende AGD per "multi-agent safe"
+## Concurrency model — what AGD means by "multi-agent safe"
 
-Per evitare aspettative sbagliate dopo aver visto S2:
+To prevent wrong expectations after reading S2:
 
-- **Atomic writes**: ogni edit è scritto su file temporaneo +
-  rinominato. File mai corrotto a metà.
-- **`flock` advisory**: scritture concorrenti serializzate via
-  lock di sistema operativo. Non c'è merge, c'è coda.
-- **Last-write-wins per ID**: due agenti che scrivono lo stesso
-  blocco — l'ultimo che ottiene il lock vince. Il primo viene
-  perso senza conflict marker.
+- **Atomic writes**: every edit is written to a tempfile and
+  renamed in. The file is never half-corrupted.
+- **`flock` advisory**: concurrent writes are serialized by an OS
+  lock. There is no merge — there is a queue.
+- **Last-write-wins per ID**: if two agents write the same block,
+  whichever gets the lock last wins. The first write is lost
+  silently, with no conflict marker.
 
-Quello che AGD **non** è:
+What AGD is **not**:
 
 - ✗ CRDT
-- ✗ merge automatico tra versioni divergenti
+- ✗ automatic merge across diverging versions
 - ✗ distributed consistency
-- ✗ vector clock / causal ordering
+- ✗ vector clocks / causal ordering
 
-Se serve coordinare K agenti che modificano stessi blocchi
-contemporaneamente, AGD da solo non basta — serve uno scheduler a
-monte.
+If you need to coordinate K agents editing the same blocks
+simultaneously, AGD alone is not enough — you need an upstream
+scheduler.
 
-## Latenza del CLI
+## CLI latency
 
-Mediana di 20 esecuzioni sul corpus 1.000 blocchi (~310KB):
+Median of 20 runs on the 1,000-block corpus (~310KB):
 
-| operazione | tempo |
+| operation | time |
 |---|---:|
-| `agd ids` | 22,5 ms |
-| `agd ids --kind` | 21,4 ms |
-| `agd get` 1 blocco | 21,0 ms |
-| `cat` (I/O baseline) | 16,7 ms |
+| `agd ids` | 22.5 ms |
+| `agd ids --kind` | 21.4 ms |
+| `agd get` 1 block | 21.0 ms |
+| `cat` (I/O baseline) | 16.7 ms |
 
-`agd` aggiunge ~5 ms di parsing sopra l'I/O. Trascurabile davanti
-a una chiamata LLM (1–5 s).
+`agd` adds ~5 ms of parsing on top of I/O. Negligible compared to
+an LLM round-trip (1–5 s).
 
-## Limiti noti
+## Known limitations
 
-- **Corpora sintetici**. Body da pool fisso di 8 stringhe lorem.
-  Varianza ~30% inferiore al reale. I rapporti sono ottimistici di
-  pari misura.
-- **`tiktoken` ≠ tokenizer Claude**. Proxy stabile in rapporto, non
-  in conteggio assoluto. S7 usa l'API: lì i numeri sono esatti.
-- **S7 su Haiku 4.5**. Su Sonnet/Opus le ratio sarebbero diverse:
-  costi base più alti rendono ogni token risparmiato più prezioso.
-  Su modelli senza prompt caching la strategia A perde sempre.
-- **Multi-agente simulato (S2)**. Conta token come job indipendenti.
-  Nessuna simulazione di overhead framework, dispatch latency,
-  serializzazione subagent.
-- **XML idealizzato (S5)**. Schema compatto. HTML reale (`<div
-  class="block">`) sarebbe ~30% più verboso e farebbe peggiorare
-  ulteriormente il confronto contro AGD.
-- **Backlink explosion non mitigata (S6)**. `agd` non ha ancora
-  `--limit` né paginazione: il pattern `--with-backlinks` non
-  protegge contro hub ad alto fan-in.
+- **Synthetic corpora**. Bodies are drawn from a fixed pool of 8
+  lorem strings. Variance ~30% lower than real files. Ratios are
+  optimistic by the same amount.
+- **`tiktoken` ≠ Claude tokenizer**. Stable proxy in ratio, not in
+  absolute count. S7 uses the API directly: those numbers are
+  exact.
+- **S7 is on Haiku 4.5**. On Sonnet/Opus the ratios would change:
+  higher base cost makes every saved token more valuable. On
+  models without prompt caching, Strategy A always loses.
+- **Simulated multi-agent (S2)**. Counts tokens as if each agent
+  were an independent job. No simulation of framework overhead,
+  dispatch latency, or subagent serialization.
+- **Idealized XML (S5)**. Compact schema. Realistic HTML (`<div
+  class="block">`) would be ~30% more verbose and would tilt the
+  comparison further away from AGD.
+- **Backlink explosion not mitigated (S6)**. `agd` lacks `--limit`
+  or pagination; the `--with-backlinks` pattern offers no
+  protection against high-fan-in hubs.
 
-## Riprodurre
+## Reproducing
 
 ```sh
 cd benchmarks
 pip install tiktoken anthropic
 
-# scenari token-only (S0-S6, latenza)
+# token-only scenarios (S0–S6, latency)
 python3 scripts/generate.py --out corpora/mem-200.agd --blocks 200 --seed 42
 python3 scripts/generate.py --out corpora/anchor-fanin-050.agd \
   --blocks 200 --anchor-inbound 50 --seed 42
 python3 scripts/bench.py --real-memory ~/path/to/your/memory.agd
 
-# scenario costo reale (S7) — ~$0,05 per run con i default
+# real-money scenario (S7) — about $0.05 per run with defaults
 export ANTHROPIC_API_KEY=sk-ant-...
 python3 scripts/bench_cost.py --turns 5
 
 cat results/summary.json results/cost.json
 ```
 
-Tutti i corpora sintetici sono regenerabili identici (`--seed 42`).
+All synthetic corpora are bit-for-bit reproducible (`--seed 42`).
 
 ## Layout
 
 ```
 benchmarks/
-├── README.md                  # questo file
-├── corpora/                   # .agd sintetici, deterministici
+├── README.md                  # this file
+├── corpora/                   # synthetic .agd, deterministic
 │   ├── mem-{10,50,200,1000}.agd
 │   └── anchor-fanin-{005,050,200}.agd
 ├── results/
-│   ├── summary.json           # output S0-S6 + latenza
-│   └── cost.json              # output S7 (Anthropic API)
+│   ├── summary.json           # S0–S6 + latency output
+│   └── cost.json              # S7 output (Anthropic API)
 └── scripts/
-    ├── generate.py            # generatore corpus
+    ├── generate.py            # corpus generator
     ├── bench.py               # token-accounting harness
     └── bench_cost.py          # real-money harness
 ```
