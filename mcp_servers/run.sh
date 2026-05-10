@@ -12,7 +12,7 @@ set -e
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$HERE/.." && pwd)"
-VENV_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/agd-memory/venv"
+VENV_DIR="${CLAUDE_PLUGIN_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/agd-memory}/venv"
 PY_BIN="$VENV_DIR/bin/python"
 SENTINEL="$VENV_DIR/.ready"
 

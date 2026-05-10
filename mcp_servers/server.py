@@ -52,6 +52,28 @@ def _ensure_memory_file() -> Path | None:
     return p if p.is_file() else None
 
 
+_SCAFFOLD = """\
+@meta format=agd version=1 [#meta]
+
+@h1 Memoria di sessione [#root]
+
+@h2 User [#h-user]
+
+@h2 Feedback [#h-feedback]
+
+@h2 Project [#h-project]
+
+@h2 Reference [#h-reference]
+"""
+
+
+def _bootstrap_memory_file() -> Path:
+    p = memory_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(_SCAFFOLD)
+    return p
+
+
 server = Server("agd-memory")
 
 
@@ -174,13 +196,16 @@ async def _call_tool(name: str, arguments: dict | None) -> list[TextContent]:
     arguments = arguments or {}
     mem = _ensure_memory_file()
     if mem is None:
-        return [TextContent(
-            type="text",
-            text=(
-                f"No AGD memory file for this project at {memory_path()}. "
-                "Save a first entry via agd_memory_save to bootstrap one."
-            ),
-        )]
+        if name == "agd_memory_save":
+            mem = _bootstrap_memory_file()
+        else:
+            return [TextContent(
+                type="text",
+                text=(
+                    f"No AGD memory file for this project at {memory_path()}. "
+                    "Save a first entry via agd_memory_save to bootstrap one."
+                ),
+            )]
 
     if name == "agd_memory_toc":
         kind = arguments.get("kind")

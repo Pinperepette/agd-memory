@@ -1,6 +1,6 @@
 ---
 name: memory
-description: Per-project persistent memory in AGD format with selective retrieval and graph traversal. Use when the user says "ricordi", "what do you remember", "do you know X" — or when you need project context (user preferences, paths, past decisions, scope-restricted rules) before answering. The memory file is a graph: pull the TOC first, then fetch the relevant blocks plus their backlinks/refs in a single call. Costs roughly 6-15x fewer tokens than loading the whole memory file (TOC alone ~6x, typical 1-3 block fetch ~14x, single-block ~74x).
+description: "Per-project persistent memory in AGD format with selective retrieval and graph traversal. Use when the user says \"ricordi\", \"what do you remember\", \"do you know X\" — or when you need project context (user preferences, paths, past decisions, scope-restricted rules) before answering. The memory file is a graph; pull the TOC first, then fetch the relevant blocks plus their backlinks/refs in a single call. Costs roughly 6-15x fewer tokens than loading the whole memory file (TOC alone ~6x, typical 1-3 block fetch ~14x, single-block ~74x)."
 license: MIT
 metadata:
   author: pinperepette
