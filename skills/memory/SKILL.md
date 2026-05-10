@@ -115,6 +115,45 @@ Do not save what is already derivable from the codebase, git log, or
 the current conversation. Save only what would be lost if the session
 ended.
 
+## When to propose `/remember` (soft nudge)
+
+Saves are user-curated. Do not call `agd_memory_save` autonomously.
+Instead, when a memory-worthy fact emerges in conversation, suggest
+saving it with a single in-line line — never block the flow waiting
+for an answer. The `remember` skill handles the actual save once the
+user agrees.
+
+**Propose a save when:**
+
+- a stable decision is made (architecture, library choice, naming
+  convention, regola di stile)
+- a fix is shipped and other sessions will reference it
+  ("v0.3.1 fixes X")
+- a non-trivial path / env var / command / URL is discovered
+- the user states a preference ("always X, never Y")
+- a workaround for a known bug is established
+- a constraint is discovered (schema enum, system limit, gotcha)
+
+**Do NOT propose** when:
+
+- the fact is visible by `grep`, `Read`, or `git log` — keep memory
+  for things not derivable from the code
+- the work is in-progress; wait until it's actually decided / shipped
+- the fact is already in memory (check the TOC; if close, suggest
+  updating the existing block rather than adding a new one)
+- the content is sensitive (api keys, tokens, credentials)
+- the user is in the middle of a task and a nudge would interrupt
+
+**How to phrase the nudge** (in-line, one line, optional):
+
+> Vuoi che ricordi `#agd-mcp-kind-enum` (gotcha schema MCP save)?
+
+If the user ignores it, drop it — do not nag. If they say yes, save
+with the proposed id+kind+desc. If they revise, save the revision.
+
+**Never save without explicit consent.** A "thumbs up", "sì", "ok" or
+"fai" is enough; ambiguity is not.
+
 ## Entry format
 
 Each entry is one custom block with a fenced body:
