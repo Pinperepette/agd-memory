@@ -4,147 +4,389 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>agd-memory</title>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
 <style>
-/* ─────────────────────────────────────────────────────────────────────
-   Palette: light = warm cream "paper", dark = warm walnut. Accents are
-   burnt orange + amber + deep navy + pine green. Cyan is gone. */
 :root {
-  --paper:     #faf6ed;
-  --paper-2:   #f3eddc;
-  --paper-3:   #ebe2cc;
-  --rule:      #d9cfb1;
-  --rule-2:    #c8bb96;
-  --ink:       #1f1d18;
-  --ink-2:     #4b443a;
-  --ink-3:     #857d6c;
-  --ink-4:     #b3a98f;
-  --accent:    #b34d1a;   /* burnt orange */
-  --accent-2:  #9a6500;   /* amber */
-  --accent-3:  #1e3a8a;   /* deep navy */
-  --good:      #15623c;
-  --warn:      #9a3412;
-  --shadow:    0 1px 0 rgba(31, 29, 24, .04), 0 6px 24px -12px rgba(31, 29, 24, .12);
-  --shadow-hi: 0 1px 0 rgba(31, 29, 24, .06), 0 14px 40px -18px rgba(31, 29, 24, .25);
+  --bg:           #ffffff;
+  --bg-2:         #fafafa;
+  --bg-3:         #f4f4f5;
+  --rule:         #e4e4e7;
+  --rule-2:       #d4d4d8;
+  --ink:          #18181b;
+  --ink-2:        #3f3f46;
+  --ink-3:        #71717a;
+  --ink-4:        #a1a1aa;
+  --accent:       #7c3aed;
+  --accent-soft:  #f5f3ff;
+  --accent-bord:  #ddd6fe;
+  --accent-ink:   #5b21b6;
 }
 [data-theme="dark"] {
-  --paper:     #1c1917;
-  --paper-2:   #25211d;
-  --paper-3:   #2e2924;
-  --rule:      #3a342d;
-  --rule-2:    #56503f;
-  --ink:       #ece2c8;
-  --ink-2:     #c8b993;
-  --ink-3:     #8a8169;
-  --ink-4:     #57513f;
-  --accent:    #fb923c;
-  --accent-2:  #fbbf24;
-  --accent-3:  #93c5fd;
-  --good:      #86efac;
-  --warn:      #fda4af;
-  --shadow:    0 1px 0 rgba(0,0,0,.4), 0 8px 24px -8px rgba(0,0,0,.5);
-  --shadow-hi: 0 1px 0 rgba(0,0,0,.5), 0 16px 48px -16px rgba(0,0,0,.7);
+  --bg:           #09090b;
+  --bg-2:         #131316;
+  --bg-3:         #1c1c20;
+  --rule:         #27272a;
+  --rule-2:       #3f3f46;
+  --ink:          #fafafa;
+  --ink-2:        #d4d4d8;
+  --ink-3:        #a1a1aa;
+  --ink-4:        #71717a;
+  --accent:       #a78bfa;
+  --accent-soft:  #1e1b3a;
+  --accent-bord:  #3b2f6a;
+  --accent-ink:   #c4b5fd;
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body {
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, -apple-system, "Segoe UI", "Inter", system-ui, sans-serif;
-  font-size: 15px;
+  font-family: "Inter", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  font-size: 14.5px;
+  line-height: 1.55;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-.serif { font-family: "Iowan Old Style", "Source Serif Pro", "Charter", "Palatino Linotype", Palatino, Georgia, serif; }
-.mono  { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", monospace; }
+@supports (font-variation-settings: normal) {
+  body { font-family: "Inter var", "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+}
+.mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; font-feature-settings: "calt" 0; }
 
-/* Topbar ────────────────────────────────────────────────────────── */
+/* ── Topbar ──────────────────────────────────────────────────────── */
 .topbar {
+  height: 52px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 20px;
   border-bottom: 1px solid var(--rule);
-  background: var(--paper);
-  padding: 14px 24px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  z-index: 5;
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 5;
 }
-.brand {
-  display: flex; align-items: baseline; gap: 10px;
-  font-family: "Iowan Old Style", "Source Serif Pro", Charter, Georgia, serif;
-}
-.brand .mark {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--accent);
-  display: inline-block;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
-}
-.brand .name { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; color: var(--ink); }
-.brand .path {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  color: var(--ink-3); font-size: 11px;
-}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+.brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.brand .path { font-family: "JetBrains Mono", ui-monospace, monospace; color: var(--ink-3); font-weight: 400; font-size: 11.5px; }
 .spacer { flex: 1; }
-.icon-btn {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--ink-2);
-  border: 1px solid transparent;
-  cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-  transition: all 120ms;
-  font-size: 16px;
-}
-.icon-btn:hover { background: var(--paper-2); color: var(--ink); border-color: var(--rule); }
-.mode-toggle {
-  display: inline-flex;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 3px;
-  background: var(--paper-2);
-}
-.mode-toggle button {
-  padding: 5px 14px; border-radius: 999px;
-  color: var(--ink-2); font-size: 12.5px;
-  cursor: pointer; transition: all 130ms;
-  letter-spacing: 0.02em;
-}
-.mode-toggle button.active {
-  background: var(--ink); color: var(--paper);
-  font-weight: 500;
-}
 
-/* Mode show/hide ──────────────────────────────────────────────────── */
-body.mode-read  .graph-only { display: none !important; }
-body.mode-graph .read-only  { display: none !important; }
-
-/* Search overlay (cmd-k) ──────────────────────────────────────────── */
 .search-trigger {
   display: inline-flex; align-items: center; gap: 8px;
-  background: var(--paper-2);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 12.5px;
-  color: var(--ink-3);
-  cursor: pointer;
-  min-width: 180px;
-  transition: all 120ms;
+  background: var(--bg-2); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 5px 12px; font-size: 12.5px; color: var(--ink-3);
+  cursor: pointer; transition: all 120ms; min-width: 200px;
 }
 .search-trigger:hover { border-color: var(--rule-2); color: var(--ink-2); }
 .search-trigger kbd {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 10.5px;
-  background: var(--paper);
-  padding: 1.5px 5px; border-radius: 4px;
-  border: 1px solid var(--rule); color: var(--ink-3);
+  font-family: "JetBrains Mono", monospace; font-size: 10.5px;
+  background: var(--bg); padding: 1px 5px; border-radius: 4px;
+  border: 1px solid var(--rule); color: var(--ink-3); margin-left: auto;
 }
+[data-theme="dark"] .search-trigger kbd {
+  background: var(--bg-3);
+  border-color: var(--rule-2);
+  color: var(--ink-2);
+}
+.icon-btn {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ink-2); cursor: pointer; font-size: 15px;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--bg-3); color: var(--ink); border-color: var(--rule-2); }
+[data-theme="dark"] .icon-btn:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.mode-toggle {
+  display: inline-flex; padding: 2px;
+  background: var(--bg-2); border: 1px solid var(--rule); border-radius: 7px;
+}
+.mode-toggle button {
+  padding: 4px 12px; border-radius: 5px;
+  font-size: 12.5px; color: var(--ink-3); cursor: pointer;
+  transition: all 130ms;
+}
+.mode-toggle button.active {
+  background: var(--bg); color: var(--ink);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+[data-theme="dark"] .mode-toggle button.active {
+  background: var(--bg-3);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* Mode show/hide ─────────────────────────────────────────────────── */
+body.mode-read  .graph-only { display: none !important; }
+body.mode-graph .read-only  { display: none !important; }
+
+/* ── Layout ──────────────────────────────────────────────────────── */
+.shell { height: calc(100% - 52px); display: flex; }
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  border-right: 1px solid var(--rule);
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 18px 0 60px;
+}
+.main {
+  flex: 1; min-width: 0;
+  display: flex;
+  background: var(--bg);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.sidebar .doc-title {
+  padding: 4px 18px 14px;
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+}
+.sidebar .doc-title:hover { color: var(--accent); }
+.sidebar .doc-title .ico { color: var(--ink-3); font-size: 12px; }
+
+.sidebar .sec {
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+  margin: 0 0;
+}
+.sidebar .sec-head {
+  padding: 6px 18px 4px;
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 600;
+}
+.sidebar .sec-item {
+  padding: 4px 18px 4px 24px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: all 100ms;
+}
+.sidebar .sec-item:hover { background: var(--bg-2); color: var(--ink); }
+.sidebar .sec-item.active {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+[data-theme="dark"] .sidebar .sec-item.active { color: var(--accent-ink); }
+
+/* ── Reader (table/schema view, full-width) ──────────────────────── */
+#reader {
+  flex: 1; overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 0;
+}
+.reader-inner {
+  max-width: none;
+  margin: 0;
+  padding: 24px 32px 80px;
+}
+.doc-head {
+  display: flex; align-items: baseline; gap: 18px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.doc-h1 {
+  font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--ink); margin: 0;
+}
+.doc-sub { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-3); }
+.doc-sub .stat .n { color: var(--ink); font-weight: 600; margin-right: 3px; }
+
+.toolbar { margin-left: auto; display: inline-flex; gap: 6px; }
+
+.section-h {
+  display: flex; align-items: center; gap: 12px;
+  margin: 28px 0 0;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.section-h:first-of-type { margin-top: 0; }
+.section-h .name {
+  font-size: 13.5px; font-weight: 600; color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.section-h .id-anchor {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; color: var(--ink-4);
+}
+.section-h .count {
+  margin-left: auto;
+  font-size: 11.5px; color: var(--ink-3);
+}
+
+/* Column header row (Notion-database-like) */
+.col-h {
+  display: grid;
+  grid-template-columns: 92px minmax(180px, 1.2fr) minmax(220px, 2fr) 96px 96px 24px;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 12px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  background: var(--bg);
+  border-left: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.block-tbl {
+  border: 1px solid var(--rule);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: var(--bg);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.block {
+  display: grid;
+  grid-template-columns: 92px minmax(180px, 1.2fr) minmax(220px, 2fr) 96px 96px 24px;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  transition: background 100ms;
+  scroll-margin-top: 80px;
+  min-height: 38px;
+}
+.block:last-child { border-bottom: none; }
+.block:hover { background: var(--bg-2); }
+.block.expanded { background: var(--bg-2); }
+.block.flash { animation: flash 1.4s ease; }
+@keyframes flash {
+  0%   { background: transparent; }
+  20%  { background: var(--accent-soft); }
+  100% { background: transparent; }
+}
+
+.block .col-kind { display: inline-flex; }
+.block .col-id {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12.5px; font-weight: 500; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.block .col-id .hash { color: var(--ink-4); }
+.block .col-desc {
+  font-size: 13px; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.block .col-desc .body-snip { color: var(--ink-3); }
+.block .col-date {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; color: var(--ink-3);
+  text-align: right;
+  white-space: nowrap;
+}
+.block .col-links {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; color: var(--ink-3);
+  text-align: right;
+  white-space: nowrap;
+}
+.block .col-links .pos { color: var(--accent); }
+.block .col-toggle {
+  color: var(--ink-4);
+  font-size: 11px;
+  transition: transform 150ms;
+  display: inline-flex; justify-content: center;
+  user-select: none;
+}
+.block.expanded .col-toggle { transform: rotate(90deg); }
+
+/* Expanded panel below the row */
+.block-expand {
+  display: none;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg);
+  padding: 18px 24px 22px 116px;
+}
+.block-expand.open { display: block; }
+.block-expand:last-child { border-bottom: none; }
+.block-expand .body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink);
+  max-width: 820px;
+}
+.block-expand .body > :first-child { margin-top: 0; }
+.block-expand .body > :last-child { margin-bottom: 0; }
+.block-expand .body p { margin: 8px 0; }
+.block-expand .body h1 { font-size: 17px; font-weight: 600; margin: 14px 0 6px; }
+.block-expand .body h2 { font-size: 15px; font-weight: 600; margin: 12px 0 6px; }
+.block-expand .body h3 { font-size: 14px; font-weight: 600; margin: 10px 0 4px; color: var(--ink-2); }
+.block-expand .body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-underline-offset: 2px;
+}
+.block-expand .body a:hover { text-decoration-color: var(--accent); }
+.block-expand .body code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12.5px;
+  background: var(--bg-3); border: 1px solid var(--rule);
+  padding: 1px 5px; border-radius: 4px;
+  color: var(--ink);
+}
+.block-expand .body pre {
+  background: var(--bg-3); border: 1px solid var(--rule);
+  padding: 11px 13px; border-radius: 6px;
+  font-size: 12.5px; overflow-x: auto;
+}
+.block-expand .body pre code { background: transparent; border: 0; padding: 0; }
+.block-expand .body blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 4px 0 4px 12px; margin: 10px 0; color: var(--ink-2);
+}
+.block-expand .body ul, .block-expand .body ol { padding-left: 22px; }
+.block-expand .body table { border-collapse: collapse; margin: 10px 0; font-size: 12.5px; }
+.block-expand .body th, .block-expand .body td { border: 1px solid var(--rule); padding: 5px 9px; }
+.block-expand .body th { background: var(--bg-3); font-weight: 600; }
+
+.block-expand .meta {
+  margin-top: 14px;
+  display: flex; flex-wrap: wrap; gap: 14px;
+  font-size: 12px;
+}
+.block-expand .meta .label {
+  color: var(--ink-4);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: 0.03em;
+  margin-right: 6px;
+}
+.block-expand .meta a {
+  font-family: "JetBrains Mono", monospace;
+  color: var(--accent); cursor: pointer;
+  font-size: 12px;
+}
+.block-expand .meta a:hover { text-decoration: underline; }
+.block-expand .meta .group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* ── Search overlay (cmd-k) ──────────────────────────────────────── */
 .cmdk-overlay {
   position: fixed; inset: 0;
-  background: color-mix(in srgb, var(--ink) 30%, transparent);
+  background: color-mix(in srgb, var(--ink) 24%, transparent);
   backdrop-filter: blur(4px);
   display: none;
   align-items: flex-start; justify-content: center;
@@ -153,273 +395,45 @@ body.mode-graph .read-only  { display: none !important; }
 .cmdk-overlay.open { display: flex; }
 .cmdk {
   width: min(640px, 92vw);
-  background: var(--paper);
+  background: var(--bg);
   border: 1px solid var(--rule);
-  border-radius: 14px;
-  box-shadow: var(--shadow-hi);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.04);
   overflow: hidden;
 }
+[data-theme="dark"] .cmdk { box-shadow: 0 20px 50px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.06); }
 .cmdk input {
   width: 100%;
-  background: transparent;
-  border: 0; outline: 0;
+  background: transparent; border: 0; outline: 0;
   padding: 16px 20px;
   color: var(--ink);
-  font-size: 16px;
+  font-size: 15.5px;
   border-bottom: 1px solid var(--rule);
 }
+.cmdk input::placeholder { color: var(--ink-4); }
 .cmdk-results { max-height: 50vh; overflow-y: auto; padding: 6px; }
 .cmdk-result {
   display: flex; gap: 12px; align-items: baseline;
-  padding: 10px 14px; border-radius: 8px; cursor: pointer;
+  padding: 10px 14px; border-radius: 6px; cursor: pointer;
 }
-.cmdk-result:hover, .cmdk-result.active { background: var(--paper-2); }
+.cmdk-result:hover, .cmdk-result.active { background: var(--bg-2); }
 .cmdk-result .id { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink); }
 .cmdk-result .desc { color: var(--ink-3); font-size: 12px; }
 
-/* Layout ──────────────────────────────────────────────────────────── */
-.main { flex: 1; display: flex; min-height: 0; }
-
-/* Timeline rail ─────────────────────────────────────────────────── */
-.rail {
-  width: 220px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--rule);
-  background: var(--paper);
-  overflow-y: auto;
-  padding: 28px 0 80px;
-  position: relative;
-}
-.rail::before {
-  content: "";
-  position: absolute;
-  left: 56px; top: 36px; bottom: 60px;
-  width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--rule-2) 8%, var(--rule-2) 92%, transparent);
-}
-.rail-group { padding: 0 12px; margin-bottom: 18px; }
-.rail-date {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10.5px; letter-spacing: 0.05em;
-  color: var(--ink-3);
-  padding: 0 0 8px 56px;
-  text-transform: uppercase;
-}
-.rail-item {
-  position: relative;
-  padding: 6px 12px 6px 56px;
-  cursor: pointer;
-  transition: all 120ms;
-  border-radius: 0 8px 8px 0;
-}
-.rail-item:hover { background: var(--paper-2); }
-.rail-item.active {
-  background: var(--paper-3);
-  box-shadow: inset 2px 0 0 var(--accent);
-}
-.rail-item .dot {
-  position: absolute;
-  left: 50px; top: 50%; transform: translate(-50%, -50%);
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: var(--ink-4);
-  border: 2px solid var(--paper);
-  box-shadow: 0 0 0 1px var(--rule-2);
-  transition: all 150ms;
-}
-.rail-item:hover .dot { transform: translate(-50%, -50%) scale(1.3); }
-.rail-item.active .dot {
-  width: 11px; height: 11px;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-.rail-item .id {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11.5px;
-  color: var(--ink-2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.rail-item.active .id { color: var(--ink); font-weight: 600; }
-.rail-item .desc {
-  font-size: 11px; color: var(--ink-3);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  margin-top: 1px;
-}
-
-/* Reader ──────────────────────────────────────────────────────────── */
-#reader {
-  flex: 1;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  background: var(--paper);
-  padding: 0;
-}
-.reader-inner {
-  max-width: 740px;
-  margin: 0 auto;
-  padding: 56px 56px 200px;
-}
-.reader-stats {
-  display: flex; flex-wrap: wrap; gap: 18px;
-  padding: 16px 20px;
-  margin-bottom: 32px;
-  background: var(--paper-2);
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-.reader-stats .stat .n {
-  font-family: "Iowan Old Style", "Source Serif Pro", Charter, Georgia, serif;
-  font-size: 22px; font-weight: 600;
-  color: var(--ink);
-  margin-right: 6px;
-}
-.reader-stats .stat .l {
-  font-size: 11.5px; letter-spacing: 0.04em;
-  color: var(--ink-3);
-}
-.reader-stats .stat { display: inline-flex; align-items: baseline; }
-
-.section {
-  background: var(--paper);
-  margin: 0 0 36px;
-  padding: 28px 32px 26px;
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  position: relative;
-  scroll-margin-top: 24px;
-  transition: box-shadow 250ms, border-color 250ms;
-}
-.section:hover { box-shadow: var(--shadow-hi); border-color: var(--rule-2); }
-.section.flash {
-  animation: flash 1.4s ease;
-}
-@keyframes flash {
-  0%   { background: var(--paper); border-color: var(--rule); }
-  18%  { background: color-mix(in srgb, var(--accent) 8%, var(--paper)); border-color: var(--accent); }
-  100% { background: var(--paper); border-color: var(--rule); }
-}
-.section .meta-top {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-.kind-chip {
-  display: inline-flex; align-items: center;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid currentColor;
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  text-transform: uppercase;
-}
-.section .id-line {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 16px; font-weight: 500;
-  color: var(--ink);
-}
-.section .id-hash { color: var(--ink-3); }
-.section .date {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  color: var(--ink-3);
-  margin-left: auto;
-}
-.section .desc {
-  font-family: "Iowan Old Style", "Source Serif Pro", Charter, Georgia, serif;
-  font-style: italic;
-  color: var(--ink-2);
-  font-size: 16px;
-  margin: 6px 0 18px;
-  line-height: 1.45;
-}
-.section .body-md {
-  font-family: "Iowan Old Style", "Source Serif Pro", Charter, Georgia, serif;
-  color: var(--ink);
-  font-size: 17px;
-  line-height: 1.7;
-}
-.section .body-md p { margin: 10px 0; }
-.section .body-md > :first-child { margin-top: 0; }
-.section .body-md > :last-child { margin-bottom: 0; }
-.section .body-md h1 { font-size: 22px; margin: 18px 0 10px; font-weight: 600; }
-.section .body-md h2 { font-size: 19px; margin: 14px 0 8px; font-weight: 600; }
-.section .body-md h3 { font-size: 16px; margin: 12px 0 6px; font-weight: 600; color: var(--ink-2); }
-.section .body-md a { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); text-underline-offset: 2px; }
-.section .body-md a:hover { text-decoration-color: var(--accent); }
-.section .body-md code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  background: var(--paper-2);
-  padding: 1px 5px; border-radius: 4px;
-  color: var(--accent);
-}
-.section .body-md pre {
-  background: var(--paper-2);
-  border: 1px solid var(--rule);
-  padding: 12px 14px;
-  border-radius: 6px;
-  font-size: 13.5px;
-  overflow-x: auto;
-}
-.section .body-md pre code { background: transparent; padding: 0; color: var(--ink); }
-.section .body-md blockquote {
-  border-left: 3px solid var(--accent-2);
-  padding: 4px 0 4px 14px; margin: 10px 0;
-  color: var(--ink-2); font-style: italic;
-}
-.section .body-md ul, .section .body-md ol { padding-left: 22px; }
-.section .body-md table {
-  border-collapse: collapse; margin: 10px 0; font-size: 14px;
-}
-.section .body-md th, .section .body-md td {
-  border: 1px solid var(--rule); padding: 6px 10px;
-}
-.section .body-md th { background: var(--paper-2); font-weight: 600; }
-.section .footer {
-  margin-top: 22px; padding-top: 14px;
-  border-top: 1px dashed var(--rule);
-  display: flex; flex-wrap: wrap; gap: 18px;
-  font-size: 12.5px;
-  color: var(--ink-3);
-}
-.section .footer .label {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-3);
-  margin-right: 6px;
-}
-.section .footer a {
-  font-family: "JetBrains Mono", monospace;
-  color: var(--accent-3);
-  cursor: pointer;
-}
-.section .footer a:hover { text-decoration: underline; }
-
-/* Graph ──────────────────────────────────────────────────────────── */
-#cy { background: var(--paper); }
-.graph-wrap {
-  flex: 1; display: flex; flex-direction: column; min-width: 0;
-}
+/* ── Graph mode ──────────────────────────────────────────────────── */
+.graph-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+#cy { background: var(--bg); flex: 1; min-height: 0; }
 .graph-controls {
   border-top: 1px solid var(--rule);
   padding: 8px 16px;
-  font-size: 12px;
-  color: var(--ink-3);
-  background: var(--paper);
-  display: flex; align-items: center; gap: 14px;
+  font-size: 12px; color: var(--ink-3);
+  background: var(--bg);
+  display: flex; align-items: center; gap: 12px;
 }
 .pill-btn {
-  padding: 4px 12px;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ink-2); cursor: pointer;
-  font-size: 11.5px;
+  padding: 4px 12px; border-radius: 6px;
+  background: var(--bg); border: 1px solid var(--rule);
+  color: var(--ink-2); cursor: pointer; font-size: 12px;
   transition: all 120ms;
 }
 .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -427,132 +441,171 @@ body.mode-graph .read-only  { display: none !important; }
 .details-pane {
   width: 380px; min-width: 320px;
   border-left: 1px solid var(--rule);
-  background: var(--paper);
+  background: var(--bg);
   overflow-y: auto;
-  padding: 28px;
+  padding: 28px 26px;
 }
-.details-empty { color: var(--ink-3); font-style: italic; padding-top: 24px; }
+.details-empty { color: var(--ink-3); padding-top: 24px; font-size: 13px; }
 
-/* Scrollbars (subtle) ─────────────────────────────────────────────── */
+/* ── Scrollbars ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 6px; border: 2px solid var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 6px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--rule-2); }
 
-/* Toast ──────────────────────────────────────────────────────────── */
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: var(--ink); color: var(--paper);
-  padding: 8px 16px; border-radius: 999px;
-  font-size: 13px; box-shadow: var(--shadow-hi);
-  opacity: 0; pointer-events: none;
-  transition: opacity 200ms, transform 200ms;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
 </style>
 </head>
 <body class="mode-read">
-<div style="display:flex; flex-direction:column; height:100%;">
-
 <header class="topbar">
   <div class="brand">
-    <span class="mark"></span>
-    <span class="name">agd-memory</span>
+    <span class="dot"></span>
+    <span>agd-memory</span>
     <span class="path mono" id="filepath"></span>
   </div>
   <div class="spacer"></div>
-  <button class="search-trigger" id="search-trigger" title="Search (⌘K or /)">
-    <span>search blocks…</span>
+  <button class="search-trigger" id="search-trigger">
+    <span>Search blocks…</span>
     <kbd>⌘K</kbd>
   </button>
-  <div class="mode-toggle" role="tablist" aria-label="view mode">
+  <div class="mode-toggle" role="tablist">
     <button id="m-read" class="active" data-mode="read">Read</button>
     <button id="m-graph" data-mode="graph">Graph</button>
   </div>
   <button class="icon-btn" id="theme-toggle" title="Toggle theme">☼</button>
 </header>
 
-<div class="main">
+<div class="shell">
+  <aside class="sidebar" id="sidebar"></aside>
 
-  <!-- Timeline rail -->
-  <aside class="rail" id="rail"></aside>
-
-  <!-- Reader -->
-  <div id="reader" class="read-only"></div>
-
-  <!-- Graph -->
-  <div class="graph-wrap graph-only">
-    <div id="cy" style="flex:1; min-height: 0;"></div>
-    <div class="graph-controls">
-      <span>drag · scroll to zoom · click node</span>
-      <span class="spacer" style="flex:1"></span>
-      <button id="fit" class="pill-btn">fit</button>
-      <button id="relayout" class="pill-btn">relayout</button>
+  <div class="main">
+    <div id="reader" class="read-only"></div>
+    <div class="graph-wrap graph-only">
+      <div id="cy"></div>
+      <div class="graph-controls">
+        <span>drag · scroll to zoom · click node</span>
+        <span class="spacer" style="flex:1"></span>
+        <button id="fit" class="pill-btn">fit</button>
+        <button id="relayout" class="pill-btn">relayout</button>
+      </div>
     </div>
+    <aside class="details-pane graph-only" id="details"></aside>
   </div>
-
-  <!-- Details (graph mode only) -->
-  <aside class="details-pane graph-only" id="details"></aside>
-</div>
 </div>
 
-<!-- Search overlay -->
 <div class="cmdk-overlay" id="cmdk">
   <div class="cmdk">
-    <input type="text" id="cmdk-input" placeholder="search id, desc, body…" autocomplete="off">
+    <input type="text" id="cmdk-input" placeholder="Search id, desc, body…" autocomplete="off">
     <div class="cmdk-results" id="cmdk-results"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
 const md = window.markdownit({ html: false, linkify: true, breaks: false });
 
-// Kind palette: warm + restrained, no cyan ─────────────────────────
 const KIND_COLORS = {
-  "h1":         "#9a6500",
-  "h2":         "#9a6500",
-  "h3":         "#9a6500",
-  "h4":         "#9a6500",
-  "p":          "#5b574e",
-  "x-user":     "#b34d1a",
-  "x-feedback": "#9a6500",
-  "x-project":  "#15623c",
-  "x-reference":"#1e3a8a",
-  "x-edge":     "#7c3aed",
-  "x-stress":   "#6b7280",
-  "code":       "#9a6500",
-  "raw":        "#9a6500",
-  "ul":         "#15623c",
-  "ol":         "#15623c",
-  "quote":      "#9d174d",
+  "x-user":     "#9333ea",
+  "x-feedback": "#ea580c",
+  "x-project":  "#16a34a",
+  "x-reference":"#2563eb",
+  "x-edge":     "#db2777",
+  "x-stress":   "#71717a",
+  "code":       "#ca8a04",
+  "raw":        "#ca8a04",
+  "ul":         "#16a34a",
+  "ol":         "#16a34a",
+  "quote":      "#db2777",
 };
-const colorFor = k => KIND_COLORS[k] || "#5b574e";
+const colorFor = k => KIND_COLORS[k] || "#71717a";
+const isHeading = k => ["h1","h2","h3","h4"].includes(k);
 
 const dateRE = /(\d{4}-\d{2}-\d{2})/;
-function dateFromId(id) {
-  const m = (id || "").match(dateRE);
-  return m ? m[1] : null;
-}
+const dateFromId = id => { const m = (id || "").match(dateRE); return m ? m[1] : null; };
 
 let DATA = null;
-let SELECTED = null;
+let SECTIONS = null;
+let DOC_TITLE = null;
 let MODE = "read";
 let cy = null;
 let graphBuilt = false;
+
+function buildSections() {
+  // Treat h1 as document title; h2+ as section markers. Non-heading
+  // blocks fall under the most recent heading they were preceded by.
+  // Untitled sections (no heading yet) go into a synthetic "Notes".
+  SECTIONS = [];
+  DOC_TITLE = null;
+  let current = null;
+  for (const b of DATA.blocks) {
+    if (b.kind === "h1" && !DOC_TITLE) {
+      DOC_TITLE = b;
+      continue;
+    }
+    if (isHeading(b.kind)) {
+      current = { heading: b, blocks: [] };
+      SECTIONS.push(current);
+      continue;
+    }
+    if (!current) {
+      current = { heading: null, blocks: [] };
+      SECTIONS.push(current);
+    }
+    current.blocks.push(b);
+  }
+  // Drop sections that ended up empty (a heading with no children)
+  SECTIONS = SECTIONS.filter(s => s.blocks.length > 0);
+}
+
+function sectionName(s) {
+  if (!s.heading) return "Notes";
+  // Heading body is inline text; viewer.py joins it into `body` already.
+  const t = (s.heading.body || s.heading.id || "").trim();
+  return t || s.heading.id;
+}
 
 async function load() {
   const r = await fetch("/memory.json");
   const j = await r.json();
   if (j.error) {
-    document.getElementById("reader").innerHTML = `<div style="padding:40px;color:var(--warn)">${j.error}</div>`;
+    document.getElementById("reader").innerHTML = `<div style="padding:60px;color:#ef4444">${j.error}</div>`;
     return;
   }
   DATA = j;
   document.getElementById("filepath").textContent = j.path;
+  buildSections();
+  renderSidebar();
   renderReader();
-  renderRail();
+}
+
+function renderSidebar() {
+  const el = document.getElementById("sidebar");
+  el.innerHTML = "";
+
+  if (DOC_TITLE) {
+    const t = document.createElement("div");
+    t.className = "doc-title";
+    t.innerHTML = `<span class="ico">◆</span><span>${escapeHTML(DOC_TITLE.body || "Memory")}</span>`;
+    t.onclick = () => document.getElementById("reader").scrollTo({ top: 0, behavior: "smooth" });
+    el.appendChild(t);
+  }
+
+  for (const s of SECTIONS) {
+    const sec = document.createElement("div");
+    sec.className = "sec";
+    const head = document.createElement("div");
+    head.className = "sec-head";
+    head.textContent = sectionName(s);
+    sec.appendChild(head);
+    for (const b of s.blocks) {
+      const it = document.createElement("div");
+      it.className = "sec-item";
+      it.dataset.id = b.id;
+      it.textContent = "#" + b.id;
+      it.title = b.desc || "";
+      it.onclick = () => jumpTo(b.id);
+      sec.appendChild(it);
+    }
+    el.appendChild(sec);
+  }
 }
 
 function renderReader() {
@@ -561,113 +614,139 @@ function renderReader() {
   const inner = document.createElement("div");
   inner.className = "reader-inner";
 
-  // Stats card
-  const stats = document.createElement("div");
-  stats.className = "reader-stats";
+  // Doc head: title + stats + toolbar (all on one strip)
+  const docH = document.createElement("div");
+  docH.className = "doc-head";
   const k = DATA.stats.kinds;
-  stats.innerHTML = `
-    <span class="stat"><span class="n">${DATA.stats.blocks}</span><span class="l">blocks</span></span>
-    <span class="stat"><span class="n">${DATA.stats.edges}</span><span class="l">edges</span></span>
-    <span class="stat"><span class="n">${Object.keys(k).length}</span><span class="l">kinds</span></span>
-    <span class="stat"><span class="n">${(DATA.stats.bytes/1024).toFixed(1)}</span><span class="l">KB</span></span>
+  docH.innerHTML = `
+    <h1 class="doc-h1">${escapeHTML(DOC_TITLE?.body || "Memory")}</h1>
+    <span class="doc-sub">
+      <span class="stat"><span class="n">${DATA.stats.blocks}</span>blocks</span>
+      <span class="stat"><span class="n">${DATA.stats.edges}</span>edges</span>
+      <span class="stat"><span class="n">${Object.keys(k).length}</span>kinds</span>
+      <span class="stat"><span class="n">${(DATA.stats.bytes/1024).toFixed(1)} KB</span></span>
+      <span class="stat mono" style="color:var(--ink-4)">${DATA.path.split('/').pop()}</span>
+    </span>
+    <span class="toolbar">
+      <button id="expand-all" class="pill-btn">Expand all</button>
+      <button id="collapse-all" class="pill-btn">Collapse all</button>
+    </span>
   `;
-  inner.appendChild(stats);
+  inner.appendChild(docH);
 
-  for (const b of DATA.blocks) {
-    const sec = document.createElement("section");
-    sec.className = "section";
-    sec.id = "b-" + b.id;
-
-    const c = colorFor(b.kind);
-    const head = document.createElement("div");
-    head.className = "meta-top";
-    head.innerHTML = `
-      <span class="kind-chip" style="color:${c};">${escapeHTML(b.kind)}</span>
-      <span class="id-line"><span class="id-hash">#</span>${escapeHTML(b.id)}</span>
-      ${dateFromId(b.id) ? `<span class="date">${dateFromId(b.id)}</span>` : ""}
+  for (const s of SECTIONS) {
+    const sh = document.createElement("div");
+    sh.className = "section-h";
+    sh.id = s.heading ? "s-" + s.heading.id : "s-notes";
+    sh.innerHTML = `
+      <span class="name">${escapeHTML(sectionName(s))}</span>
+      ${s.heading ? `<span class="id-anchor mono">#${escapeHTML(s.heading.id)}</span>` : ""}
+      <span class="count">${s.blocks.length} ${s.blocks.length === 1 ? "entry" : "entries"}</span>
     `;
-    sec.appendChild(head);
+    inner.appendChild(sh);
 
-    if (b.desc) {
-      const d = document.createElement("div");
-      d.className = "desc";
-      d.textContent = b.desc;
-      sec.appendChild(d);
+    const colH = document.createElement("div");
+    colH.className = "col-h";
+    colH.innerHTML = `
+      <span>kind</span>
+      <span>id</span>
+      <span>desc / excerpt</span>
+      <span style="text-align:right">date</span>
+      <span style="text-align:right">links</span>
+      <span></span>
+    `;
+    inner.appendChild(colH);
+
+    const tbl = document.createElement("div");
+    tbl.className = "block-tbl";
+    for (const b of s.blocks) {
+      tbl.appendChild(renderBlockRow(b));
+      tbl.appendChild(renderBlockExpand(b));
     }
-
-    if (b.body && b.body.length) {
-      const body = document.createElement("div");
-      body.className = "body-md";
-      body.innerHTML = md.render(b.body);
-      sec.appendChild(body);
-    }
-
-    if (b.refs.length || b.backlinks.length || (b.attrs && Object.keys(b.attrs).length)) {
-      const f = document.createElement("div");
-      f.className = "footer";
-      const parts = [];
-      if (b.refs.length)
-        parts.push(`<span><span class="label">Refs →</span>${b.refs.map(r => `<a data-id="${r}">#${r}</a>`).join(" ")}</span>`);
-      if (b.backlinks.length)
-        parts.push(`<span><span class="label">← Backlinks</span>${b.backlinks.map(r => `<a data-id="${r}">#${r}</a>`).join(" ")}</span>`);
-      if (b.attrs && Object.keys(b.attrs).length) {
-        const ats = Object.entries(b.attrs).map(([k,v]) => `${k}=${escapeHTML(JSON.stringify(v))}`).join(" ");
-        parts.push(`<span><span class="label">Attrs</span><span class="mono">${ats}</span></span>`);
-      }
-      f.innerHTML = parts.join("");
-      sec.appendChild(f);
-    }
-
-    inner.appendChild(sec);
+    inner.appendChild(tbl);
   }
   r.appendChild(inner);
 
-  // Wire ref/backlink clicks
+  // Wire row clicks (toggle), but ignore clicks on inner anchors
+  r.querySelectorAll(".block").forEach(row => {
+    row.onclick = e => {
+      if (e.target.closest("a[data-id]")) return;
+      toggleBlock(row.dataset.id);
+    };
+  });
   r.querySelectorAll("a[data-id]").forEach(a => {
     a.onclick = e => { e.preventDefault(); jumpTo(a.dataset.id); };
   });
+  document.getElementById("expand-all").onclick = () => expandAll(true);
+  document.getElementById("collapse-all").onclick = () => expandAll(false);
 
-  // Observe scroll → highlight active rail item
   setupScrollSpy();
 }
 
-function renderRail() {
-  const rail = document.getElementById("rail");
-  rail.innerHTML = "";
-  // Group consecutive blocks by date (id-derived); ungrouped blocks
-  // share an "untimed" header.
-  let lastDate = null;
-  let group = null;
-  for (const b of DATA.blocks) {
-    const d = dateFromId(b.id) || "—";
-    if (d !== lastDate) {
-      group = document.createElement("div");
-      group.className = "rail-group";
-      const dh = document.createElement("div");
-      dh.className = "rail-date";
-      dh.textContent = d === "—" ? "no date" : d;
-      group.appendChild(dh);
-      rail.appendChild(group);
-      lastDate = d;
-    }
-    const item = document.createElement("div");
-    item.className = "rail-item";
-    item.dataset.id = b.id;
-    item.onclick = () => jumpTo(b.id);
-    item.innerHTML = `
-      <span class="dot" style="background:${colorFor(b.kind)};"></span>
-      <div class="id">#${escapeHTML(b.id)}</div>
-      ${b.desc ? `<div class="desc">${escapeHTML(b.desc)}</div>` : ""}
-    `;
-    group.appendChild(item);
+function renderBlockRow(b) {
+  const c = colorFor(b.kind);
+  const date = dateFromId(b.id) || "—";
+  const desc = b.desc ? escapeHTML(b.desc) : "";
+  const snip = (b.body || "").replace(/\s+/g, " ").trim().slice(0, 140);
+  const descCell = desc
+    ? `${desc}${snip ? ` <span class="body-snip">· ${escapeHTML(snip)}</span>` : ""}`
+    : `<span class="body-snip">${escapeHTML(snip)}</span>`;
+  const r = b.refs.length, bk = b.backlinks.length;
+  const linksCell = (r || bk)
+    ? `${r ? `<span class="pos">→ ${r}</span>` : ""}${(r && bk) ? "  " : ""}${bk ? `← ${bk}` : ""}`
+    : "—";
+
+  const row = document.createElement("div");
+  row.className = "block";
+  row.id = "b-" + b.id;
+  row.dataset.id = b.id;
+  row.innerHTML = `
+    <span class="col-kind"><span class="kind-chip" style="color:${c}">${escapeHTML(b.kind)}</span></span>
+    <span class="col-id"><span class="hash">#</span>${escapeHTML(b.id)}</span>
+    <span class="col-desc">${descCell}</span>
+    <span class="col-date">${date}</span>
+    <span class="col-links">${linksCell}</span>
+    <span class="col-toggle">›</span>
+  `;
+  return row;
+}
+
+function renderBlockExpand(b) {
+  const exp = document.createElement("div");
+  exp.className = "block-expand";
+  exp.dataset.expandFor = b.id;
+  let html = "";
+  if (b.body && b.body.length) html += `<div class="body">${md.render(b.body)}</div>`;
+  if (b.refs.length || b.backlinks.length) {
+    html += `<div class="meta">`;
+    if (b.refs.length)
+      html += `<span class="group"><span class="label">refs →</span>${b.refs.map(x => `<a data-id="${x}">#${x}</a>`).join(" ")}</span>`;
+    if (b.backlinks.length)
+      html += `<span class="group"><span class="label">← backlinks</span>${b.backlinks.map(x => `<a data-id="${x}">#${x}</a>`).join(" ")}</span>`;
+    html += `</div>`;
   }
+  exp.innerHTML = html;
+  return exp;
+}
+
+function toggleBlock(id) {
+  const row = document.getElementById("b-" + id);
+  const exp = document.querySelector(`.block-expand[data-expand-for="${id}"]`);
+  if (!row || !exp) return;
+  const isOpen = row.classList.toggle("expanded");
+  exp.classList.toggle("open", isOpen);
+}
+
+function expandAll(open) {
+  document.querySelectorAll(".block").forEach(r => r.classList.toggle("expanded", open));
+  document.querySelectorAll(".block-expand").forEach(e => e.classList.toggle("open", open));
 }
 
 function setupScrollSpy() {
   const reader = document.getElementById("reader");
-  const sections = reader.querySelectorAll(".section");
+  const blocks = reader.querySelectorAll(".block");
+  if (!blocks.length) return;
   const obs = new IntersectionObserver((entries) => {
-    // Pick the section closest to the top within view
     let best = null, bestTop = Infinity;
     for (const en of entries) {
       if (en.isIntersecting) {
@@ -675,43 +754,43 @@ function setupScrollSpy() {
         if (top >= 0 && top < bestTop) { bestTop = top; best = en.target; }
       }
     }
-    if (best) {
-      const id = best.id.replace(/^b-/, "");
-      setRailActive(id);
-    }
-  }, { root: reader, rootMargin: "0px 0px -70% 0px", threshold: 0.01 });
-  sections.forEach(s => obs.observe(s));
+    if (best) setSidebarActive(best.id.replace(/^b-/, ""));
+  }, { root: reader, rootMargin: "0px 0px -75% 0px", threshold: 0.01 });
+  blocks.forEach(b => obs.observe(b));
 }
 
-function setRailActive(id) {
-  document.querySelectorAll(".rail-item").forEach(el => {
-    el.classList.toggle("active", el.dataset.id === id);
-  });
-  // keep active item visible in rail
-  const a = document.querySelector(`.rail-item.active`);
+function setSidebarActive(id) {
+  document.querySelectorAll(".sec-item").forEach(el =>
+    el.classList.toggle("active", el.dataset.id === id));
+  const a = document.querySelector(".sec-item.active");
   if (a) {
-    const r = document.getElementById("rail");
-    const off = a.offsetTop - r.offsetTop - r.clientHeight / 3;
-    r.scrollTo({ top: off, behavior: "smooth" });
+    const sb = document.getElementById("sidebar");
+    const sbRect = sb.getBoundingClientRect();
+    const aRect = a.getBoundingClientRect();
+    if (aRect.top < sbRect.top + 60 || aRect.bottom > sbRect.bottom - 40) {
+      sb.scrollTo({ top: a.offsetTop - sb.clientHeight / 3, behavior: "smooth" });
+    }
   }
 }
 
 function jumpTo(id) {
-  SELECTED = id;
   if (MODE === "read") {
     const el = document.getElementById("b-" + id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      el.classList.remove("flash");
-      void el.offsetWidth;
-      el.classList.add("flash");
-    }
-    setRailActive(id);
+    if (!el) return;
+    const exp = document.querySelector(`.block-expand[data-expand-for="${id}"]`);
+    el.classList.add("expanded");
+    if (exp) exp.classList.add("open");
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.classList.remove("flash");
+    void el.offsetWidth;
+    el.classList.add("flash");
+    setSidebarActive(id);
   } else {
     selectGraph(id);
   }
 }
 
+/* ── Mode ────────────────────────────────────────────────────────── */
 function setMode(m) {
   MODE = m;
   document.body.classList.toggle("mode-read",  m === "read");
@@ -725,52 +804,56 @@ function setMode(m) {
   }
 }
 
+/* ── Graph ───────────────────────────────────────────────────────── */
 function renderGraph() {
-  const elements = [];
+  const styles = getComputedStyle(document.documentElement);
+  const stroke = styles.getPropertyValue("--bg").trim();
+  const edgeC  = styles.getPropertyValue("--rule-2").trim();
+  const accent = styles.getPropertyValue("--accent").trim();
+  const inkC   = styles.getPropertyValue("--ink-2").trim();
+  const els = [];
   const present = new Set(DATA.blocks.map(b => b.id));
   for (const b of DATA.blocks) {
-    elements.push({ data: { id: b.id, kind: b.kind, color: colorFor(b.kind), degree: b.refs.length + b.backlinks.length }});
+    if (isHeading(b.kind)) continue;
+    els.push({ data: { id: b.id, kind: b.kind, color: colorFor(b.kind), degree: b.refs.length + b.backlinks.length }});
   }
   for (const b of DATA.blocks) {
-    for (const t of b.refs) if (present.has(t)) elements.push({ data: { id: `${b.id}__${t}`, source: b.id, target: t }});
+    if (isHeading(b.kind)) continue;
+    for (const t of b.refs) if (present.has(t) && !isHeading(DATA.blocks.find(x => x.id === t)?.kind)) {
+      els.push({ data: { id: `${b.id}__${t}`, source: b.id, target: t }});
+    }
   }
-  const styles = getComputedStyle(document.documentElement);
-  const edgeColor = styles.getPropertyValue("--rule-2").trim() || "#c8bb96";
-  const nodeStroke = styles.getPropertyValue("--paper").trim() || "#faf6ed";
+  if (cy) cy.destroy();
   cy = cytoscape({
     container: document.getElementById("cy"),
-    elements,
+    elements: els,
     style: [
       { selector: "node", style: {
           "background-color": "data(color)",
           "label": "data(id)",
           "font-family": "JetBrains Mono, ui-monospace, monospace",
-          "font-size": 10,
-          "color": styles.getPropertyValue("--ink-2").trim(),
+          "font-size": 10, "color": inkC,
           "text-valign": "bottom", "text-margin-y": 6,
-          "text-outline-color": nodeStroke, "text-outline-width": 2,
-          "width": "mapData(degree, 0, 8, 14, 36)",
-          "height": "mapData(degree, 0, 8, 14, 36)",
-          "border-width": 2, "border-color": nodeStroke,
-          "transition-property": "background-color, border-color, opacity",
-          "transition-duration": 150,
+          "text-outline-color": stroke, "text-outline-width": 2,
+          "width": "mapData(degree, 0, 8, 12, 32)",
+          "height": "mapData(degree, 0, 8, 12, 32)",
+          "border-width": 2, "border-color": stroke,
+          "transition-property": "border-color, opacity", "transition-duration": 150,
         }
       },
-      { selector: "node:selected", style: { "border-width": 3, "border-color": styles.getPropertyValue("--accent").trim() }},
+      { selector: "node:selected", style: { "border-width": 3, "border-color": accent }},
       { selector: "node.faded", style: { "opacity": 0.18 }},
       { selector: "edge", style: {
-          "width": 1.4, "line-color": edgeColor,
-          "target-arrow-color": edgeColor, "target-arrow-shape": "triangle",
-          "curve-style": "bezier", "arrow-scale": 0.7, "opacity": 0.7,
+          "width": 1.2, "line-color": edgeC,
+          "target-arrow-color": edgeC, "target-arrow-shape": "triangle",
+          "curve-style": "bezier", "arrow-scale": 0.7, "opacity": 0.6,
         }
       },
       { selector: "edge.highlight", style: {
-          "line-color": styles.getPropertyValue("--accent").trim(),
-          "target-arrow-color": styles.getPropertyValue("--accent").trim(),
+          "line-color": accent, "target-arrow-color": accent,
           "width": 2.4, "opacity": 1,
         }
       },
-      { selector: "edge.faded", style: { "opacity": 0.07 }},
     ],
     layout: { name: "cose", animate: false, idealEdgeLength: 90, nodeRepulsion: 6000, padding: 30 },
     wheelSensitivity: 0.2,
@@ -784,7 +867,6 @@ function renderGraph() {
 }
 
 function selectGraph(id) {
-  SELECTED = id;
   if (cy) {
     cy.elements().removeClass("highlight");
     cy.nodes().unselect();
@@ -801,36 +883,37 @@ function selectGraph(id) {
 
 function renderDetails(id) {
   const el = document.getElementById("details");
-  if (!id) { el.innerHTML = `<div class="details-empty">click a node to see its body</div>`; return; }
+  if (!id) { el.innerHTML = `<div class="details-empty">Click a node to see its body.</div>`; return; }
   const b = DATA.blocks.find(x => x.id === id);
   if (!b) { el.innerHTML = `<div class="details-empty">id not found: ${id}</div>`; return; }
   const c = colorFor(b.kind);
   el.innerHTML = `
-    <div class="meta-top" style="margin-bottom:6px;">
+    <div class="head" style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
       <span class="kind-chip" style="color:${c};">${escapeHTML(b.kind)}</span>
-      <span class="id-line"><span class="id-hash">#</span>${escapeHTML(b.id)}</span>
+      <span class="id mono" style="font-weight:600;"><span style="color:var(--ink-4)">#</span>${escapeHTML(b.id)}</span>
     </div>
-    ${b.desc ? `<div class="desc">${escapeHTML(b.desc)}</div>` : ""}
-    ${b.body ? `<div class="body-md" style="margin-top:14px;">${md.render(b.body)}</div>` : ""}
-    ${b.refs.length ? `<div class="footer"><span><span class="label">Refs →</span>${b.refs.map(r => `<a data-id="${r}">#${r}</a>`).join(" ")}</span></div>` : ""}
-    ${b.backlinks.length ? `<div class="footer"><span><span class="label">← Backlinks</span>${b.backlinks.map(r => `<a data-id="${r}">#${r}</a>`).join(" ")}</span></div>` : ""}
+    ${b.desc ? `<div class="desc" style="color:var(--ink-3);font-size:13.5px;margin-bottom:14px;">${escapeHTML(b.desc)}</div>` : ""}
+    ${b.body ? `<div class="body" style="font-size:14.5px;line-height:1.65;">${md.render(b.body)}</div>` : ""}
+    ${b.refs.length ? `<div class="meta" style="margin-top:18px;font-size:12px;"><span class="label" style="color:var(--ink-4);font-family:monospace;font-size:10.5px;margin-right:6px;">refs →</span>${b.refs.map(x => `<a data-id="${x}" style="color:var(--accent);font-family:monospace;cursor:pointer;">#${x}</a>`).join(" ")}</div>` : ""}
+    ${b.backlinks.length ? `<div class="meta" style="margin-top:8px;font-size:12px;"><span class="label" style="color:var(--ink-4);font-family:monospace;font-size:10.5px;margin-right:6px;">← backlinks</span>${b.backlinks.map(x => `<a data-id="${x}" style="color:var(--accent);font-family:monospace;cursor:pointer;">#${x}</a>`).join(" ")}</div>` : ""}
   `;
-  el.querySelectorAll("a[data-id]").forEach(a => { a.onclick = () => { setMode("read"); setTimeout(() => jumpTo(a.dataset.id), 150); };});
+  el.querySelectorAll("a[data-id]").forEach(a => {
+    a.onclick = () => { setMode("read"); setTimeout(() => jumpTo(a.dataset.id), 150); };
+  });
 }
 
-function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
-
-// ── Search overlay (cmd-k) ──────────────────────────────────────────
+/* ── Search ──────────────────────────────────────────────────────── */
 function openSearch() {
   document.getElementById("cmdk").classList.add("open");
-  document.getElementById("cmdk-input").value = "";
-  document.getElementById("cmdk-input").focus();
+  const inp = document.getElementById("cmdk-input");
+  inp.value = ""; inp.focus();
   renderCmdk("");
 }
 function closeSearch() { document.getElementById("cmdk").classList.remove("open"); }
 function renderCmdk(q) {
   const ql = (q || "").toLowerCase().trim();
   const matches = DATA.blocks.filter(b => {
+    if (isHeading(b.kind)) return false;
     if (!ql) return true;
     return (b.id || "").toLowerCase().includes(ql)
         || (b.desc || "").toLowerCase().includes(ql)
@@ -842,29 +925,31 @@ function renderCmdk(q) {
        <span class="kind-chip" style="color:${colorFor(b.kind)};">${b.kind}</span>
        <span class="id">#${escapeHTML(b.id)}</span>
        ${b.desc ? `<span class="desc">${escapeHTML(b.desc)}</span>` : ""}
-     </div>`).join("") || `<div style="padding:18px;color:var(--ink-3);font-style:italic;">no matches</div>`;
+     </div>`).join("") || `<div style="padding:18px;color:var(--ink-3);">No matches.</div>`;
   r.querySelectorAll(".cmdk-result").forEach(el => {
     el.onclick = () => { closeSearch(); jumpTo(el.dataset.id); };
   });
 }
 
-// ── Theme toggle ────────────────────────────────────────────────────
+/* ── Theme ───────────────────────────────────────────────────────── */
 function setTheme(t) {
   document.documentElement.setAttribute("data-theme", t);
   document.getElementById("theme-toggle").textContent = t === "dark" ? "☾" : "☼";
   localStorage.setItem("agd-viewer-theme", t);
-  if (cy) renderGraph(); // re-skin graph palette
+  if (cy) renderGraph();
 }
-const initialTheme = localStorage.getItem("agd-viewer-theme") || "light";
-setTheme(initialTheme);
+setTheme(localStorage.getItem("agd-viewer-theme") || "light");
 
-// ── Wiring ──────────────────────────────────────────────────────────
+function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
+
+/* ── Wiring ──────────────────────────────────────────────────────── */
 document.getElementById("search-trigger").onclick = openSearch;
 document.getElementById("cmdk-input").addEventListener("input", e => renderCmdk(e.target.value));
 document.getElementById("cmdk").addEventListener("click", e => { if (e.target.id === "cmdk") closeSearch(); });
 document.getElementById("m-read").onclick = () => setMode("read");
 document.getElementById("m-graph").onclick = () => setMode("graph");
-document.getElementById("theme-toggle").onclick = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+document.getElementById("theme-toggle").onclick = () =>
+  setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
 
 window.addEventListener("keydown", e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openSearch(); return; }
@@ -873,7 +958,6 @@ window.addEventListener("keydown", e => {
     if (document.getElementById("cmdk").classList.contains("open")) { closeSearch(); return; }
     if (MODE === "graph") selectGraph(null);
   }
-  // cmdk arrow nav
   if (document.getElementById("cmdk").classList.contains("open")) {
     const items = [...document.querySelectorAll(".cmdk-result")];
     if (!items.length) return;
