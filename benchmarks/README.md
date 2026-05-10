@@ -6,18 +6,22 @@ is not "does AGD beat markdown on token count": it is **"when I can
 address a memory block by name, how much do I save versus loading
 the whole file?"**
 
-Four complementary measures:
+Five complementary measures:
 
 1. **Tokens shipped** (S0–S5): how many tokens enter the prompt.
 2. **Backlink fan-in** (S6): when the graph turns against you.
 3. **Real dollars** (S7): actual Anthropic API calls, prompt cache
    on, Haiku 4.5.
-4. **CLI latency**: parsing overhead of `agd` versus raw I/O.
+4. **Subagent execution** (S8): real Claude Code subagents on a real
+   skill, monolithic preload vs AGD addressable retrieval. Measures
+   tokens, tool calls, wall-clock, branch precision, and correctness.
+5. **CLI latency**: parsing overhead of `agd` versus raw I/O.
 
 The numbers come from real execution. No formulas, no mocking:
 `agd` is invoked as a subprocess and its stdout is tokenized; for
 S7, `messages.create` is called for real and `usage` is read off
-the response.
+the response; for S8, subagents are spawned via Claude Code's
+`Agent` tool and the runtime telemetry is logged.
 
 ## TL;DR
 
@@ -30,6 +34,7 @@ On a synthetic 200-block corpus (~18k tokens whole-doc):
 | `--kind x-project` filter, in tokens | **25.1× cheaper** | §S4 |
 | Selective vs whole-doc cached, in **real dollars** (5-turn Haiku) | **2.15× cheaper** | §S7 |
 | Backlink explosion: anchor with 200 fan-in | **81% of the file** | §S6 |
+| Subagent A/B on a real skill (4 tasks, monolithic preload vs AGD) | **−40.6% tokens, parity correctness** | §S8 |
 
 **Three caveats to read before quoting any number:**
 
@@ -217,6 +222,39 @@ sizes, time is dominated by output generation, not input
 processing. On Sonnet/Opus or much larger contexts (>50k tokens)
 the gap would show up.
 
+## S8 — skill routing: monolithic preload vs AGD routed retrieval
+
+S0–S7 measure memory operations in isolation. S8 measures **what
+happens when an agent actually executes against the memory**.
+
+Setup: take an upstream Claude Code skill
+([`anthropics/skills/claude-api`](https://github.com/anthropics/skills/tree/main/skills/claude-api),
+33 KB SKILL.md = ~7,948 tokens), decompose it into 38 AGD blocks,
+then run the same four tasks through two arms — monolithic preload
+(read SKILL.md upfront) vs AGD routed (3-block skeleton + on-demand
+fetch from a sidecar `.agd` file).
+
+| arm | total tokens (4 tasks) | tool calls | wall-clock | tasks correct |
+|---|---:|---:|---:|---:|
+| Monolithic | 117,002 | 16 | 211.6 s | 4/4 |
+| AGD routed | 69,545 | 10 | 124.1 s | 4/4 |
+| **delta** | **−40.6%** | **−37.5%** | **−41.4%** | parity |
+
+Headline non-token finding: **task B finished with zero block
+fetches**. The router's navigation map names
+`#claude-api-pitfall-migration-scope` by ID with a one-line
+description, and the name alone was sufficient to trigger the
+correct behavior (ask scope before editing). The router itself
+encodes operational knowledge — not just an index.
+
+Caveats: N=1 per cell (4 tasks × 2 arms × 1 rep = 8 subagent runs).
+Strong directional signal, weak statistical power. The skill picked
+decomposes cleanly along two near-orthogonal axes (language ×
+feature); a denser cross-referenced skill would show smaller savings.
+
+Full report, exact prompts, decomposed sidecar, and raw telemetry:
+[`skill_routing/`](skill_routing/).
+
 ## Concurrency model — what AGD means by "multi-agent safe"
 
 To prevent wrong expectations after reading S2:
@@ -307,8 +345,13 @@ benchmarks/
 ├── results/
 │   ├── summary.json           # S0–S6 + latency output
 │   └── cost.json              # S7 output (Anthropic API)
-└── scripts/
-    ├── generate.py            # corpus generator
-    ├── bench.py               # token-accounting harness
-    └── bench_cost.py          # real-money harness
+├── scripts/
+│   ├── generate.py            # corpus generator
+│   ├── bench.py               # token-accounting harness
+│   └── bench_cost.py          # real-money harness
+└── skill_routing/             # S8 — subagent A/B on a real skill
+    ├── README.md              # full report
+    ├── corpus/                # SKILL.md snapshot + decomposed .agd
+    ├── prompts/               # verbatim subagent prompts (8 cells)
+    └── results/               # raw telemetry per cell
 ```
