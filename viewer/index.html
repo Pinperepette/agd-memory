@@ -85,9 +85,16 @@ body {
   border: 1px solid var(--rule); color: var(--ink-3); margin-left: auto;
 }
 [data-theme="dark"] .search-trigger kbd {
-  background: var(--bg-3);
-  border-color: var(--rule-2);
-  color: var(--ink-2);
+  background: #1c1c20;
+  border-color: #fb923c44;
+  color: #fb923c;
+}
+[data-theme="dark"] .search-trigger:hover {
+  border-color: #fb923c;
+  color: #fb923c;
+}
+[data-theme="dark"] .search-trigger:hover kbd {
+  border-color: #fb923c;
 }
 .icon-btn {
   width: 32px; height: 32px;
@@ -99,7 +106,17 @@ body {
   transition: all 120ms;
 }
 .icon-btn:hover { background: var(--bg-3); color: var(--ink); border-color: var(--rule-2); }
-[data-theme="dark"] .icon-btn:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+[data-theme="dark"] .icon-btn {
+  background: #1c1c20;
+  border-color: #2e2e36;
+  color: #fb923c;
+}
+[data-theme="dark"] .icon-btn:hover {
+  background: #fb923c;
+  color: #18181b;
+  border-color: #fb923c;
+  box-shadow: 0 0 0 1px rgba(251, 146, 60, .25);
+}
 .mode-toggle {
   display: inline-flex; padding: 2px;
   background: var(--bg-2); border: 1px solid var(--rule); border-radius: 7px;
@@ -114,11 +131,25 @@ body {
   font-weight: 500;
   box-shadow: 0 1px 2px rgba(0,0,0,.05);
 }
+[data-theme="dark"] .mode-toggle {
+  background: transparent;
+  border-color: #2e2e36;
+}
 [data-theme="dark"] .mode-toggle button.active {
-  background: var(--bg-3);
+  background: #fb923c;
+  color: #18181b;
+  font-weight: 600;
   box-shadow:
-    0 1px 2px rgba(0,0,0,.4),
-    inset 0 1px 0 rgba(255,255,255,.04);
+    0 1px 2px rgba(0,0,0,.5),
+    0 0 0 1px rgba(251, 146, 60, .25);
+}
+[data-theme="dark"] .mode-toggle button:not(.active) {
+  background: transparent;
+  color: var(--ink-2);
+}
+[data-theme="dark"] .mode-toggle button:not(.active):hover {
+  background: #1c1c20;
+  color: #fb923c;
 }
 
 /* Mode show/hide ─────────────────────────────────────────────────── */
@@ -437,6 +468,16 @@ body.mode-graph .read-only  { display: none !important; }
   transition: all 120ms;
 }
 .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
+[data-theme="dark"] .pill-btn {
+  background: #1c1c20;
+  border-color: #2e2e36;
+  color: var(--ink-2);
+}
+[data-theme="dark"] .pill-btn:hover {
+  background: #fb923c;
+  color: #18181b;
+  border-color: #fb923c;
+}
 
 .details-pane {
   width: 380px; min-width: 320px;
