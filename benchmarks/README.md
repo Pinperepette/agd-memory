@@ -48,6 +48,24 @@ On a synthetic 200-block corpus (~18k tokens whole-doc):
    parent to orchestrate slices explicitly. Default Claude Code
    subagents run "independent" (~7.5×), not "shared" (45×).
 
+## See also: task-level bench
+
+A separate harness in [`task_bench/`](./task_bench/README.md) extends
+the question from "tokens shipped" to "real coding tasks". It runs
+SWE-bench Verified bug-fix instances through three retrieval
+strategies (`preload-bm25`, `grep-agent`, `agd-graph`) and scores the
+resulting patch against the gold patch. Adds a fifth measure to the
+list above:
+
+> **Retrieval Amplification Factor (RAF)** = tokens loaded into
+> context / tokens essential for the correct fix (the latter computed
+> from the gold patch).
+
+v0 results on 8 `psf/requests` tasks: `agd-graph` reduces RAF median
+from 128 (preload) to 7.4, while raising `function_overlap` from 0.44
+to 0.69 vs preload (0.50 vs grep-agent). Full write-up in
+[`task_bench/REPORT_v0.md`](./task_bench/REPORT_v0.md).
+
 ## S0 — synthetic vs real
 
 | corpus | blocks | whole-doc | TOC | ratio |
