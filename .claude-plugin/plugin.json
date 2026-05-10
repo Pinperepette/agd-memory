@@ -1,6 +1,6 @@
 {
   "name": "agd-memory",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Per-project persistent memory for Claude Code, stored in AGD format with selective retrieval (TOC + targeted block fetch). 6-15x fewer tokens than loading the whole memory file.",
   "author": {
     "name": "pinperepette",

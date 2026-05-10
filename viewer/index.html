@@ -125,9 +125,94 @@
     background-clip: text;
     color: transparent;
   }
+
+  /* Mode toggle: hide panes that don't belong to the current mode */
+  body.mode-read  .graph-only { display: none !important; }
+  body.mode-graph .read-only  { display: none !important; }
+
+  .mode-toggle {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px;
+    background: var(--bg-2);
+  }
+  .mode-toggle button {
+    padding: 4px 14px;
+    border-radius: 999px;
+    color: var(--fg-1);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 120ms ease;
+  }
+  .mode-toggle button.active {
+    background: var(--accent);
+    color: var(--bg-0);
+    font-weight: 600;
+  }
+
+  /* Reader pane: long-form, human-friendly */
+  #reader {
+    background: var(--bg-0);
+  }
+  .reader-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 48px 120px;
+  }
+  .reader-section { padding: 28px 0; border-top: 1px solid var(--line); }
+  .reader-section:first-of-type { border-top: none; padding-top: 8px; }
+  .reader-section .head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .reader-section .head .id {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--fg-0);
+  }
+  .reader-section .head .desc {
+    color: var(--fg-1);
+    font-size: 14px;
+  }
+  .reader-section .body-md {
+    color: var(--fg-0);
+    line-height: 1.65;
+    font-size: 15px;
+    margin-top: 10px;
+  }
+  .reader-section .body-md p { margin: 8px 0; }
+  .reader-section .body-md pre { font-size: 13px; }
+  .reader-section .meta {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--fg-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .reader-section .meta a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    cursor: pointer;
+  }
+  .reader-section .meta a:hover { text-decoration: underline; }
+  .reader-section.flash {
+    animation: flash 1.4s ease;
+  }
+  @keyframes flash {
+    0%   { background: transparent; }
+    20%  { background: rgba(125, 211, 252, 0.10); }
+    100% { background: transparent; }
+  }
 </style>
 </head>
-<body class="flex flex-col">
+<body class="flex flex-col mode-read">
   <header class="topbar border-b border-[var(--line)] px-4 py-3 flex items-center gap-4">
     <div class="flex items-center gap-2">
       <div class="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse"></div>
@@ -135,6 +220,10 @@
       <span class="text-[var(--fg-2)] text-xs mono" id="filepath"></span>
     </div>
     <div class="flex-1"></div>
+    <div class="mode-toggle" role="tablist" aria-label="view mode">
+      <button id="m-read"  class="active" data-mode="read">Read</button>
+      <button id="m-graph" data-mode="graph">Graph</button>
+    </div>
     <div class="flex items-center text-xs">
       <span class="stat"><span class="n" id="s-blocks">·</span><span class="l">blocks</span></span>
       <span class="stat"><span class="n" id="s-edges">·</span><span class="l">edges</span></span>
@@ -144,7 +233,7 @@
   </header>
 
   <div class="flex-1 flex min-h-0">
-    <!-- Left: list -->
+    <!-- Left: list (always visible) -->
     <aside class="pane flex flex-col" style="width: 320px; min-width: 280px; border-right: 1px solid var(--line);">
       <div class="p-3 space-y-2 border-b border-[var(--line)]">
         <input class="search mono" id="search" placeholder="search id, desc, body…" autofocus>
@@ -153,19 +242,23 @@
       <div class="scroll flex-1" id="list"></div>
     </aside>
 
-    <!-- Center: graph -->
+    <!-- Center: reader (default) or graph (toggle) -->
     <main class="flex-1 flex flex-col min-w-0">
-      <div id="cy" class="flex-1 min-h-0"></div>
-      <div class="text-[var(--fg-2)] text-xs px-3 py-2 border-t border-[var(--line)] flex items-center gap-3">
-        <span>drag to pan · scroll to zoom · click node to focus</span>
-        <span class="flex-1"></span>
-        <button id="fit" class="pill" style="cursor: pointer;">fit</button>
-        <button id="relayout" class="pill" style="cursor: pointer;">relayout</button>
+      <div id="reader" class="scroll flex-1 read-only"></div>
+
+      <div id="graph-wrap" class="flex-1 flex flex-col min-h-0 graph-only">
+        <div id="cy" class="flex-1 min-h-0"></div>
+        <div class="text-[var(--fg-2)] text-xs px-3 py-2 border-t border-[var(--line)] flex items-center gap-3">
+          <span>drag to pan · scroll to zoom · click node to focus</span>
+          <span class="flex-1"></span>
+          <button id="fit" class="pill" style="cursor: pointer;">fit</button>
+          <button id="relayout" class="pill" style="cursor: pointer;">relayout</button>
+        </div>
       </div>
     </main>
 
-    <!-- Right: details -->
-    <aside class="pane flex flex-col" style="width: 440px; min-width: 360px; border-left: 1px solid var(--line);">
+    <!-- Right: details (graph mode only) -->
+    <aside class="pane flex flex-col graph-only" style="width: 440px; min-width: 360px; border-left: 1px solid var(--line);">
       <div class="p-4 border-b border-[var(--line)]" id="details-head">
         <div class="text-[var(--fg-2)] text-xs uppercase tracking-wider">no selection</div>
       </div>
@@ -199,6 +292,8 @@ let DATA = null;
 let SELECTED = null;
 let activeKinds = new Set();   // empty = all
 let cy = null;
+let MODE = "read";             // "read" | "graph"
+let graphBuilt = false;
 
 async function load() {
   const r = await fetch("/memory.json");
@@ -215,7 +310,101 @@ async function load() {
   document.getElementById("s-bytes").textContent  = j.stats.bytes.toLocaleString();
   buildKindFilter(j.stats.kinds);
   renderList();
-  renderGraph();
+  renderReader();
+}
+
+function setMode(m) {
+  MODE = m;
+  document.body.classList.toggle("mode-read",  m === "read");
+  document.body.classList.toggle("mode-graph", m === "graph");
+  document.getElementById("m-read").classList.toggle("active",  m === "read");
+  document.getElementById("m-graph").classList.toggle("active", m === "graph");
+  if (m === "graph" && !graphBuilt) {
+    renderGraph();
+    graphBuilt = true;
+  } else if (m === "graph" && cy) {
+    // Cytoscape needs a resize hint after the container becomes visible
+    setTimeout(() => { cy.resize(); cy.fit(undefined, 30); }, 50);
+  }
+  if (m === "graph" && SELECTED) highlightNeighborhood(SELECTED);
+}
+
+function renderReader() {
+  const root = document.getElementById("reader");
+  root.innerHTML = "";
+  const inner = document.createElement("div");
+  inner.className = "reader-inner";
+  // Render in document order (the order the blocks appear in the file).
+  for (const b of DATA.blocks) {
+    const sec = document.createElement("section");
+    sec.className = "reader-section";
+    sec.id = "b-" + b.id;
+    const head = document.createElement("div");
+    head.className = "head";
+    const tag = document.createElement("span");
+    tag.className = "kind-tag mono";
+    tag.style.background = colorFor(b.kind) + "22";
+    tag.style.color = colorFor(b.kind);
+    tag.textContent = b.kind;
+    const id = document.createElement("span");
+    id.className = "id";
+    id.textContent = "#" + b.id;
+    head.appendChild(tag);
+    head.appendChild(id);
+    if (b.desc) {
+      const d = document.createElement("span");
+      d.className = "desc";
+      d.textContent = "— " + b.desc;
+      head.appendChild(d);
+    }
+    sec.appendChild(head);
+
+    if (b.body && b.body.length) {
+      const bd = document.createElement("div");
+      bd.className = "body-md";
+      bd.innerHTML = md.render(b.body);
+      sec.appendChild(bd);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    if (b.refs.length) {
+      const span = document.createElement("span");
+      span.innerHTML = "→ refs: " + b.refs.map(r => `<a data-id="${r}">#${r}</a>`).join(" ");
+      meta.appendChild(span);
+    }
+    if (b.backlinks.length) {
+      const span = document.createElement("span");
+      span.innerHTML = "← backlinks: " + b.backlinks.map(r => `<a data-id="${r}">#${r}</a>`).join(" ");
+      meta.appendChild(span);
+    }
+    if (meta.childNodes.length) sec.appendChild(meta);
+
+    inner.appendChild(sec);
+  }
+  root.appendChild(inner);
+  // Wire ref/backlink clicks to scroll
+  root.querySelectorAll("a[data-id]").forEach(a => {
+    a.onclick = e => { e.preventDefault(); jumpTo(a.dataset.id); };
+  });
+}
+
+function jumpTo(id) {
+  SELECTED = id;
+  if (MODE === "read") {
+    const el = document.getElementById("b-" + id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.classList.remove("flash");
+      void el.offsetWidth;        // force reflow to restart animation
+      el.classList.add("flash");
+    }
+  } else {
+    select(id);
+  }
+  // refresh list-row selection style
+  document.querySelectorAll(".row").forEach(r => r.classList.remove("selected"));
+  renderList();
 }
 
 function buildKindFilter(kinds) {
@@ -256,7 +445,7 @@ function renderList() {
   for (const b of blocks) {
     const row = document.createElement("div");
     row.className = "row" + (SELECTED === b.id ? " selected" : "");
-    row.onclick = () => select(b.id);
+    row.onclick = () => jumpTo(b.id);
     const tag = document.createElement("span");
     tag.className = "kind-tag mono";
     tag.style.background = colorFor(b.kind) + "22";
@@ -348,6 +537,10 @@ function renderGraph() {
 
   document.getElementById("fit").onclick = () => cy.fit(undefined, 30);
   document.getElementById("relayout").onclick = () => cy.layout({ name: "cose", animate: true, animationDuration: 600, idealEdgeLength: 90, nodeRepulsion: 6000, padding: 30 }).run();
+
+  // The container may have just become visible — give the layout a tick
+  // so cytoscape sees the real size, then fit.
+  setTimeout(() => { cy.resize(); cy.fit(undefined, 30); }, 60);
 }
 
 function filterGraph() {
@@ -446,8 +639,11 @@ function escapeHTML(s) {
 
 document.getElementById("search").addEventListener("input", () => {
   renderList();
-  filterGraph();
+  if (graphBuilt) filterGraph();
 });
+
+document.getElementById("m-read").addEventListener("click", () => setMode("read"));
+document.getElementById("m-graph").addEventListener("click", () => setMode("graph"));
 
 window.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== document.getElementById("search")) {
