@@ -39,11 +39,9 @@ disk.
 
    Verify: `agd --version` prints `agd 0.3.0` or newer.
 
-3. **Python 3.12** plus the `mcp` package (for the MCP server):
-
-   ```sh
-   python3.12 -m pip install mcp
-   ```
+3. **Python 3.10 or newer** (for the MCP server). The plugin auto-creates a
+   private venv at `~/.local/share/agd-memory/venv` on first launch and
+   installs the `mcp` package into it — no manual pip step.
 
 ## Install
 
@@ -152,6 +150,7 @@ agd-memory/
 │   ├── hooks.json          # registers SessionStart hook
 │   └── agd-memory-bootstrap.sh
 ├── mcp_servers/
+│   ├── run.sh              # self-bootstrapping launcher (creates venv on first run)
 │   └── server.py           # MCP server, four tools
 ├── .mcp.json               # registers the MCP server
 ├── requirements.txt        # mcp package
