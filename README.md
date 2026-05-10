@@ -34,13 +34,13 @@ disk.
    marketplace `github` source with `This plugin uses a source type your
    Claude Code version does not support`. Run `claude update` to upgrade,
    then `claude --version` to confirm.
-2. **`agd` CLI** (>= v0.3.0):
+2. **`agd` CLI** (>= v0.3.1):
 
    ```sh
-   cargo install --git https://github.com/Pinperepette/agd
+   cargo install --git https://github.com/Pinperepette/agd --tag v0.3.1
    ```
 
-   Verify: `agd --version` prints `agd 0.3.0` or newer.
+   Verify: `agd --version` prints `agd 0.3.1` or newer.
 
 3. **Python 3.10 or newer** (for the MCP server). The plugin auto-creates a
    private venv under `${CLAUDE_PLUGIN_DATA}/venv` on first launch and
