@@ -1,0 +1,460 @@
+@h1 Skill: claude-api (AGD-decomposed) [#h-root]
+
+@h2 Router [#h-router]
+
+@x-reference desc="entry point: routing map for claude-api skill" refs="#claude-api-defaults,#claude-api-output-rule,#claude-api-provider-check,#claude-api-lang-detect,#claude-api-task-router" [#claude-api-skill]
+~~~
+TRIGGERS: code imports `anthropic` / `@anthropic-ai/sdk`; user asks for Claude API,
+Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature
+(caching, thinking, compaction, tool use, batch, files, citations, memory) or model.
+SKIP: file imports `openai` / other-provider SDK, filename like `*-openai.py`.
+
+ALWAYS-RUN gates (apply on every task):
+  #claude-api-provider-check   pre-flight: detect non-Anthropic markers, refuse if mismatch
+  #claude-api-output-rule      SDK-vs-raw-HTTP rule
+  #claude-api-defaults         model + thinking + streaming defaults
+
+NAVIGATION:
+  Detect language          → #claude-api-lang-detect (then #ref-claude-api-{lang})
+  Pick a surface/tier      → #claude-api-surface-table → #claude-api-decision-tree
+  Per-task routing         → #claude-api-task-router (translates user intent → file fetches)
+  Lookup tables            → #claude-api-models-current, #claude-api-thinking-table,
+                             #claude-api-caching-quick, #claude-api-compaction-quick,
+                             #claude-api-lang-features
+  Managed Agents           → #claude-api-managed-agents
+  Architecture decisions   → #claude-api-architecture
+  Pitfalls (tagged)        → fetch the matching #claude-api-pitfall-* with the relevant feature
+
+WebFetch live docs only when: user says "latest"/"current", cached data looks wrong,
+or feature isn't covered. URLs in shared/live-sources.md.
+~~~
+
+@h2 Always-run gates [#h-gates]
+
+@x-reference desc="pre-flight: detect non-Anthropic providers, refuse on mismatch" [#claude-api-provider-check]
+~~~
+Scan target file (or prompt + project) for non-Anthropic markers:
+  `import openai` · `from openai` · `langchain_openai` · `OpenAI(`
+  `gpt-4` · `gpt-5` · file names like `agent-openai.py` · `*-generic.py`
+  any explicit instruction to keep code provider-neutral
+
+If found: STOP. Tell user this skill produces Claude/Anthropic SDK code; ask whether
+they want to switch the file to Claude or want a non-Claude implementation.
+Do NOT edit a non-Anthropic file with Anthropic SDK calls.
+~~~
+
+@x-reference desc="output rule: SDK vs raw HTTP, never mix, no OpenAI shims" [#claude-api-output-rule]
+~~~
+When user asks to add/modify/implement a Claude feature, code MUST call Claude through ONE of:
+
+1. Official Anthropic SDK for the project's language
+   (`anthropic`, `@anthropic-ai/sdk`, `com.anthropic.*`, etc.)
+   DEFAULT whenever a supported SDK exists.
+
+2. Raw HTTP (`curl`, `requests`, `fetch`, `httpx`)
+   ONLY when user explicitly asks for cURL/REST/raw HTTP, project is shell/cURL,
+   or language has no official SDK.
+
+NEVER mix the two. NEVER use OpenAI-compatible shims.
+
+NEVER guess SDK usage. Function/class names, namespaces, signatures, import paths
+must come from explicit docs — `{lang}/` files in skill, official SDK repos, or
+shared/live-sources.md. If a binding isn't documented, WebFetch the SDK repo
+BEFORE writing code. Do not infer Ruby/Java/Go/PHP/C# APIs from cURL or other lang.
+~~~
+
+@x-reference desc="defaults: Opus 4.7 + adaptive thinking + streaming-when-long" refs="#claude-api-models-current,#claude-api-thinking-table,#claude-api-pitfall-thinking-47,#claude-api-pitfall-max-tokens" [#claude-api-defaults]
+~~~
+Unless user requests otherwise:
+
+MODEL    : Claude Opus 4.7 — model string `claude-opus-4-7`
+THINKING : adaptive — `thinking: {type: "adaptive"}` for anything remotely complex
+STREAMING: any request with long input, long output, or high `max_tokens` — prevents
+           hitting request timeouts. Use SDK `.get_final_message()` / `.finalMessage()`
+           helper to get the complete response if you don't need individual stream events.
+
+Other models / older patterns → see #claude-api-models-current
+Thinking config per model     → see #claude-api-thinking-table
+Common max_tokens trap        → see #claude-api-pitfall-max-tokens
+~~~
+
+@h2 Lookup tables [#h-lookups]
+
+@x-reference desc="file-extension → language → folder lookup" refs="#claude-api-lang-features,#ref-claude-api-python,#ref-claude-api-typescript,#ref-claude-api-java,#ref-claude-api-go,#ref-claude-api-ruby,#ref-claude-api-csharp,#ref-claude-api-php,#ref-claude-api-curl" [#claude-api-lang-detect]
+~~~
+1. Infer from project files:
+
+  *.py, requirements.txt, pyproject.toml, setup.py, Pipfile      → Python   → python/
+  *.ts, *.tsx, package.json, tsconfig.json                       → TypeScript → typescript/
+  *.js, *.jsx (no .ts files)                                     → TypeScript (JS uses same SDK)
+  *.java, pom.xml, build.gradle                                  → Java     → java/
+  *.kt, *.kts, build.gradle.kts                                  → Java (Kotlin uses Java SDK)
+  *.scala, build.sbt                                             → Java (Scala uses Java SDK)
+  *.go, go.mod                                                   → Go       → go/
+  *.rb, Gemfile                                                  → Ruby     → ruby/
+  *.cs, *.csproj                                                 → C#       → csharp/
+  *.php, composer.json                                           → PHP      → php/
+
+2. Multiple langs detected → check current file or ask:
+   "I detected both X and Y. Which language are you using?"
+
+3. Can't infer → AskUserQuestion (Python/TypeScript/Java/Go/Ruby/cURL/C#/PHP).
+   If unavailable, default Python and note it.
+
+4. Unsupported lang (Rust/Swift/C++/Elixir) → suggest cURL from curl/, mention
+   community SDKs may exist, offer Python/TS as reference.
+
+5. User asks for cURL/raw HTTP → curl/.
+~~~
+
+@x-reference desc="language × feature support matrix (tool runner, managed agents)" [#claude-api-lang-features]
+~~~
+| Language   | Tool Runner | Managed Agents | Notes                                 |
+|------------|-------------|----------------|---------------------------------------|
+| Python     | Yes (beta)  | Yes (beta)     | Full — `@beta_tool` decorator         |
+| TypeScript | Yes (beta)  | Yes (beta)     | Full — `betaZodTool` + Zod            |
+| Java       | Yes (beta)  | Yes (beta)     | Beta tool use with annotated classes  |
+| Go         | Yes (beta)  | Yes (beta)     | `BetaToolRunner` in `toolrunner` pkg  |
+| Ruby       | Yes (beta)  | Yes (beta)     | `BaseTool` + `tool_runner` in beta    |
+| C#         | No          | No             | Official SDK only                     |
+| PHP        | Yes (beta)  | Yes (beta)     | `BetaRunnableTool` + `toolRunner()`   |
+| cURL       | N/A         | Yes (beta)     | Raw HTTP, no SDK features             |
+~~~
+
+@x-reference desc="use-case → tier → recommended surface" refs="#claude-api-decision-tree,#claude-api-architecture" [#claude-api-surface-table]
+~~~
+START SIMPLE. Default to simplest tier that meets needs. Single API calls handle most
+cases — only reach for agents when task genuinely requires open-ended exploration.
+
+| Use case                                          | Tier            | Surface                   |
+|---------------------------------------------------|-----------------|---------------------------|
+| Classification, summarization, extraction, Q&A    | Single LLM call | Claude API                |
+| Batch processing or embeddings                    | Single LLM call | Claude API (batch endpt)  |
+| Multi-step pipeline w/ code-controlled logic      | Workflow        | Claude API + tool use     |
+| Open-ended task w/ unknown # of steps             | Agent           | Tool runner / Managed Ag. |
+| Persistent agents w/ workspace, sessions          | Managed Agent   | Anthropic Managed Agents  |
+
+For "should I build an agent?" → #claude-api-decision-tree
+For deeper architecture choices → #claude-api-architecture
+~~~
+
+@x-reference desc="agent-vs-workflow decision tree" [#claude-api-decision-tree]
+~~~
+Build an AGENT only when ALL of:
+- Task has no fixed steps (open-ended exploration)
+- Number of steps is unknown ahead of time
+- Branching depends on prior tool results
+- Outcome quality justifies extra latency + cost
+
+Otherwise prefer WORKFLOW (you write the loop in code) — predictable, debuggable,
+cheaper, faster. Most "agent" requests are actually workflows in disguise.
+~~~
+
+@x-reference desc="architecture: bash-vs-dedicated tools, context mgmt, caching strategy" [#claude-api-architecture]
+~~~
+Concept-only summary. For depth: shared/agent-design.md.
+
+Tool surface:
+  bash tool        — flexible, agent-driven; wide attack surface
+  dedicated tools  — typed, narrow, easier to validate; more upfront design
+
+Context management (3 mechanisms, pick by lifetime):
+  context editing  — drop old turns mid-conversation (transient)
+  compaction       — summarize when nearing window (medium)
+  memory tool      — persistent across sessions (long-lived)
+
+Caching: design for prefix stability (system prompts + tool defs first).
+See #claude-api-caching-quick and shared/prompt-caching.md.
+~~~
+
+@x-reference desc="current Claude models + strings (cached: 2026-04-15)" refs="#ref-claude-api-shared-live-sources" [#claude-api-models-current]
+~~~
+Cached snapshot — re-fetch shared/live-sources.md if user asks for "latest".
+
+  Family   | String                        | Notes
+  ---------+-------------------------------+----------------------------------------
+  Opus 4.7 | claude-opus-4-7               | Default. Adaptive thinking only.
+           |                               | budget_tokens / temperature / top_p / top_k
+           |                               | all REMOVED. Prefills return 400.
+  Opus 4.6 | claude-opus-4-6               | Adaptive thinking. Prefills return 400.
+  Sonnet 4.6| claude-sonnet-4-6            | Adaptive thinking. Prefills return 400.
+  Haiku 4.5| claude-haiku-4-5-20251001     | Fastest, smallest 4.x.
+~~~
+
+@x-reference desc="thinking config per model (quick reference)" refs="#claude-api-pitfall-thinking-47" [#claude-api-thinking-table]
+~~~
+| Model        | Config                                  | Notes                       |
+|--------------|-----------------------------------------|-----------------------------|
+| Opus 4.7     | thinking: {type: "adaptive"}            | ONLY adaptive. budget=400.  |
+| Opus 4.6     | thinking: {type: "adaptive"}            | budget_tokens deprecated    |
+| Sonnet 4.6   | thinking: {type: "adaptive"}            | budget_tokens deprecated    |
+| Older models | thinking: {type:"enabled", budget_tokens:N} | budget < max_tokens, ≥1024 |
+
+For migration of existing budget_tokens code → shared/model-migration.md
+(transitional escape hatch; does NOT apply to Opus 4.7).
+~~~
+
+@x-reference desc="prompt caching — quick reference" refs="#ref-claude-api-shared-prompt-caching" [#claude-api-caching-quick]
+~~~
+Apps built with this skill SHOULD include prompt caching.
+
+Principles (full doc: shared/prompt-caching.md → #ref-claude-api-shared-prompt-caching):
+- Design for PREFIX STABILITY: put system prompts + tool defs FIRST and don't mutate them
+- Place cache_control breakpoints at stable boundaries (end of system, end of tools)
+- DO NOT interleave volatile content (timestamps, request IDs) into cached prefixes
+- Anti-pattern: appending dynamic context to system prompt (silently invalidates)
+
+If user asks "why is my cache hit rate low" → fetch shared/prompt-caching.md.
+~~~
+
+@x-reference desc="compaction — quick reference (long conversations)" [#claude-api-compaction-quick]
+~~~
+For long-running conversations that may exceed the context window, use COMPACTION:
+the SDK's built-in helper summarizes older turns when usage approaches the limit.
+
+For detail (when to compact, what's preserved, interaction with tools):
+read {lang}/claude-api/README.md → Compaction section.
+
+Alternative mechanisms (lifetime trade-off):
+  context editing  → transient drops
+  memory tool      → persistent across sessions
+~~~
+
+@h2 Task router (Reading Guide, executable) [#h-task-router]
+
+@x-reference desc="user intent → which files to fetch (compiled Reading Guide)" refs="#ref-claude-api-shared-prompt-caching,#ref-claude-api-shared-tool-use-concepts,#ref-claude-api-shared-agent-design,#ref-claude-api-shared-model-migration" [#claude-api-task-router]
+~~~
+After language detected, route by user intent:
+
+INTENT                                              FETCH (from CDN)
+----------------------------------------------------+--------------------------------------------------
+single classification/summ/extract/Q&A              {lang}/claude-api/README.md
+chat UI / real-time response display                {lang}/claude-api/README.md + streaming.md
+long conversation (may exceed window)               {lang}/claude-api/README.md (Compaction §)
+migrate to newer model / replace retired            shared/model-migration.md
+prompt caching / "why low hit rate"                 shared/prompt-caching.md + README.md (caching §)
+function calling / tool use / agents                README.md + shared/tool-use-concepts.md + tool-use.md
+agent design (tool surface, ctx mgmt, caching)      shared/agent-design.md
+batch processing (non-latency-sensitive)            README.md + batches.md
+file uploads across multiple requests               README.md + files-api.md
+managed agents                                      see #claude-api-managed-agents
+debug HTTP errors                                   shared/error-codes.md
+"latest"/"current" anything                         WebFetch from shared/live-sources.md
+~~~
+
+@h2 Managed Agents [#h-managed-agents]
+
+@x-reference desc="Managed Agents (Beta) — overview + critical lifecycle rule" refs="#ref-claude-api-managed-agents-overview,#ref-claude-api-shared-managed-agents-client-patterns" [#claude-api-managed-agents]
+~~~
+Managed Agents = server-managed stateful agents with workspace.
+
+CRITICAL: Agents are PERSISTENT. Create ONCE, reference by ID.
+  - Store the agent ID returned by `agents.create`
+  - Pass it to every subsequent `sessions.create`
+  - DO NOT call `agents.create` in the request path
+
+Per-language READMEs: Python/TypeScript/Go/Ruby/PHP/Java/cURL → {lang}/managed-agents/README.md
+Concept files (language-agnostic): shared/managed-agents-*.md
+
+Anthropic CLI = convenient way to create agents/environments from version-controlled YAML
+(URL in shared/live-sources.md).
+
+Client code patterns (stream reconnect, processed_at gate, interrupt, tool_confirmation,
+idle/terminated break, post-idle status race, file-mount gotchas, host-side credentials):
+→ shared/managed-agents-client-patterns.md
+
+C# does NOT support Managed Agents — use raw HTTP from curl/managed-agents.md.
+~~~
+
+@h2 Pitfalls (tagged per-feature, fetched with the feature) [#h-pitfalls]
+
+@x-reference desc="pitfall: Opus 4.7 thinking is adaptive-only, budget_tokens returns 400" [#claude-api-pitfall-thinking-47]
+~~~
+Opus 4.7: thinking: {type: "enabled", budget_tokens: N} returns 400.
+budget_tokens fully REMOVED on Opus 4.7 (along with temperature, top_p, top_k).
+Use thinking: {type: "adaptive"}.
+~~~
+
+@x-reference desc="pitfall: 4.6/4.7 family removed assistant prefills (400 error)" [#claude-api-pitfall-prefill-removed]
+~~~
+Assistant message prefills (last-assistant-turn prefills) return 400 on:
+  Opus 4.6, Opus 4.7, Sonnet 4.6.
+
+Use structured outputs (output_config.format) or system prompt instructions to control
+response format instead.
+~~~
+
+@x-reference desc="pitfall: max_tokens defaults — don't lowball, watch streaming threshold" [#claude-api-pitfall-max-tokens]
+~~~
+Don't lowball max_tokens — hitting cap truncates output mid-thought, requires retry.
+
+Defaults:
+  non-streaming requests: ~16000   (keeps under SDK HTTP timeouts)
+  streaming requests:     ~64000   (timeouts not a concern, give the model room)
+  classification only:    ~256
+  cost caps / deliberately short: lower
+
+128K output (Opus 4.6 + 4.7): SDKs require streaming for values that large to avoid
+HTTP timeouts. Use .stream() with .get_final_message() / .finalMessage().
+~~~
+
+@x-reference desc="pitfall: tool call JSON parsing — always parse, never string-match" [#claude-api-pitfall-tool-json-parsing]
+~~~
+Opus 4.6, Opus 4.7, Sonnet 4.6 may produce different JSON string escaping in tool call
+`input` fields (Unicode or forward-slash escaping).
+
+Always parse tool inputs with json.loads() / JSON.parse() — never raw-string-match
+the serialized input.
+~~~
+
+@x-reference desc="pitfall: confirm migration scope before editing files" [#claude-api-pitfall-migration-scope]
+~~~
+When user asks to migrate code to a newer Claude model WITHOUT naming a specific
+file/dir/list, ASK which scope to apply first. Do not start editing until confirmed.
+
+Imperative phrasings still ambiguous: "migrate my codebase", "move my project to X",
+"upgrade to Sonnet 4.6", bare "migrate to Opus 4.7" — they say WHAT, not WHERE.
+
+Proceed without asking ONLY when prompt names: exact file ("migrate `app.py`"),
+specific dir ("under `services/`"), or explicit list ("update `a.py` and `b.py`").
+
+Reference: shared/model-migration.md Step 0.
+~~~
+
+@x-reference desc="pitfall: don't truncate inputs silently" [#claude-api-pitfall-no-truncate]
+~~~
+Don't truncate inputs when passing files/content to the API.
+If content is too long for context window, NOTIFY user and discuss options
+(chunking, summarization, etc.) rather than silently truncating.
+~~~
+
+@x-reference desc="pitfall: don't reimplement SDK helpers; don't redefine SDK types" [#claude-api-pitfall-no-reimpl-sdk]
+~~~
+SDK provides high-level helpers — use them, don't rebuild.
+  Use stream.finalMessage()  not  wrapping .on() events in new Promise()
+  Use typed exception classes (Anthropic.RateLimitError, etc.)  not  string-matching errors
+  Use SDK types (Anthropic.MessageParam, Anthropic.Tool, Anthropic.Message)
+    not redefining equivalent interfaces
+
+Defining your own `interface ChatMessage { role: string; content: unknown }` duplicates
+what the SDK provides and loses type safety.
+
+Structured outputs: use output_config: {format: {...}} — the deprecated `output_format`
+parameter is gone. (General API change, not 4.6-specific.)
+~~~
+
+@h2 Reference stubs (CDN pointers — fetched on demand) [#h-refs]
+
+@x-reference desc="stub: python/ folder — Python SDK guide + examples" [#ref-claude-api-python]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/python/
+Files: claude-api/README.md (install, quick start, common patterns, errors)
+       claude-api/streaming.md, tool-use.md, batches.md, files-api.md
+       managed-agents/README.md
+Fetch when language detected = Python.
+~~~
+
+@x-reference desc="stub: typescript/ folder — TS/JS SDK guide + examples" [#ref-claude-api-typescript]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/typescript/
+Files: same shape as python/ — README, streaming, tool-use, batches, files-api,
+       managed-agents/README. JS uses the same SDK as TS.
+Fetch when language detected = TypeScript or JavaScript.
+~~~
+
+@x-reference desc="stub: java/ folder (also serves Kotlin/Scala)" [#ref-claude-api-java]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/java/
+Single-file shape (vs python/ts split).
+Kotlin (*.kt) and Scala (*.scala) use this SDK.
+~~~
+
+@x-reference desc="stub: go/ folder" [#ref-claude-api-go]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/go/
+Single-file shape. Tool runner: BetaToolRunner in `toolrunner` pkg.
+~~~
+
+@x-reference desc="stub: ruby/ folder" [#ref-claude-api-ruby]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/ruby/
+Tool runner: BaseTool + tool_runner (beta).
+~~~
+
+@x-reference desc="stub: csharp/ folder — official SDK, no tool runner / managed agents" [#ref-claude-api-csharp]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/csharp/
+NOTE: No tool runner support, no Managed Agents. For Managed Agents in C#,
+use raw HTTP from curl/managed-agents.md.
+~~~
+
+@x-reference desc="stub: php/ folder" [#ref-claude-api-php]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/php/
+Tool runner: BetaRunnableTool + toolRunner() (beta).
+~~~
+
+@x-reference desc="stub: curl/ folder — raw HTTP for any language without SDK" [#ref-claude-api-curl]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/curl/
+Files: claude-api/README.md, managed-agents.md
+Use when: user explicitly asks raw HTTP, language has no SDK, or unsupported lang
+(Rust/Swift/C++/Elixir/...).
+~~~
+
+@x-reference desc="stub: shared/prompt-caching.md — caching deep dive" [#ref-claude-api-shared-prompt-caching]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/prompt-caching.md
+Topic: prefix-stability design, breakpoint placement, anti-patterns that silently
+invalidate cache. Fetch when adding/optimizing caching or debugging low hit rate.
+~~~
+
+@x-reference desc="stub: shared/tool-use-concepts.md — function calling foundations" [#ref-claude-api-shared-tool-use-concepts]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/tool-use-concepts.md
+Topic: function calling, code execution, memory, structured outputs — conceptual.
+Pair with {lang}/claude-api/tool-use.md for code.
+~~~
+
+@x-reference desc="stub: shared/agent-design.md — tool surface, ctx mgmt, caching strategy" [#ref-claude-api-shared-agent-design]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/agent-design.md
+Topic: bash vs dedicated tools, programmatic tool calling, tool search/skills,
+context editing vs compaction vs memory, caching principles. Fetch at agent design time.
+~~~
+
+@x-reference desc="stub: shared/model-migration.md — version migration playbook" [#ref-claude-api-shared-model-migration]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/model-migration.md
+Topic: upgrading models, replacing retired ones, translating budget_tokens / prefill
+patterns to current API. Includes Step 0 = scope confirmation gate.
+~~~
+
+@x-reference desc="stub: shared/managed-agents-overview.md + companion concept files" [#ref-claude-api-managed-agents-overview]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/managed-agents-*.md
+Files: overview, lifecycle, sessions, tools, files, error semantics, etc.
+Fetch alongside {lang}/managed-agents/README.md for full picture.
+~~~
+
+@x-reference desc="stub: shared/managed-agents-client-patterns.md — gotchas at the edge" [#ref-claude-api-shared-managed-agents-client-patterns]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/managed-agents-client-patterns.md
+Topic: lossless stream reconnect, processed_at queued/processed gate, interrupt,
+tool_confirmation round-trip, idle/terminated break gate, post-idle status race,
+stream-first ordering, file-mount gotchas, keeping credentials host-side via custom tools.
+Fetch when writing client code for Managed Agents.
+~~~
+
+@x-reference desc="stub: shared/error-codes.md — HTTP error reference" [#ref-claude-api-shared-error-codes]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/error-codes.md
+Topic: HTTP error codes + recommended handling. Fetch when debugging or adding
+error handling.
+~~~
+
+@x-reference desc="stub: shared/live-sources.md — WebFetch URLs for current docs" [#ref-claude-api-shared-live-sources]
+~~~
+CDN: github.com/anthropics/skills/tree/main/skills/claude-api/shared/live-sources.md
+Topic: canonical URLs to WebFetch when user wants "latest" or cached snapshot is wrong.
+~~~
