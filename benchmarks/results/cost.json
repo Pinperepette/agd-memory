@@ -1,0 +1,200 @@
+{
+  "corpus": "corpora/mem-200.agd",
+  "model": "claude-haiku-4-5",
+  "turns": 5,
+  "seed": 42,
+  "whole_doc_cached": {
+    "per_turn": [
+      {
+        "turn": 1,
+        "latency_s": 1.77,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 20041
+        },
+        "cache_creation_input_tokens": 20041,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 45,
+        "output_tokens": 120,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.025696
+      },
+      {
+        "turn": 2,
+        "latency_s": 1.446,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 20041,
+        "input_tokens": 45,
+        "output_tokens": 119,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.002644
+      },
+      {
+        "turn": 3,
+        "latency_s": 1.685,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 20041,
+        "input_tokens": 45,
+        "output_tokens": 120,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.002649
+      },
+      {
+        "turn": 4,
+        "latency_s": 2.192,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 20041,
+        "input_tokens": 45,
+        "output_tokens": 120,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.002649
+      },
+      {
+        "turn": 5,
+        "latency_s": 2.163,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 20041,
+        "input_tokens": 45,
+        "output_tokens": 120,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.002649
+      }
+    ],
+    "totals": {
+      "strategy": "whole_doc_cached",
+      "turns": 5,
+      "total_input_tokens": 225,
+      "total_cache_write": 20041,
+      "total_cache_read": 80164,
+      "total_output_tokens": 599,
+      "total_cost_usd": 0.036287,
+      "avg_latency_s": 1.851
+    }
+  },
+  "selective_uncached": {
+    "per_turn": [
+      {
+        "turn": 1,
+        "block_id": "project-milestone-164",
+        "latency_s": 1.422,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 2923,
+        "output_tokens": 66,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.003253
+      },
+      {
+        "turn": 2,
+        "block_id": "project-spike-029",
+        "latency_s": 1.773,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 2922,
+        "output_tokens": 98,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.003412
+      },
+      {
+        "turn": 3,
+        "block_id": "project-milestone-007",
+        "latency_s": 1.422,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 2882,
+        "output_tokens": 86,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.003312
+      },
+      {
+        "turn": 4,
+        "block_id": "reference-paper-190",
+        "latency_s": 3.027,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 2931,
+        "output_tokens": 119,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.003526
+      },
+      {
+        "turn": 5,
+        "block_id": "project-decision-071",
+        "latency_s": 1.694,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 2876,
+        "output_tokens": 97,
+        "server_tool_use": null,
+        "service_tier": "standard",
+        "inference_geo": "not_available",
+        "cost_usd": 0.003361
+      }
+    ],
+    "totals": {
+      "strategy": "selective_uncached",
+      "turns": 5,
+      "total_input_tokens": 14534,
+      "total_cache_write": 0,
+      "total_cache_read": 0,
+      "total_output_tokens": 466,
+      "total_cost_usd": 0.016864,
+      "avg_latency_s": 1.868
+    }
+  },
+  "dollar_savings_ratio": 2.15
+}

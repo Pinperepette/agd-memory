@@ -1,0 +1,209 @@
+{
+  "seed": 42,
+  "s0": {
+    "synthetic": {
+      "label": "synthetic mem-50",
+      "blocks": 50,
+      "whole_doc": 4446,
+      "toc": 541,
+      "ratio": 8.2
+    },
+    "real": {
+      "label": "real memory.agd",
+      "blocks": 31,
+      "whole_doc": 4790,
+      "toc": 748,
+      "ratio": 6.4
+    }
+  },
+  "s1": [
+    {
+      "size": "10",
+      "blocks": 10,
+      "whole_doc": 915,
+      "toc_only": 104,
+      "toc_plus_1": 172,
+      "toc_plus_3": 381,
+      "savings_toc": 8.8,
+      "savings_toc_plus_1": 5.3,
+      "savings_toc_plus_3": 2.4
+    },
+    {
+      "size": "50",
+      "blocks": 50,
+      "whole_doc": 4446,
+      "toc_only": 541,
+      "toc_plus_1": 650,
+      "toc_plus_3": 770,
+      "savings_toc": 8.2,
+      "savings_toc_plus_1": 6.8,
+      "savings_toc_plus_3": 5.8
+    },
+    {
+      "size": "200",
+      "blocks": 200,
+      "whole_doc": 18245,
+      "toc_only": 2233,
+      "toc_plus_1": 2313,
+      "toc_plus_3": 2535,
+      "savings_toc": 8.2,
+      "savings_toc_plus_1": 7.9,
+      "savings_toc_plus_3": 7.2
+    },
+    {
+      "size": "1000",
+      "blocks": 1000,
+      "whole_doc": 90428,
+      "toc_only": 11152,
+      "toc_plus_1": 11246,
+      "toc_plus_3": 11394,
+      "savings_toc": 8.1,
+      "savings_toc_plus_1": 8.0,
+      "savings_toc_plus_3": 7.9
+    }
+  ],
+  "s2": [
+    {
+      "n_agents": 1,
+      "naive_each_loads_whole": 18245,
+      "independent_toc_plus_picks": 2346,
+      "shared_toc_plus_picks": 2346,
+      "savings_independent": 7.8,
+      "savings_shared": 7.8
+    },
+    {
+      "n_agents": 3,
+      "naive_each_loads_whole": 54735,
+      "independent_toc_plus_picks": 7247,
+      "shared_toc_plus_picks": 2781,
+      "savings_independent": 7.6,
+      "savings_shared": 19.7
+    },
+    {
+      "n_agents": 5,
+      "naive_each_loads_whole": 91225,
+      "independent_toc_plus_picks": 12086,
+      "shared_toc_plus_picks": 3154,
+      "savings_independent": 7.5,
+      "savings_shared": 28.9
+    },
+    {
+      "n_agents": 10,
+      "naive_each_loads_whole": 182450,
+      "independent_toc_plus_picks": 24093,
+      "shared_toc_plus_picks": 3996,
+      "savings_independent": 7.6,
+      "savings_shared": 45.7
+    },
+    {
+      "n_agents": 20,
+      "naive_each_loads_whole": 364900,
+      "independent_toc_plus_picks": 48217,
+      "shared_toc_plus_picks": 5790,
+      "savings_independent": 7.6,
+      "savings_shared": 63.0
+    }
+  ],
+  "s3": [
+    {
+      "turns": 20,
+      "whole_doc_kept": 18245,
+      "selective_cumulative": 5297,
+      "savings": 3.4,
+      "per_turn_avg": 153.2
+    }
+  ],
+  "s4": [
+    {
+      "context": "blog-write",
+      "kinds": "x-user,x-feedback",
+      "whole_doc": 18245,
+      "scoped_toc": 1157,
+      "savings": 15.8
+    },
+    {
+      "context": "code-review",
+      "kinds": "x-feedback,x-reference",
+      "whole_doc": 18245,
+      "scoped_toc": 1340,
+      "savings": 13.6
+    },
+    {
+      "context": "project-status",
+      "kinds": "x-project",
+      "whole_doc": 18245,
+      "scoped_toc": 726,
+      "savings": 25.1
+    }
+  ],
+  "s5": [
+    {
+      "format": "AGD",
+      "whole_doc": 18245,
+      "toc_or_idlist": 2233,
+      "selective_fetch": 2340,
+      "savings_vs_whole": 7.8,
+      "addressable": true
+    },
+    {
+      "format": "XML",
+      "whole_doc": 20163,
+      "toc_or_idlist": 2229,
+      "selective_fetch": 2345,
+      "savings_vs_whole": 8.6,
+      "addressable": true
+    },
+    {
+      "format": "Markdown",
+      "whole_doc": 14342,
+      "toc_or_idlist": null,
+      "selective_fetch": 14342,
+      "savings_vs_whole": 1.0,
+      "addressable": false
+    }
+  ],
+  "s6": [
+    {
+      "fanin": 5,
+      "whole_doc": 18249,
+      "anchor_only": 33,
+      "with_backlinks": 505,
+      "ratio_vs_anchor": 15.3,
+      "fraction_of_whole": 0.03
+    },
+    {
+      "fanin": 50,
+      "whole_doc": 18499,
+      "anchor_only": 33,
+      "with_backlinks": 4804,
+      "ratio_vs_anchor": 145.6,
+      "fraction_of_whole": 0.26
+    },
+    {
+      "fanin": 200,
+      "whole_doc": 23652,
+      "anchor_only": 33,
+      "with_backlinks": 19246,
+      "ratio_vs_anchor": 583.2,
+      "fraction_of_whole": 0.81
+    }
+  ],
+  "latency_ms": [
+    {
+      "op": "agd ids",
+      "median_ms": 22.5
+    },
+    {
+      "op": "agd ids --kind",
+      "median_ms": 21.4
+    },
+    {
+      "op": "agd get 1 block",
+      "median_ms": 21.0
+    },
+    {
+      "op": "cat (I/O baseline)",
+      "median_ms": 16.7
+    }
+  ]
+}
