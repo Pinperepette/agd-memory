@@ -140,6 +140,25 @@ Measured on a 37-entry memory file (~4.7k tokens total, 2026-05-09):
 The ratio scales with corpus size: at 1k entries it sits around 12x
 on a 1-block selective fetch; at 10k entries closer to 14x.
 
+## Local viewer
+
+A bundled single-page viewer renders the memory as a searchable list, a
+live force-directed graph (nodes = blocks, edges = `refs`), and a body
+pane with refs/backlinks navigation. Pure Python `http.server`, no extra
+dependencies, opens the browser automatically.
+
+```sh
+viewer/run.sh
+```
+
+That serves the current project's memory at `http://127.0.0.1:8765/`
+(or the next free port). Pass a path to view any AGD file:
+`viewer/run.sh path/to/file.agd`. Inside a Claude Code session, the
+`memory-view` skill triggers on phrases like "show me the memory" or
+"open the memory" and starts the server in the background.
+
+Keyboard: `/` focuses the search, `Esc` clears selection.
+
 ## Layout
 
 ```
@@ -148,7 +167,9 @@ agd-memory/
 │   ├── plugin.json         # plugin manifest
 │   └── marketplace.json    # marketplace definition for /plugin install
 ├── skills/
-│   └── memory/
+│   ├── memory/
+│   │   └── SKILL.md
+│   └── memory-view/
 │       └── SKILL.md
 ├── hooks/
 │   ├── hooks.json          # registers SessionStart hook
@@ -156,6 +177,10 @@ agd-memory/
 ├── mcp_servers/
 │   ├── run.sh              # self-bootstrapping launcher (creates venv on first run)
 │   └── server.py           # MCP server, four tools
+├── viewer/
+│   ├── run.sh              # launcher: locates python and runs viewer.py
+│   ├── viewer.py           # http.server + JSON endpoint
+│   └── index.html          # single-page UI (cytoscape, markdown-it, tailwind)
 ├── .mcp.json               # registers the MCP server
 ├── requirements.txt        # mcp package
 ├── README.md

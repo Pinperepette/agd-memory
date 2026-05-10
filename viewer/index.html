@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agd-memory viewer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+<style>
+  :root {
+    --bg-0: #0a0a0c;
+    --bg-1: #111114;
+    --bg-2: #181820;
+    --bg-3: #22222c;
+    --line: #2a2a36;
+    --fg-0: #e6e6f0;
+    --fg-1: #b6b6c8;
+    --fg-2: #6c6c80;
+    --accent: #7dd3fc;       /* cyan */
+    --accent-2: #c4b5fd;     /* violet */
+    --warn: #fca5a5;
+    --good: #86efac;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg-0);
+    color: var(--fg-0);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", monospace; }
+  .pane { background: var(--bg-1); border: 1px solid var(--line); }
+  .scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--bg-3) transparent; }
+  .scroll::-webkit-scrollbar { width: 8px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+  .pill {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg-3);
+    color: var(--fg-1);
+    border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .pill.active { background: var(--accent); color: var(--bg-0); border-color: var(--accent); }
+  .row {
+    cursor: pointer;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    transition: background 80ms ease;
+  }
+  .row:hover { background: var(--bg-2); }
+  .row.selected { background: var(--bg-3); border-left: 2px solid var(--accent); padding-left: 10px; }
+  .kind-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    font-weight: 500;
+  }
+  .body-md h1 { font-size: 18px; margin: 12px 0 8px; }
+  .body-md h2 { font-size: 16px; margin: 10px 0 6px; }
+  .body-md h3 { font-size: 14px; margin: 8px 0 4px; color: var(--fg-1); }
+  .body-md p { margin: 6px 0; }
+  .body-md code {
+    background: var(--bg-2);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    color: var(--accent);
+  }
+  .body-md pre {
+    background: var(--bg-2);
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    border: 1px solid var(--line);
+  }
+  .body-md pre code { background: transparent; padding: 0; color: var(--fg-0); }
+  .body-md ul, .body-md ol { padding-left: 20px; }
+  .body-md a { color: var(--accent); text-decoration: none; }
+  .body-md a:hover { text-decoration: underline; }
+  .body-md blockquote {
+    border-left: 3px solid var(--accent-2);
+    padding-left: 10px;
+    margin: 6px 0;
+    color: var(--fg-1);
+  }
+  input.search {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--fg-0);
+    padding: 6px 10px;
+    border-radius: 6px;
+    outline: none;
+    width: 100%;
+  }
+  input.search:focus { border-color: var(--accent); }
+  .ref-link {
+    color: var(--accent);
+    cursor: pointer;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  }
+  .ref-link:hover { text-decoration: underline; }
+  #cy { background: radial-gradient(ellipse at center, #0e0e14 0%, #050507 90%); }
+  .stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 4px 10px;
+    border-right: 1px solid var(--line);
+  }
+  .stat .n { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .stat .l { color: var(--fg-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat:last-child { border-right: none; }
+  .topbar { background: linear-gradient(to bottom, var(--bg-1), var(--bg-0)); }
+  .grad-text {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>
+</head>
+<body class="flex flex-col">
+  <header class="topbar border-b border-[var(--line)] px-4 py-3 flex items-center gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse"></div>
+      <span class="grad-text font-semibold tracking-tight">agd-memory</span>
+      <span class="text-[var(--fg-2)] text-xs mono" id="filepath"></span>
+    </div>
+    <div class="flex-1"></div>
+    <div class="flex items-center text-xs">
+      <span class="stat"><span class="n" id="s-blocks">·</span><span class="l">blocks</span></span>
+      <span class="stat"><span class="n" id="s-edges">·</span><span class="l">edges</span></span>
+      <span class="stat"><span class="n" id="s-kinds">·</span><span class="l">kinds</span></span>
+      <span class="stat"><span class="n" id="s-bytes">·</span><span class="l">bytes</span></span>
+    </div>
+  </header>
+
+  <div class="flex-1 flex min-h-0">
+    <!-- Left: list -->
+    <aside class="pane flex flex-col" style="width: 320px; min-width: 280px; border-right: 1px solid var(--line);">
+      <div class="p-3 space-y-2 border-b border-[var(--line)]">
+        <input class="search mono" id="search" placeholder="search id, desc, body…" autofocus>
+        <div class="flex flex-wrap gap-1" id="kindfilter"></div>
+      </div>
+      <div class="scroll flex-1" id="list"></div>
+    </aside>
+
+    <!-- Center: graph -->
+    <main class="flex-1 flex flex-col min-w-0">
+      <div id="cy" class="flex-1 min-h-0"></div>
+      <div class="text-[var(--fg-2)] text-xs px-3 py-2 border-t border-[var(--line)] flex items-center gap-3">
+        <span>drag to pan · scroll to zoom · click node to focus</span>
+        <span class="flex-1"></span>
+        <button id="fit" class="pill" style="cursor: pointer;">fit</button>
+        <button id="relayout" class="pill" style="cursor: pointer;">relayout</button>
+      </div>
+    </main>
+
+    <!-- Right: details -->
+    <aside class="pane flex flex-col" style="width: 440px; min-width: 360px; border-left: 1px solid var(--line);">
+      <div class="p-4 border-b border-[var(--line)]" id="details-head">
+        <div class="text-[var(--fg-2)] text-xs uppercase tracking-wider">no selection</div>
+      </div>
+      <div class="scroll flex-1 p-4" id="details-body"></div>
+    </aside>
+  </div>
+
+<script>
+const md = window.markdownit({ html: false, linkify: true, breaks: false });
+const KIND_COLORS = {
+  "h1":         "#94a3b8",
+  "h2":         "#94a3b8",
+  "h3":         "#94a3b8",
+  "h4":         "#94a3b8",
+  "p":          "#cbd5e1",
+  "x-user":     "#fda4af",
+  "x-feedback": "#fdba74",
+  "x-project":  "#86efac",
+  "x-reference":"#67e8f9",
+  "x-edge":     "#c4b5fd",
+  "x-stress":   "#a8a29e",
+  "code":       "#fbbf24",
+  "raw":        "#fbbf24",
+  "ul":         "#a7f3d0",
+  "ol":         "#a7f3d0",
+  "quote":      "#f9a8d4",
+};
+const colorFor = k => KIND_COLORS[k] || "#7dd3fc";
+
+let DATA = null;
+let SELECTED = null;
+let activeKinds = new Set();   // empty = all
+let cy = null;
+
+async function load() {
+  const r = await fetch("/memory.json");
+  const j = await r.json();
+  if (j.error) {
+    document.getElementById("list").innerHTML = `<div class="p-4 text-[var(--warn)]">${j.error}</div>`;
+    return;
+  }
+  DATA = j;
+  document.getElementById("filepath").textContent = j.path;
+  document.getElementById("s-blocks").textContent = j.stats.blocks;
+  document.getElementById("s-edges").textContent  = j.stats.edges;
+  document.getElementById("s-kinds").textContent  = Object.keys(j.stats.kinds).length;
+  document.getElementById("s-bytes").textContent  = j.stats.bytes.toLocaleString();
+  buildKindFilter(j.stats.kinds);
+  renderList();
+  renderGraph();
+}
+
+function buildKindFilter(kinds) {
+  const wrap = document.getElementById("kindfilter");
+  const entries = Object.entries(kinds).sort((a,b) => b[1]-a[1]);
+  wrap.innerHTML = "";
+  for (const [k, n] of entries) {
+    const b = document.createElement("button");
+    b.className = "pill";
+    b.style.borderColor = colorFor(k);
+    b.style.color = colorFor(k);
+    b.innerHTML = `<span class="mono">${k}</span> <span style="opacity:.6">${n}</span>`;
+    b.onclick = () => {
+      if (activeKinds.has(k)) activeKinds.delete(k); else activeKinds.add(k);
+      b.classList.toggle("active");
+      renderList();
+      filterGraph();
+    };
+    wrap.appendChild(b);
+  }
+}
+
+function filteredBlocks() {
+  const q = (document.getElementById("search").value || "").toLowerCase().trim();
+  return DATA.blocks.filter(b => {
+    if (activeKinds.size > 0 && !activeKinds.has(b.kind)) return false;
+    if (!q) return true;
+    return (b.id || "").toLowerCase().includes(q)
+        || (b.desc || "").toLowerCase().includes(q)
+        || (b.body || "").toLowerCase().includes(q);
+  });
+}
+
+function renderList() {
+  const list = document.getElementById("list");
+  const blocks = filteredBlocks().slice().sort((a,b) => (a.id||"").localeCompare(b.id||""));
+  list.innerHTML = "";
+  for (const b of blocks) {
+    const row = document.createElement("div");
+    row.className = "row" + (SELECTED === b.id ? " selected" : "");
+    row.onclick = () => select(b.id);
+    const tag = document.createElement("span");
+    tag.className = "kind-tag mono";
+    tag.style.background = colorFor(b.kind) + "22";
+    tag.style.color = colorFor(b.kind);
+    tag.textContent = b.kind;
+    const title = document.createElement("div");
+    title.className = "mono text-sm";
+    title.textContent = "#" + b.id;
+    const desc = document.createElement("div");
+    desc.className = "text-[var(--fg-2)] text-xs truncate";
+    desc.textContent = b.desc || "";
+    const head = document.createElement("div");
+    head.className = "flex items-center";
+    head.appendChild(tag);
+    head.appendChild(title);
+    row.appendChild(head);
+    if (b.desc) row.appendChild(desc);
+    list.appendChild(row);
+  }
+  if (blocks.length === 0) {
+    list.innerHTML = `<div class="p-4 text-[var(--fg-2)] text-sm">no matches</div>`;
+  }
+}
+
+function renderGraph() {
+  const elements = [];
+  const presentIds = new Set(DATA.blocks.map(b => b.id));
+  for (const b of DATA.blocks) {
+    elements.push({ data: { id: b.id, kind: b.kind, desc: b.desc || "", color: colorFor(b.kind), degree: b.refs.length + b.backlinks.length } });
+  }
+  for (const b of DATA.blocks) {
+    for (const tgt of b.refs) {
+      if (presentIds.has(tgt)) elements.push({ data: { id: `${b.id}__${tgt}`, source: b.id, target: tgt } });
+    }
+  }
+
+  cy = cytoscape({
+    container: document.getElementById("cy"),
+    elements,
+    style: [
+      { selector: "node", style: {
+          "background-color": "data(color)",
+          "label": "data(id)",
+          "font-family": "ui-monospace, SFMono-Regular, Menlo, monospace",
+          "font-size": 10,
+          "color": "#cbd5e1",
+          "text-valign": "bottom",
+          "text-margin-y": 6,
+          "text-outline-color": "#0a0a0c",
+          "text-outline-width": 2,
+          "width": "mapData(degree, 0, 8, 14, 36)",
+          "height": "mapData(degree, 0, 8, 14, 36)",
+          "border-width": 1,
+          "border-color": "#0a0a0c",
+          "transition-property": "background-color, border-color, border-width, opacity",
+          "transition-duration": 150,
+        }
+      },
+      { selector: "node:selected", style: {
+          "border-width": 3, "border-color": "#7dd3fc",
+        }
+      },
+      { selector: "node.faded", style: { "opacity": 0.18 } },
+      { selector: "edge", style: {
+          "width": 1.2,
+          "line-color": "#3a3a4a",
+          "target-arrow-color": "#5a5a72",
+          "target-arrow-shape": "triangle",
+          "curve-style": "bezier",
+          "arrow-scale": 0.7,
+          "opacity": 0.7,
+        }
+      },
+      { selector: "edge.highlight", style: {
+          "line-color": "#7dd3fc",
+          "target-arrow-color": "#7dd3fc",
+          "width": 2.2,
+          "opacity": 1,
+        }
+      },
+      { selector: "edge.faded", style: { "opacity": 0.07 } },
+    ],
+    layout: { name: "cose", animate: false, idealEdgeLength: 90, nodeRepulsion: 6000, padding: 30 },
+    wheelSensitivity: 0.2,
+  });
+
+  cy.on("tap", "node", e => select(e.target.id()));
+  cy.on("tap", evt => { if (evt.target === cy) select(null); });
+
+  document.getElementById("fit").onclick = () => cy.fit(undefined, 30);
+  document.getElementById("relayout").onclick = () => cy.layout({ name: "cose", animate: true, animationDuration: 600, idealEdgeLength: 90, nodeRepulsion: 6000, padding: 30 }).run();
+}
+
+function filterGraph() {
+  if (!cy) return;
+  const visibleIds = new Set(filteredBlocks().map(b => b.id));
+  cy.batch(() => {
+    cy.nodes().forEach(n => n.toggleClass("faded", !visibleIds.has(n.id())));
+    cy.edges().forEach(e => {
+      const s = e.source().id(), t = e.target().id();
+      e.toggleClass("faded", !(visibleIds.has(s) && visibleIds.has(t)));
+    });
+  });
+}
+
+function highlightNeighborhood(id) {
+  if (!cy) return;
+  cy.batch(() => {
+    cy.elements().removeClass("highlight");
+    if (!id) return;
+    const n = cy.getElementById(id);
+    if (!n.length) return;
+    n.connectedEdges().addClass("highlight");
+  });
+}
+
+function select(id) {
+  SELECTED = id;
+  document.querySelectorAll(".row").forEach(r => r.classList.remove("selected"));
+  // re-render list to apply selected class (cheap)
+  renderList();
+  highlightNeighborhood(id);
+  if (cy) {
+    cy.nodes().unselect();
+    if (id) {
+      const n = cy.getElementById(id);
+      if (n.length) {
+        n.select();
+        cy.animate({ center: { eles: n }, zoom: Math.max(cy.zoom(), 1.1) }, { duration: 350 });
+      }
+    }
+  }
+  renderDetails(id);
+}
+
+function renderDetails(id) {
+  const head = document.getElementById("details-head");
+  const body = document.getElementById("details-body");
+  if (!id) {
+    head.innerHTML = `<div class="text-[var(--fg-2)] text-xs uppercase tracking-wider">no selection</div>
+                      <div class="text-[var(--fg-1)] text-sm mt-1">click a block in the list or graph</div>`;
+    body.innerHTML = "";
+    return;
+  }
+  const b = DATA.blocks.find(x => x.id === id);
+  if (!b) { body.innerHTML = `<div class="text-[var(--warn)]">id not found: ${id}</div>`; return; }
+  head.innerHTML = `
+    <div class="flex items-center gap-2 mb-1">
+      <span class="kind-tag mono" style="background:${colorFor(b.kind)}22;color:${colorFor(b.kind)};">${b.kind}</span>
+      <span class="mono text-base font-semibold">#${b.id}</span>
+    </div>
+    ${b.desc ? `<div class="text-[var(--fg-1)] text-sm">${escapeHTML(b.desc)}</div>` : ""}
+  `;
+  let attrsHtml = "";
+  const otherAttrs = Object.entries(b.attrs || {});
+  if (otherAttrs.length) {
+    attrsHtml = `<section class="mt-3"><div class="text-[var(--fg-2)] text-xs uppercase tracking-wider mb-1">attrs</div>
+      <div class="mono text-xs space-y-0.5">${otherAttrs.map(([k,v]) => `<div><span style="color:var(--accent-2)">${escapeHTML(k)}</span>=<span class="text-[var(--fg-1)]">${escapeHTML(JSON.stringify(v))}</span></div>`).join("")}</div></section>`;
+  }
+  let bodyHtml = "";
+  if (b.body && b.body.length) {
+    const rendered = md.render(b.body);
+    bodyHtml = `<section class="mt-3"><div class="text-[var(--fg-2)] text-xs uppercase tracking-wider mb-1">body · ${b.body.length} bytes</div>
+      <div class="body-md">${rendered}</div></section>`;
+  } else {
+    bodyHtml = `<section class="mt-3"><div class="text-[var(--fg-2)] text-xs italic">no body</div></section>`;
+  }
+  let refsHtml = "";
+  if (b.refs.length) {
+    refsHtml = `<section class="mt-4"><div class="text-[var(--fg-2)] text-xs uppercase tracking-wider mb-1">refs · ${b.refs.length}</div>
+      <div class="space-y-1">${b.refs.map(r => `<div class="ref-link" data-id="${r}">→ #${r}</div>`).join("")}</div></section>`;
+  }
+  let backHtml = "";
+  if (b.backlinks.length) {
+    backHtml = `<section class="mt-4"><div class="text-[var(--fg-2)] text-xs uppercase tracking-wider mb-1">backlinks · ${b.backlinks.length}</div>
+      <div class="space-y-1">${b.backlinks.map(r => `<div class="ref-link" data-id="${r}">← #${r}</div>`).join("")}</div></section>`;
+  }
+  body.innerHTML = bodyHtml + attrsHtml + refsHtml + backHtml;
+  body.querySelectorAll(".ref-link").forEach(el => {
+    el.onclick = () => select(el.dataset.id);
+  });
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+}
+
+document.getElementById("search").addEventListener("input", () => {
+  renderList();
+  filterGraph();
+});
+
+window.addEventListener("keydown", e => {
+  if (e.key === "/" && document.activeElement !== document.getElementById("search")) {
+    e.preventDefault();
+    document.getElementById("search").focus();
+    document.getElementById("search").select();
+  } else if (e.key === "Escape") {
+    select(null);
+  }
+});
+
+load();
+</script>
+</body>
+</html>
