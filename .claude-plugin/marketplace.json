@@ -11,8 +11,8 @@
       "source": {
         "source": "github",
         "repo": "Pinperepette/agd-memory",
-        "commit": "df987f7def3ffa4bbdca55ef01e66711d510fa92",
-        "sha": "df987f7def3ffa4bbdca55ef01e66711d510fa92"
+        "commit": "4b07f50da4a21e443e14feb947858ff076757209",
+        "sha": "4b07f50da4a21e443e14feb947858ff076757209"
       },
       "description": "Per-project persistent memory in AGD format. Skill + SessionStart hook + MCP server, all driven by the agd CLI."
     }
