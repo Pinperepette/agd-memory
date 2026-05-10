@@ -45,23 +45,38 @@ Example: function `merge_setting` in `requests/sessions.py` has id `requests-ses
 Each block carries `lineno=` and `endline=` (1-indexed). Use these to build correct unified-diff hunk headers `@@ -<lineno>,<count> +<lineno>,<count> @@` against the original file.
 
 Tools:
+- agd_rank_symbols(query, top_k): BM25-rank symbols by relevance to a natural-language query. Returns top symbols with their file= attribute and desc. **USE THIS FIRST** when the problem statement does NOT mention a specific file path. The top result's file= tells you what to pass to agd_toc(file=...) next.
 - agd_toc(file=PATH): TOC of one file's symbols (cheap and focused). Pass the suspected file path to scope the listing. Use agd_toc() (no file) only as a last resort.
-- agd_search(query): substring search across block bodies.
+- agd_search(query): exact substring search across block bodies (use only when you need a literal string match — for keywords prefer agd_rank_symbols).
 - agd_get(ids, with_backlinks): fetch blocks by id; with_backlinks=True also includes callers.
 - agd_backlinks(id): list ids that refs= the given block.
 - read_window(path, start_line, end_line): read a raw slice of a source file. Use for the few neighbour lines you need to write a precise hunk header (the block body alone is not enough — you need surrounding context to anchor the diff).
 - submit_patch(diff): submit the final unified diff. MANDATORY. Do NOT emit the diff as text.
 
 Strategy:
-1. Read the problem. Extract file path and likely symbol.
+1. Read the problem.
+   - If it mentions a file path (e.g., `src/_pytest/skipping.py`): go straight to step 2.
+   - If it does NOT mention a file path (e.g., "chained exception handling fails"): call agd_rank_symbols(query=KEY_TERMS) FIRST to find candidate symbols and their files. Then go to step 2 with the top result's file=.
 2. agd_toc(file=PATH) on the suspected file to see its symbols.
 3. agd_get on the suspect block; if needed, read_window for neighbour context.
 4. submit_patch with the diff. The `file=` of the block is your `--- a/<path>`. Use `lineno=` and the body to compute hunk headers.
 
-Be efficient: 2-4 tool calls plus submit_patch."""
+Be efficient: 2-5 tool calls plus submit_patch. Always submit_patch at the end — never let the loop time out."""
 
 
 TOOLS = [
+    {
+        "name": "agd_rank_symbols",
+        "description": "BM25-rank symbols by relevance to a natural-language query. Returns top symbols with their file=, desc, and id. Use FIRST when the problem statement does not mention a specific file path — the top result's file= tells you which file to scope subsequent agd_toc(file=...) calls to.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "Free-form keywords from the problem statement. Multiple words are AND-ed via BM25 scoring."},
+                "top_k": {"type": "integer", "default": 12, "description": "How many top symbols to return."},
+            },
+            "required": ["query"],
+        },
+    },
     {
         "name": "agd_toc",
         "description": "Return the AGD memory TOC. Pass `file=PATH` to restrict to one file's symbols (much cheaper than the global TOC).",
@@ -148,6 +163,116 @@ def _agd(corpus: Path, args: list[str], timeout: float = 20.0) -> str:
     return r.stdout
 
 
+# --- BM25 symbol ranking (v3) -------------------------------------------------
+# The v0+ failure analysis showed that agd-graph times out without submitting
+# whenever the problem statement does NOT mention a file path. Substring search
+# (agd_search) returns too many irrelevant matches; the model can't construct
+# a file scope. agd_rank_symbols closes that gap by ranking symbols by BM25
+# over their (desc + body) against the query. Top result's file= drives the
+# subsequent agd_toc(file=...) scope.
+
+import math, re
+from collections import Counter
+
+_BM25_CACHE: dict[str, tuple[list[dict], list[list[str]], list[int], float, Counter]] = {}
+_TOK = re.compile(r"[A-Za-z_][A-Za-z0-9_]{2,}")
+
+
+def _terms(text: str) -> list[str]:
+    return [m.group(0).lower() for m in _TOK.finditer(text)]
+
+
+def _parse_corpus(corpus_path: Path) -> list[dict]:
+    """Parse @x-symbol blocks from the AGD corpus.
+    Returns list of {id, file, desc, qual, body}. Cheap (~50ms on 600KB).
+    """
+    text = corpus_path.read_text(errors="replace")
+    out: list[dict] = []
+    cur: dict | None = None
+    in_fence = False
+    body_lines: list[str] = []
+    block_re = re.compile(
+        r'^@x-symbol\s+'
+        r'desc="(?P<desc>[^"]*)"\s+'
+        r'file="(?P<file>[^"]*)"\s+'
+        r'qual=(?P<qual>\S+)'
+        r'.*?\[#(?P<id>[^\]]+)\]\s*$'
+    )
+    for line in text.splitlines():
+        if cur is None:
+            m = block_re.match(line)
+            if m:
+                cur = {"id": m.group("id"), "file": m.group("file"),
+                       "desc": m.group("desc"), "qual": m.group("qual"),
+                       "body": ""}
+            continue
+        if line.strip() == "~~~":
+            if not in_fence:
+                in_fence = True
+                body_lines = []
+            else:
+                cur["body"] = "\n".join(body_lines)
+                out.append(cur)
+                cur = None
+                in_fence = False
+        elif in_fence:
+            body_lines.append(line)
+    return out
+
+
+def _bm25_index(corpus_path: Path):
+    """Build (or fetch cached) BM25 index over symbol bodies+descs."""
+    key = str(corpus_path)
+    if key in _BM25_CACHE:
+        return _BM25_CACHE[key]
+    syms = _parse_corpus(corpus_path)
+    docs_terms = []
+    for s in syms:
+        # Index desc + first 80 lines of body (caps cost on large symbols)
+        body_head = "\n".join(s["body"].splitlines()[:80])
+        docs_terms.append(_terms(s["desc"] + " " + s["qual"] + " " + body_head))
+    doc_lens = [len(t) for t in docs_terms]
+    avgdl = (sum(doc_lens) / len(doc_lens)) if doc_lens else 1.0
+    df: Counter[str] = Counter()
+    for t in docs_terms:
+        df.update(set(t))
+    _BM25_CACHE[key] = (syms, docs_terms, doc_lens, avgdl, df)
+    return _BM25_CACHE[key]
+
+
+def _bm25_score(N: int, df_t: int, tf: int, dl: int, avgdl: float,
+                k1: float = 1.5, b: float = 0.75) -> float:
+    if tf == 0:
+        return 0.0
+    idf = math.log(1 + (N - df_t + 0.5) / (df_t + 0.5))
+    denom = tf + k1 * (1 - b + b * dl / (avgdl or 1))
+    return idf * (tf * (k1 + 1)) / (denom or 1)
+
+
+def _t_rank_symbols(corpus_path: Path, query: str, top_k: int = 12) -> str:
+    syms, docs_terms, doc_lens, avgdl, df = _bm25_index(corpus_path)
+    if not syms:
+        return "[empty corpus]"
+    q_terms = list(set(_terms(query)))
+    if not q_terms:
+        return "[empty query — provide keywords]"
+    N = len(syms)
+    scored: list[tuple[float, dict]] = []
+    for i, sym in enumerate(syms):
+        tf_doc = Counter(docs_terms[i])
+        score = sum(_bm25_score(N, df.get(t, 0), tf_doc.get(t, 0), doc_lens[i], avgdl) for t in q_terms)
+        if score > 0:
+            scored.append((score, sym))
+    scored.sort(key=lambda x: -x[0])
+    if not scored:
+        return f"[no symbols matched terms: {q_terms}]"
+    lines = [f"# top {min(top_k, len(scored))} of {len(scored)} matching symbols (BM25)"]
+    for score, sym in scored[:top_k]:
+        lines.append(f"{score:6.2f}  {sym['id']}\tfile={sym['file']}\tdesc={sym['desc']}")
+    return "\n".join(lines)
+# -----------------------------------------------------------------------------
+
+
 def _t_toc(corpus: Path, file: str | None = None) -> str:
     full = _agd(corpus, ["ids"])
     if not file:
@@ -228,6 +353,8 @@ def _short_args(args: dict[str, Any]) -> str:
 
 def _dispatch(corpus: Path, repo: Path | None, name: str, args: dict[str, Any]) -> str:
     try:
+        if name == "agd_rank_symbols":
+            return _cap(_t_rank_symbols(corpus, args["query"], args.get("top_k", 12)))
         if name == "agd_toc":
             return _cap(_t_toc(corpus, args.get("file")))
         if name == "agd_search":

@@ -1,0 +1,1847 @@
+{
+  "model": "claude-haiku-4-5",
+  "token_budget": 80000,
+  "adapters": [
+    "preload-bm25",
+    "grep-agent",
+    "agd-graph"
+  ],
+  "n_instances": 10,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 12.38,
+      "loaded_tokens": 79791,
+      "essential_tokens": 218,
+      "raf": 366.01,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100379,
+        "output_tokens": 1427,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "src/_pytest/runner.py"
+        ],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/runner.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": [
+          "src/_pytest/runner.py::from_call",
+          "src/_pytest/runner.py::result"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 214,
+        "files_loaded": 11,
+        "top_scores": [
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 118.41
+          },
+          {
+            "path": "doc/en/conf.py",
+            "score": 113.68
+          },
+          {
+            "path": "src/_pytest/fixtures.py",
+            "score": 102.19
+          },
+          {
+            "path": "testing/test_terminal.py",
+            "score": 101.15
+          },
+          {
+            "path": "src/_pytest/junitxml.py",
+            "score": 97.7
+          },
+          {
+            "path": "src/_pytest/config/__init__.py",
+            "score": 96.6
+          },
+          {
+            "path": "src/_pytest/hookspec.py",
+            "score": 95.1
+          },
+          {
+            "path": "src/_pytest/python.py",
+            "score": 93.82
+          },
+          {
+            "path": "src/_pytest/terminal.py",
+            "score": 89.58
+          },
+          {
+            "path": "testing/test_doctest.py",
+            "score": 85.38
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/runner.py",
+      "patch_lines": 31
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 31.15,
+      "loaded_tokens": 12647,
+      "essential_tokens": 218,
+      "raf": 58.01,
+      "tool_calls": 17,
+      "api": {
+        "input_tokens": 214477,
+        "output_tokens": 2649,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.029,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 17,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 14
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 52.04,
+      "loaded_tokens": 14693,
+      "essential_tokens": 218,
+      "raf": 67.4,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 249223,
+        "output_tokens": 4119,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_toc()",
+          "agd_search(query='xfail marker')",
+          "agd_search(query='add_marker')",
+          "agd_search(query='pytest.mark.xfail')",
+          "agd_search(query='def runtest_protocol')",
+          "agd_search(query='XFAIL STRICT')",
+          "agd_search(query='class Item')",
+          "agd_search(query='getxfailmarker')",
+          "agd_search(query='outcome xfail')",
+          "read_window(path='src/pytest', start_line=1, end_line=50)",
+          "read_window(path='pytest', start_line=1, end_line=50)",
+          "agd_search(query='XFail')",
+          "agd_search(query='runtest')",
+          "agd_search(query='strict mode')",
+          "agd_search(query='outcomes')",
+          "agd_search(query='result')",
+          "read_window(path='src/_pytest/outcomes.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/nodes.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/nodes.py', start_line=300, end_line=400)",
+          "read_window(path='src/_pytest/nodes.py', start_line=200, end_line=300)",
+          "read_window(path='src/_pytest', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/main.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/skipping.py', start_line=1, end_line=150)",
+          "read_window(path='src/_pytest/skipping.py', start_line=150, end_line=300)",
+          "read_window(path='src/_pytest/skipping.py', start_line=260, end_line=310)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 13.67,
+      "loaded_tokens": 79858,
+      "essential_tokens": 443,
+      "raf": 180.27,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 99896,
+        "output_tokens": 2011,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 214,
+        "files_loaded": 14,
+        "top_scores": [
+          {
+            "path": "src/_pytest/skipping.py",
+            "score": 77.59
+          },
+          {
+            "path": "src/_pytest/hookspec.py",
+            "score": 60.64
+          },
+          {
+            "path": "testing/test_skipping.py",
+            "score": 54.82
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 52.96
+          },
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 49.33
+          },
+          {
+            "path": "src/_pytest/outcomes.py",
+            "score": 48.02
+          },
+          {
+            "path": "src/_pytest/runner.py",
+            "score": 47.41
+          },
+          {
+            "path": "src/_pytest/nodes.py",
+            "score": 46.82
+          },
+          {
+            "path": "src/_pytest/python.py",
+            "score": 45.31
+          },
+          {
+            "path": "src/_pytest/mark/__init__.py",
+            "score": 45.31
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 36
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 10.88,
+      "loaded_tokens": 3256,
+      "essential_tokens": 443,
+      "raf": 7.35,
+      "tool_calls": 4,
+      "api": {
+        "input_tokens": 13638,
+        "output_tokens": 1257,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.333,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 4,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 21
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 12.7,
+      "loaded_tokens": 4419,
+      "essential_tokens": 443,
+      "raf": 9.98,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 21282,
+        "output_tokens": 1167,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='src/_pytest/skipping.py')",
+          "read_window(path='src/_pytest/skipping.py', start_line=1, end_line=250)",
+          "read_window(path='src/_pytest/skipping.py', start_line=200, end_line=350)",
+          "read_window(path='src/_pytest/skipping.py', start_line=260, end_line=306)",
+          "submit_patch(diff=\u2026905c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 18
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 6.44,
+      "loaded_tokens": 79887,
+      "essential_tokens": 123,
+      "raf": 649.49,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 101285,
+        "output_tokens": 492,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/compat.py"
+        ],
+        "model_files": [
+          "src/_pytest/compat.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ],
+        "model_functions": [
+          "src/_pytest/compat.py::getfuncargnames"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 201,
+        "files_loaded": 13,
+        "top_scores": [
+          {
+            "path": "src/_pytest/python.py",
+            "score": 145.06
+          },
+          {
+            "path": "src/_pytest/compat.py",
+            "score": 138.08
+          },
+          {
+            "path": "src/_pytest/fixtures.py",
+            "score": 131.03
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 111.96
+          },
+          {
+            "path": "testing/python/integration.py",
+            "score": 102.28
+          },
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 100.05
+          },
+          {
+            "path": "src/_pytest/config/__init__.py",
+            "score": 95.87
+          },
+          {
+            "path": "src/_pytest/hookspec.py",
+            "score": 94.97
+          },
+          {
+            "path": "src/_pytest/mark/structures.py",
+            "score": 93.53
+          },
+          {
+            "path": "src/_pytest/nodes.py",
+            "score": 91.82
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/compat.py",
+      "patch_lines": 13
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 14.76,
+      "loaded_tokens": 1697,
+      "essential_tokens": 123,
+      "raf": 13.8,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 17173,
+        "output_tokens": 963,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/compat.py"
+        ],
+        "model_files": [
+          "src/_pytest/compat.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ],
+        "model_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 6,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/compat.py",
+      "patch_lines": 13
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 13.61,
+      "loaded_tokens": 3172,
+      "essential_tokens": 123,
+      "raf": 25.79,
+      "tool_calls": 9,
+      "api": {
+        "input_tokens": 30492,
+        "output_tokens": 1039,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/compat.py"
+        ],
+        "model_files": [
+          "src/_pytest/compat.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ],
+        "model_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 9,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='_pytest/compat.py')",
+          "agd_search(query='num_mock_patch_args')",
+          "read_window(path='_pytest/compat.py')",
+          "agd_toc()",
+          "agd_search(query='p.new in sentinels')",
+          "agd_search(query='getfuncargnames')",
+          "read_window(path='pytest/compat.py')",
+          "read_window(path='src/_pytest/compat.py')",
+          "submit_patch(diff=\u2026517c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/compat.py",
+      "patch_lines": 9
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 5.94,
+      "loaded_tokens": 79830,
+      "essential_tokens": 129,
+      "raf": 618.84,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 102368,
+        "output_tokens": 327,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/python.py"
+        ],
+        "model_files": [
+          "src/_pytest/python.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ],
+        "model_functions": [
+          "src/_pytest/python.py::reportinfo"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 203,
+        "files_loaded": 12,
+        "top_scores": [
+          {
+            "path": "src/_pytest/terminal.py",
+            "score": 66.41
+          },
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 64.7
+          },
+          {
+            "path": "src/_pytest/assertion/rewrite.py",
+            "score": 64.65
+          },
+          {
+            "path": "src/_pytest/nodes.py",
+            "score": 63.66
+          },
+          {
+            "path": "src/_pytest/doctest.py",
+            "score": 62.61
+          },
+          {
+            "path": "src/_pytest/python.py",
+            "score": 60.47
+          },
+          {
+            "path": "testing/python/collect.py",
+            "score": 57.65
+          },
+          {
+            "path": "src/_pytest/junitxml.py",
+            "score": 57.52
+          },
+          {
+            "path": "src/_pytest/reports.py",
+            "score": 56.91
+          },
+          {
+            "path": "src/_pytest/config/__init__.py",
+            "score": 56.44
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/python.py",
+      "patch_lines": 12
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 9.74,
+      "loaded_tokens": 1919,
+      "essential_tokens": 129,
+      "raf": 14.88,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 14024,
+        "output_tokens": 783,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.875,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/python.py"
+        ],
+        "model_files": [
+          "src/_pytest/python.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ],
+        "model_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/python.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 9.73,
+      "loaded_tokens": 2119,
+      "essential_tokens": 129,
+      "raf": 16.43,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 18525,
+        "output_tokens": 763,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.875,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/python.py"
+        ],
+        "model_files": [
+          "src/_pytest/python.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ],
+        "model_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 6,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='src/_pytest/python.py')",
+          "agd_search(query='replace(\".[\", \"[\")')",
+          "agd_search(query='getmodpath')",
+          "read_window(path='src/_pytest/python.py', start_line=274, end_line=292)",
+          "read_window(path='src/_pytest/python.py', start_line=260, end_line=310)",
+          "submit_patch(diff=\u2026288c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/python.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 27.28,
+      "loaded_tokens": 79915,
+      "essential_tokens": 1152,
+      "raf": 69.37,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100605,
+        "output_tokens": 3830,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.036,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [
+          "src/_pytest/reports.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": [
+          "src/_pytest/reports.py::<line4>"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 202,
+        "files_loaded": 14,
+        "top_scores": [
+          {
+            "path": "testing/code/test_excinfo.py",
+            "score": 50.37
+          },
+          {
+            "path": "src/_pytest/_code/code.py",
+            "score": 46.67
+          },
+          {
+            "path": "src/_pytest/fixtures.py",
+            "score": 45.81
+          },
+          {
+            "path": "src/_pytest/nodes.py",
+            "score": 45.36
+          },
+          {
+            "path": "src/_pytest/reports.py",
+            "score": 44.69
+          },
+          {
+            "path": "src/_pytest/main.py",
+            "score": 44.28
+          },
+          {
+            "path": "src/_pytest/python.py",
+            "score": 44.11
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 43.7
+          },
+          {
+            "path": "src/_pytest/hookspec.py",
+            "score": 41.41
+          },
+          {
+            "path": "src/_pytest/debugging.py",
+            "score": 40.77
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/reports.py",
+      "patch_lines": 345
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 52.92,
+      "loaded_tokens": 10188,
+      "essential_tokens": 1152,
+      "raf": 8.84,
+      "tool_calls": 19,
+      "api": {
+        "input_tokens": 162827,
+        "output_tokens": 5846,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.25,
+        "line_jaccard": 0.314,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [
+          "src/_pytest/reports.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": [
+          "src/_pytest/reports.py::<line9>",
+          "src/_pytest/reports.py::disassembled_report"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 18,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/reports.py",
+      "patch_lines": 294
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 34.88,
+      "loaded_tokens": 2381,
+      "essential_tokens": 1152,
+      "raf": 2.07,
+      "tool_calls": 27,
+      "api": {
+        "input_tokens": 116465,
+        "output_tokens": 2196,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_toc()",
+          "agd_search(query='chained exception')",
+          "agd_search(query='serialize exception')",
+          "agd_search(query='__cause__ __context__')",
+          "read_window(path='src', start_line=1, end_line=20)",
+          "agd_search(query='ExceptionInfo')",
+          "agd_search(query='xdist worker')",
+          "agd_search(query='serialize')",
+          "read_window(path='src/xdist/worker.py', start_line=1, end_line=50)",
+          "read_window(path='xdist/worker.py', start_line=1, end_line=50)",
+          "read_window(path='src_pytest_xdist/worker.py', start_line=1, end_line=50)",
+          "read_window(path='.', start_line=1, end_line=50)",
+          "agd_search(query='pytest xdist')",
+          "agd_search(query='from_exception')",
+          "agd_search(query='cause')",
+          "read_window(path='src/pytest_xdist/__init__.py', start_line=1, end_line=30)",
+          "read_window(path='pytest_xdist/__init__.py', start_line=1, end_line=30)",
+          "read_window(path='xdist/__init__.py', start_line=1, end_line=30)",
+          "read_window(path='src_pytest_xdist__init__.py', start_line=1, end_line=30)",
+          "read_window(path='src/pytest_xdist/workermanager.py', start_line=1, end_line=100)",
+          "agd_search(query='repr')",
+          "agd_search(query='tblen')",
+          "agd_search(query='exconly')",
+          "agd_search(query='reschedule_tests')",
+          "agd_search(query='Traceback')",
+          "agd_search(query='Exception')",
+          "read_window(path='src/xdist/workermanager.py', start_line=1, end_line=100)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 26.07,
+      "loaded_tokens": 79872,
+      "essential_tokens": 368,
+      "raf": 217.04,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 102541,
+        "output_tokens": 3403,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/capture.py"
+        ],
+        "model_files": [
+          "src/_pytest/capture.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/capture.py::__init__"
+        ],
+        "model_functions": [
+          "src/_pytest/capture.py::<line4>",
+          "src/_pytest/capture.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 215,
+        "files_loaded": 10,
+        "top_scores": [
+          {
+            "path": "testing/test_terminal.py",
+            "score": 100.89
+          },
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 91.27
+          },
+          {
+            "path": "src/_pytest/config/__init__.py",
+            "score": 88.55
+          },
+          {
+            "path": "testing/test_capture.py",
+            "score": 86.9
+          },
+          {
+            "path": "testing/acceptance_test.py",
+            "score": 85.44
+          },
+          {
+            "path": "src/_pytest/terminal.py",
+            "score": 81.85
+          },
+          {
+            "path": "src/_pytest/capture.py",
+            "score": 80.64
+          },
+          {
+            "path": "testing/test_config.py",
+            "score": 79.17
+          },
+          {
+            "path": "doc/en/conf.py",
+            "score": 77.73
+          },
+          {
+            "path": "testing/test_assertrewrite.py",
+            "score": 76.72
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/capture.py",
+      "patch_lines": 18
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 32.0,
+      "loaded_tokens": 8440,
+      "essential_tokens": 368,
+      "raf": 22.93,
+      "tool_calls": 21,
+      "api": {
+        "input_tokens": 163949,
+        "output_tokens": 2549,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/capture.py"
+        ],
+        "model_files": [
+          "src/_pytest/capture.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/capture.py::__init__"
+        ],
+        "model_functions": [
+          "src/_pytest/capture.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 21,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/capture.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 37.26,
+      "loaded_tokens": 11578,
+      "essential_tokens": 368,
+      "raf": 31.46,
+      "tool_calls": 21,
+      "api": {
+        "input_tokens": 192191,
+        "output_tokens": 2529,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/capture.py"
+        ],
+        "model_files": [
+          "src/_pytest/capture.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/capture.py::__init__"
+        ],
+        "model_functions": [
+          "src/_pytest/capture.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 21,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='_pytest/capture.py')",
+          "agd_search(query='readouterr')",
+          "agd_toc()",
+          "agd_search(query='CaptureFixture')",
+          "agd_search(query='carriage return convert')",
+          "agd_search(query='universal_newlines')",
+          "agd_search(query='FDCapture')",
+          "agd_search(query='newline')",
+          "read_window(path='src/_pytest/capture.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/capture.py', start_line=100, end_line=300)",
+          "read_window(path='src/_pytest/capture.py', start_line=300, end_line=500)",
+          "read_window(path='src/_pytest/capture.py', start_line=500, end_line=700)",
+          "read_window(path='src/_pytest/capture.py', start_line=700, end_line=900)",
+          "read_window(path='src/_pytest/capture.py', start_line=\"'349\", end_line=500)",
+          "read_window(path='src/_pytest/capture.py', start_line=349, end_line=430)",
+          "read_window(path='src/_pytest/capture.py', start_line=470, end_line=500)",
+          "read_window(path='src/_pytest/capture.py', start_line=468, end_line=490)",
+          "read_window(path='src/_pytest/capture.py', start_line=177, end_line=200)",
+          "read_window(path='src/_pytest/capture.py', start_line=\"'382\", end_line=398)",
+          "read_window(path='src/_pytest/capture.py', start_line=382, end_line=398)",
+          "submit_patch(diff=\u2026365c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/capture.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 6.33,
+      "loaded_tokens": 79863,
+      "essential_tokens": 107,
+      "raf": 746.38,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100889,
+        "output_tokens": 554,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "model_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ],
+        "model_functions": [
+          "src/_pytest/pathlib.py::ImportPathMismatchError"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 223,
+        "files_loaded": 13,
+        "top_scores": [
+          {
+            "path": "src/_pytest/pathlib.py",
+            "score": 44.67
+          },
+          {
+            "path": "testing/test_tmpdir.py",
+            "score": 38.84
+          },
+          {
+            "path": "testing/test_cacheprovider.py",
+            "score": 38.76
+          },
+          {
+            "path": "testing/test_collection.py",
+            "score": 35.87
+          },
+          {
+            "path": "src/_pytest/hookspec.py",
+            "score": 34.6
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 34.41
+          },
+          {
+            "path": "testing/test_conftest.py",
+            "score": 32.7
+          },
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 32.62
+          },
+          {
+            "path": "doc/en/conf.py",
+            "score": 32.37
+          },
+          {
+            "path": "testing/test_warnings.py",
+            "score": 31.96
+          }
+        ]
+      },
+      "patch_first_line": "diff --git a/src/_pytest/pathlib.py b/src/_pytest/pathlib.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 9.62,
+      "loaded_tokens": 1217,
+      "essential_tokens": 107,
+      "raf": 11.37,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 10168,
+        "output_tokens": 848,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "model_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ],
+        "model_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/pathlib.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 22.91,
+      "loaded_tokens": 9121,
+      "essential_tokens": 107,
+      "raf": 85.24,
+      "tool_calls": 15,
+      "api": {
+        "input_tokens": 82548,
+        "output_tokens": 1806,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "model_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ],
+        "model_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 14,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_search(query='follow_symlinks=False')",
+          "agd_search(query='follow_symlinks')",
+          "agd_search(query='symlink')",
+          "agd_toc()",
+          "read_window(path='src/pytest', start_line=1, end_line=50)",
+          "agd_search(query='def collect')",
+          "read_window(path='src/pytest/main.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/main.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/main.py', start_line=1, end_line=800)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=1, end_line=150)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=200, end_line=350)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=350, end_line=500)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=500, end_line=650)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=551, end_line=563)",
+          "submit_patch(diff=\u2026380c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pathlib.py",
+      "patch_lines": 9
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 7.71,
+      "loaded_tokens": 79896,
+      "essential_tokens": 216,
+      "raf": 369.89,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100583,
+        "output_tokens": 650,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "testing/test_pastebin.py"
+        ],
+        "gold_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "model_files": [
+          "src/_pytest/pastebin.py",
+          "testing/test_pastebin.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ],
+        "model_functions": [
+          "src/_pytest/pastebin.py::create_new_paste",
+          "testing/test_pastebin.py::test_non_ascii_paste_text"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 199,
+        "files_loaded": 17,
+        "top_scores": [
+          {
+            "path": "src/_pytest/pastebin.py",
+            "score": 101.12
+          },
+          {
+            "path": "testing/test_pastebin.py",
+            "score": 91.63
+          },
+          {
+            "path": "src/_pytest/capture.py",
+            "score": 72.67
+          },
+          {
+            "path": "src/_pytest/pytester.py",
+            "score": 63.4
+          },
+          {
+            "path": "src/_pytest/junitxml.py",
+            "score": 62.86
+          },
+          {
+            "path": "src/_pytest/doctest.py",
+            "score": 62.73
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 61.05
+          },
+          {
+            "path": "src/_pytest/monkeypatch.py",
+            "score": 60.32
+          },
+          {
+            "path": "doc/en/conf.py",
+            "score": 57.11
+          },
+          {
+            "path": "testing/test_assertrewrite.py",
+            "score": 54.88
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pastebin.py",
+      "patch_lines": 27
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 10.38,
+      "loaded_tokens": 2819,
+      "essential_tokens": 216,
+      "raf": 13.05,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 21369,
+        "output_tokens": 1100,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.389,
+        "off_target_files": [
+          "testing/test_pastebin.py"
+        ],
+        "gold_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "model_files": [
+          "src/_pytest/pastebin.py",
+          "testing/test_pastebin.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ],
+        "model_functions": [
+          "src/_pytest/pastebin.py::create_new_paste",
+          "testing/test_pastebin.py::test_create_new_paste"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 6,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/pastebin.py",
+      "patch_lines": 23
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 8.24,
+      "loaded_tokens": 2265,
+      "essential_tokens": 216,
+      "raf": 10.49,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 13402,
+        "output_tokens": 651,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.636,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "model_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ],
+        "model_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_toc(file='src/_pytest/pastebin.py')",
+          "agd_search(query='pastebin')",
+          "agd_search(query='lexer python3')",
+          "read_window(path='src/_pytest/pastebin.py')",
+          "submit_patch(diff=\u2026319c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pastebin.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 16.1,
+      "loaded_tokens": 79786,
+      "essential_tokens": 182,
+      "raf": 438.38,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 100278,
+        "output_tokens": 2314,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "src/_pytest/assertion/rewrite.py"
+        ],
+        "gold_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "model_files": [
+          "src/_pytest/assertion/rewrite.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/mark/expression.py::__getitem__",
+          "src/_pytest/mark/expression.py::expression",
+          "src/_pytest/mark/expression.py::not_expr"
+        ],
+        "model_functions": [
+          "src/_pytest/assertion/rewrite.py::generic_visit"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 212,
+        "files_loaded": 14,
+        "top_scores": [
+          {
+            "path": "scripts/release-on-comment.py",
+            "score": 34.31
+          },
+          {
+            "path": "src/_pytest/config/__init__.py",
+            "score": 28.88
+          },
+          {
+            "path": "testing/test_faulthandler.py",
+            "score": 27.76
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 27.48
+          },
+          {
+            "path": "src/_pytest/outcomes.py",
+            "score": 26.01
+          },
+          {
+            "path": "src/_pytest/assertion/rewrite.py",
+            "score": 25.89
+          },
+          {
+            "path": "doc/en/conf.py",
+            "score": 25.72
+          },
+          {
+            "path": "testing/logging/test_reporting.py",
+            "score": 25.19
+          },
+          {
+            "path": "src/_pytest/faulthandler.py",
+            "score": 25.03
+          },
+          {
+            "path": "src/_pytest/hookspec.py",
+            "score": 23.91
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/assertion/rewrite.py",
+      "patch_lines": 24
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 17.84,
+      "loaded_tokens": 3794,
+      "essential_tokens": 182,
+      "raf": 20.85,
+      "tool_calls": 9,
+      "api": {
+        "input_tokens": 32918,
+        "output_tokens": 1406,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.333,
+        "line_jaccard": 0.35,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "model_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/mark/expression.py::__getitem__",
+          "src/_pytest/mark/expression.py::expression",
+          "src/_pytest/mark/expression.py::not_expr"
+        ],
+        "model_functions": [
+          "src/_pytest/mark/expression.py::not_expr"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 9,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/mark/expression.py",
+      "patch_lines": 17
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 39.54,
+      "loaded_tokens": 15432,
+      "essential_tokens": 182,
+      "raf": 84.79,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 240386,
+        "output_tokens": 2632,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "src/_pytest/mark/expression.py::__getitem__",
+          "src/_pytest/mark/expression.py::expression",
+          "src/_pytest/mark/expression.py::not_expr"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_toc()",
+          "agd_search(query='Expression.compile')",
+          "agd_search(query='class Expression')",
+          "agd_search(query='compile.*False')",
+          "agd_search(query='Expression')",
+          "read_window(path='src/pytest_ast_backend.py', start_line=1, end_line=50)",
+          "agd_search(query='compile.*name.*value')",
+          "agd_search(query='keyword')",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=200, end_line=300)",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=500, end_line=600)",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=800, end_line=900)",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=1000, end_line=1100)",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=1200, end_line=1300)",
+          "read_window(path='src/_pytest/assertion/util.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/assertion/util.py', start_line=100, end_line=250)",
+          "read_window(path='src/_pytest', start_line=1, end_line=50)",
+          "agd_search(query='def compile')",
+          "agd_search(query='Name.*False')",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=700, end_line=800)",
+          "read_window(path='src/_pytest/assertion/rewrite.py', start_line=920, end_line=1000)",
+          "read_window(path='src/_pytest/python.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/mark', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/mark/structures.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/mark/structures.py', start_line=300, end_line=400)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "adapter": "preload-bm25",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 14.07,
+      "loaded_tokens": 79862,
+      "essential_tokens": 304,
+      "raf": 262.7,
+      "tool_calls": 1,
+      "api": {
+        "input_tokens": 101269,
+        "output_tokens": 1541,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.079,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/logging.py"
+        ],
+        "model_files": [
+          "src/_pytest/logging.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ],
+        "model_functions": [
+          "src/_pytest/logging.py::LogCaptureFixture",
+          "src/_pytest/logging.py::__enter__",
+          "src/_pytest/logging.py::__exit__"
+        ]
+      },
+      "adapter_notes": {
+        "files_considered": 215,
+        "files_loaded": 18,
+        "top_scores": [
+          {
+            "path": "src/_pytest/logging.py",
+            "score": 70.08
+          },
+          {
+            "path": "testing/logging/test_fixture.py",
+            "score": 58.41
+          },
+          {
+            "path": "doc/en/conf.py",
+            "score": 55.66
+          },
+          {
+            "path": "testing/logging/test_reporting.py",
+            "score": 48.76
+          },
+          {
+            "path": "testing/test_capture.py",
+            "score": 38.72
+          },
+          {
+            "path": "src/_pytest/deprecated.py",
+            "score": 37.97
+          },
+          {
+            "path": "src/_pytest/python_api.py",
+            "score": 35.84
+          },
+          {
+            "path": "src/_pytest/junitxml.py",
+            "score": 34.58
+          },
+          {
+            "path": "src/_pytest/pathlib.py",
+            "score": 31.37
+          },
+          {
+            "path": "src/_pytest/fixtures.py",
+            "score": 30.66
+          }
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/logging.py",
+      "patch_lines": 43
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 41.87,
+      "loaded_tokens": 8933,
+      "essential_tokens": 304,
+      "raf": 29.38,
+      "tool_calls": 20,
+      "api": {
+        "input_tokens": 152333,
+        "output_tokens": 2915,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.667,
+        "line_jaccard": 0.708,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/logging.py"
+        ],
+        "model_files": [
+          "src/_pytest/logging.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ],
+        "model_functions": [
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 20,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/logging.py",
+      "patch_lines": 37
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 52.37,
+      "loaded_tokens": 15448,
+      "essential_tokens": 304,
+      "raf": 50.82,
+      "tool_calls": 24,
+      "api": {
+        "input_tokens": 260046,
+        "output_tokens": 3822,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.762,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/logging.py"
+        ],
+        "model_files": [
+          "src/_pytest/logging.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ],
+        "model_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 23,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_search(query='caplog fixture')",
+          "agd_search(query='set_level')",
+          "agd_toc()",
+          "agd_search(query='caplog handler level')",
+          "agd_search(query='LogCaptureFixture')",
+          "read_window(path='src/_pytest/logging.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/logging.py', start_line=100, end_line=300)",
+          "read_window(path='src/_pytest/logging.py', start_line=300, end_line=500)",
+          "read_window(path='src/_pytest/logging.py', start_line=422, end_line=450)",
+          "read_window(path='src/_pytest/logging.py', start_line=500, end_line=700)",
+          "read_window(path='src/_pytest/logging.py', start_line=700, end_line=900)",
+          "read_window(path='src/_pytest/logging.py', start_line=630, end_line=700)",
+          "agd_search(query='@pytest.fixture')",
+          "read_window(path='src/_pytest/logging.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/logging.py', start_line=800, end_line=900)",
+          "read_window(path='src/_pytest/logging.py', start_line=815, end_line=850)",
+          "agd_search(query='def caplog')",
+          "read_window(path='src/_pytest/conftest.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/fixtures.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/logging.py', start_line=1, end_line=1000)",
+          "read_window(path='src/_pytest/logging.py', start_line=400, end_line=500)",
+          "read_window(path='src/_pytest/logging.py', start_line=313, end_line=350)",
+          "read_window(path='src/_pytest/logging.py', start_line=341, end_line=460)",
+          "submit_patch(diff=\u20261440c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/logging.py",
+      "patch_lines": 34
+    }
+  ]
+}

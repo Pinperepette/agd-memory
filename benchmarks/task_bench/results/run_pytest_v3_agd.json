@@ -1,0 +1,583 @@
+{
+  "model": "claude-haiku-4-5",
+  "token_budget": 80000,
+  "adapters": [
+    "agd-graph"
+  ],
+  "n_instances": 10,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 58.41,
+      "loaded_tokens": 20792,
+      "essential_tokens": 218,
+      "raf": 95.38,
+      "tool_calls": 26,
+      "api": {
+        "input_tokens": 437708,
+        "output_tokens": 4409,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='xfail marker handling', top_k=12)",
+          "agd_rank_symbols(query='add_marker dynamic marker', top_k=12)",
+          "agd_rank_symbols(query='skipping xfail runtest', top_k=12)",
+          "agd_get(ids=['testing-test_skipping-py--f-test_mark_xfail_item'])",
+          "agd_toc(file='testing/test_skipping.py')",
+          "agd_rank_symbols(query='pytest_runtest xfail skip', top_k=12)",
+          "agd_toc(file='src/_pytest/skipping.py')",
+          "agd_search(query='pytest_runtest_makereport')",
+          "read_window(path='src/_pytest/skipping.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/skipping.py', start_line=100, end_line=250)",
+          "read_window(path='src/_pytest/skipping.py', start_line=240, end_line=350)",
+          "read_window(path='testing/test_skipping.py', start_line=1, end_line=100)",
+          "agd_search(query='test_mark_xfail_item')",
+          "read_window(path='testing/test_skipping.py', start_line=200, end_line=350)",
+          "read_window(path='testing/test_skipping.py', start_line=350, end_line=450)",
+          "read_window(path='testing/test_skipping.py', start_line=414, end_line=427)",
+          "read_window(path='testing/test_skipping.py', start_line=1, end_line=50)",
+          "read_window(path='testing/test_skipping.py', start_line=150, end_line=200)",
+          "read_window(path='testing/test_skipping.py', start_line=480, end_line=550)",
+          "read_window(path='testing/test_skipping.py', start_line=550, end_line=650)",
+          "read_window(path='testing/test_skipping.py', start_line=425, end_line=435)",
+          "read_window(path='testing/test_skipping.py', start_line=850, end_line=950)",
+          "read_window(path='testing/test_skipping.py', start_line=950, end_line=1050)",
+          "read_window(path='testing/test_skipping.py', start_line=1050, end_line=1150)",
+          "read_window(path='testing/test_skipping.py', start_line=1150, end_line=1250)",
+          "read_window(path='testing/test_skipping.py', start_line=414, end_line=427)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 20.19,
+      "loaded_tokens": 4637,
+      "essential_tokens": 443,
+      "raf": 10.47,
+      "tool_calls": 8,
+      "api": {
+        "input_tokens": 38066,
+        "output_tokens": 2164,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.25,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 8,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='pytest_runtest_makereport skip xfail runxfail', top_k=10)",
+          "agd_toc(file='src/_pytest/skipping.py')",
+          "agd_get(ids=['src-_pytest-skipping-py--f-pytest_runtest_makereport'])",
+          "read_window(path='src/_pytest/skipping.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/skipping.py', start_line=200, end_line=300)",
+          "read_window(path='src/_pytest/skipping.py', start_line=300, end_line=320)",
+          "read_window(path='src/_pytest/skipping.py', start_line=260, end_line=306)",
+          "submit_patch(diff=\u20261933c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 43
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 20.97,
+      "loaded_tokens": 5465,
+      "essential_tokens": 123,
+      "raf": 44.43,
+      "tool_calls": 10,
+      "api": {
+        "input_tokens": 52347,
+        "output_tokens": 1476,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/compat.py"
+        ],
+        "model_files": [
+          "src/_pytest/compat.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ],
+        "model_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 10,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='num_mock_patch_args numpy array sentinel', top_k=5)",
+          "agd_rank_symbols(query='num_mock_patch_args compat', top_k=5)",
+          "agd_get(ids=['src-_pytest-compat-py--f-num_mock_patch_args'])",
+          "agd_toc(file='src/_pytest/compat.py')",
+          "agd_search(query='num_mock_patch_args')",
+          "read_window(path='src/_pytest/compat.py', start_line=1, end_line=150)",
+          "agd_search(query='test_getfuncargnames_patching')",
+          "read_window(path='testing/python/integration.py', start_line=1, end_line=100)",
+          "read_window(path='testing/python/integration.py', start_line=100, end_line=200)",
+          "submit_patch(diff=\u2026586c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/compat.py",
+      "patch_lines": 12
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 13.94,
+      "loaded_tokens": 2882,
+      "essential_tokens": 129,
+      "raf": 22.34,
+      "tool_calls": 7,
+      "api": {
+        "input_tokens": 29075,
+        "output_tokens": 1030,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.875,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/python.py"
+        ],
+        "model_files": [
+          "src/_pytest/python.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ],
+        "model_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 7,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='headline test report parametrize', top_k=10)",
+          "agd_search(query='replace(\".[\", \"[\")')",
+          "agd_rank_symbols(query='getmodpath reportinfo python.py', top_k=5)",
+          "agd_get(ids=['src-_pytest-python-py--c-pyobjmixin--m-getmodpath'])",
+          "read_window(path='src/_pytest/python.py', start_line=274, end_line=292)",
+          "read_window(path='src/_pytest/python.py', start_line=264, end_line=310)",
+          "submit_patch(diff=\u2026302c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/python.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 58.1,
+      "loaded_tokens": 19143,
+      "essential_tokens": 1152,
+      "raf": 16.62,
+      "tool_calls": 24,
+      "api": {
+        "input_tokens": 319009,
+        "output_tokens": 5235,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.25,
+        "line_jaccard": 0.092,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [
+          "src/_pytest/reports.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": [
+          "src/_pytest/reports.py::<line9>",
+          "src/_pytest/reports.py::_to_json",
+          "src/_pytest/reports.py::disassembled_report"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 24,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='exception serialization chained exceptions', top_k=10)",
+          "agd_rank_symbols(query='pytest xdist exception serialization remote worker', top_k=10)",
+          "agd_search(query='serialize exception')",
+          "agd_search(query='__cause__')",
+          "agd_toc()",
+          "agd_rank_symbols(query='ExceptionInfo getrepr chain', top_k=5)",
+          "agd_get(ids=['src-_pytest-_code-code-py--c-exceptioninfo', 'src-_pytest-\u2026)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=300, end_line=500)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=500, end_line=700)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=700, end_line=900)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=813, end_line=900)",
+          "agd_rank_symbols(query='serialize excinfo chain python pickle', top_k=10)",
+          "agd_rank_symbols(query='TestReport longrepr excinfo', top_k=10)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/reports.py', start_line=100, end_line=300)",
+          "read_window(path='src/_pytest/reports.py', start_line=204, end_line=290)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=20)",
+          "read_window(path='src/_pytest/reports.py', start_line=154, end_line=262)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=900, end_line=1100)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=20)",
+          "read_window(path='src/_pytest/reports.py', start_line=154, end_line=202)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=280)",
+          "submit_patch(diff=\u20266672c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/reports.py",
+      "patch_lines": 161
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 24.64,
+      "loaded_tokens": 9641,
+      "essential_tokens": 368,
+      "raf": 26.2,
+      "tool_calls": 14,
+      "api": {
+        "input_tokens": 117907,
+        "output_tokens": 1843,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/capture.py"
+        ],
+        "model_files": [
+          "src/_pytest/capture.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/capture.py::__init__"
+        ],
+        "model_functions": [
+          "src/_pytest/capture.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 14,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='capfd readouterr capture carriage return', top_k=10)",
+          "agd_toc(file='src/_pytest/capture.py')",
+          "agd_search(query='readouterr')",
+          "read_window(path='src/_pytest/capture.py', start_line=1, end_line=100)",
+          "agd_search(query='replace \\\\\\\\r \\\\\\\\n')",
+          "agd_search(query='newline universal')",
+          "read_window(path='src/_pytest/capture.py', start_line=200, end_line=400)",
+          "read_window(path='src/_pytest/capture.py', start_line=400, end_line=600)",
+          "read_window(path='src/_pytest/capture.py', start_line=557, end_line=650)",
+          "read_window(path='src/_pytest/capture.py', start_line=349, end_line=400)",
+          "read_window(path='src/_pytest/capture.py', start_line=140, end_line=200)",
+          "read_window(path='src/_pytest/capture.py', start_line=177, end_line=192)",
+          "read_window(path='src/_pytest/capture.py', start_line=380, end_line=398)",
+          "submit_patch(diff=\u2026437c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/capture.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 44.39,
+      "loaded_tokens": 24004,
+      "essential_tokens": 107,
+      "raf": 224.34,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 401387,
+        "output_tokens": 3234,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "model_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ],
+        "model_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='symlink follow_symlinks collection directory', top_k=12)",
+          "agd_toc(file='src/_pytest/pathlib.py')",
+          "agd_get(ids=['src-_pytest-pathlib-py--f-visit'])",
+          "agd_search(query='follow_symlinks')",
+          "read_window(path='src/_pytest/pathlib.py')",
+          "read_window(path='src/_pytest/pathlib.py', start_line=200, end_line=400)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=400, end_line=600)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=600, end_line=800)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=610, end_line=800)",
+          "agd_search(query='def visit')",
+          "read_window(path='testing/test_collection.py', start_line=1, end_line=100)",
+          "read_window(path='testing/test_collection.py', start_line=1, end_line=2000)",
+          "read_window(path='testing/test_collection.py', start_line=200, end_line=400)",
+          "read_window(path='testing/test_collection.py', start_line=500, end_line=700)",
+          "read_window(path='testing/test_collection.py', start_line=700, end_line=900)",
+          "read_window(path='testing/test_collection.py', start_line=1200, end_line=1400)",
+          "read_window(path='src/_pytest/main.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/main.py', start_line=400, end_line=600)",
+          "read_window(path='src/_pytest/main.py', start_line=560, end_line=700)",
+          "read_window(path='src/_pytest/main.py', start_line=674, end_line=750)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=550, end_line=650)",
+          "read_window(path='testing/test_collection.py', start_line=1235, end_line=1260)",
+          "read_window(path='testing/test_collection.py', start_line=1050, end_line=1150)",
+          "read_window(path='testing/test_collection.py', start_line=1150, end_line=1235)",
+          "submit_patch(diff=\u2026405c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pathlib.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 12.31,
+      "loaded_tokens": 2771,
+      "essential_tokens": 216,
+      "raf": 12.83,
+      "tool_calls": 7,
+      "api": {
+        "input_tokens": 24822,
+        "output_tokens": 974,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.636,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "model_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ],
+        "model_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 7,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='pastebin lexer python3', top_k=5)",
+          "agd_toc(file='src/_pytest/pastebin.py')",
+          "agd_get(ids=['src-_pytest-pastebin-py--f-create_new_paste'])",
+          "agd_search(query='lexer=python3')",
+          "read_window(path='src/_pytest/pastebin.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/pastebin.py', start_line=65, end_line=92)",
+          "submit_patch(diff=\u2026319c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pastebin.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 20.35,
+      "loaded_tokens": 4730,
+      "essential_tokens": 182,
+      "raf": 25.99,
+      "tool_calls": 9,
+      "api": {
+        "input_tokens": 42396,
+        "output_tokens": 1386,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.333,
+        "line_jaccard": 0.35,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "model_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/mark/expression.py::__getitem__",
+          "src/_pytest/mark/expression.py::expression",
+          "src/_pytest/mark/expression.py::not_expr"
+        ],
+        "model_functions": [
+          "src/_pytest/mark/expression.py::not_expr"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 9,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='Expression compile False', top_k=10)",
+          "agd_toc(file='src/_pytest/mark/expression.py')",
+          "agd_get(ids=['src-_pytest-mark-expression-py--c-expression--m-compile', \u2026)",
+          "agd_search(query='Expression.compile')",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=1, end_line=200)",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=200, end_line=250)",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=90, end_line=170)",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=168, end_line=220)",
+          "submit_patch(diff=\u2026713c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/mark/expression.py",
+      "patch_lines": 17
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5",
+      "elapsed_s": 32.8,
+      "loaded_tokens": 10926,
+      "essential_tokens": 304,
+      "raf": 35.94,
+      "tool_calls": 15,
+      "api": {
+        "input_tokens": 121574,
+        "output_tokens": 2764,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.714,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/logging.py"
+        ],
+        "model_files": [
+          "src/_pytest/logging.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ],
+        "model_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 15,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='caplog fixture log level restore', top_k=12)",
+          "agd_toc(file='src/_pytest/logging.py')",
+          "agd_get(ids=['src-_pytest-logging-py--c-logcapturefixture--m-_finalize',\u2026)",
+          "read_window(path='src/_pytest/logging.py', start_line=1, end_line=100)",
+          "agd_search(query='class LogCaptureFixture')",
+          "read_window(path='src/_pytest/logging.py', start_line=300, end_line=600)",
+          "read_window(path='src/_pytest/logging.py', start_line=422, end_line=460)",
+          "read_window(path='src/_pytest/logging.py', start_line=460, end_line=520)",
+          "read_window(path='testing/logging/test_fixture.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/logging.py', start_line=313, end_line=340)",
+          "read_window(path='src/_pytest/logging.py', start_line=500, end_line=650)",
+          "read_window(path='src/_pytest/logging.py', start_line=630, end_line=780)",
+          "read_window(path='src/_pytest/logging.py', start_line=341, end_line=380)",
+          "read_window(path='src/_pytest/logging.py', start_line=341, end_line=460)",
+          "submit_patch(diff=\u20261322c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/logging.py",
+      "patch_lines": 30
+    }
+  ]
+}

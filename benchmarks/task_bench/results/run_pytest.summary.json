@@ -1,0 +1,150 @@
+{
+  "model": "claude-haiku-4-5",
+  "n_instances": 10,
+  "n_rows": 30,
+  "n_errors": 0,
+  "errors": [],
+  "per_adapter": [
+    {
+      "adapter": "preload-bm25",
+      "n": 10,
+      "raf_median": 367.95,
+      "raf_p95": 702.78,
+      "raf_mean": 391.84,
+      "function_overlap_mean": 0.3,
+      "file_overlap_mean": 0.8,
+      "line_jaccard_mean": 0.061,
+      "off_target_mean": 0.3,
+      "tool_calls_mean": 1,
+      "loaded_tokens_mean": 79856,
+      "essential_tokens_mean": 324,
+      "total_cost_usd": 1.0928,
+      "elapsed_s_mean": 13.6
+    },
+    {
+      "adapter": "grep-agent",
+      "n": 10,
+      "raf_median": 14.34,
+      "raf_p95": 45.13,
+      "raf_mean": 20.05,
+      "function_overlap_mean": 0.725,
+      "file_overlap_mean": 1.0,
+      "line_jaccard_mean": 0.554,
+      "off_target_mean": 0.1,
+      "tool_calls_mean": 11.2,
+      "loaded_tokens_mean": 5491,
+      "essential_tokens_mean": 324,
+      "total_cost_usd": 0.9045,
+      "elapsed_s_mean": 23.12
+    },
+    {
+      "adapter": "agd-graph",
+      "n": 10,
+      "raf_median": 28.62,
+      "raf_p95": 85.04,
+      "raf_mean": 38.45,
+      "function_overlap_mean": 0.7,
+      "file_overlap_mean": 0.7,
+      "line_jaccard_mean": 0.481,
+      "off_target_mean": 0,
+      "tool_calls_mean": 16.2,
+      "loaded_tokens_mean": 8063,
+      "essential_tokens_mean": 324,
+      "total_cost_usd": 1.3282,
+      "elapsed_s_mean": 28.33
+    }
+  ],
+  "raf_cdf": [
+    {
+      "raf_le": 2,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.0,
+      "agd-graph": 0.0
+    },
+    {
+      "raf_le": 5,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.0,
+      "agd-graph": 0.1
+    },
+    {
+      "raf_le": 10,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.2,
+      "agd-graph": 0.2
+    },
+    {
+      "raf_le": 50,
+      "preload-bm25": 0.0,
+      "grep-agent": 0.9,
+      "agd-graph": 0.6
+    },
+    {
+      "raf_le": 200,
+      "preload-bm25": 0.2,
+      "grep-agent": 1.0,
+      "agd-graph": 1.0
+    }
+  ],
+  "per_task_winners": [
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "winner_adapter": null,
+      "note": "no adapter produced a non-zero function_overlap"
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 7.35,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 13.8,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 14.88,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 8.84,
+      "winner_function_overlap": 0.25
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 22.93,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 11.37,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 10.49,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 20.85,
+      "winner_function_overlap": 0.333
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "winner_adapter": "grep-agent",
+      "winner_raf": 29.38,
+      "winner_function_overlap": 0.667
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "model": "claude-haiku-4-5",
+  "n_instances": 10,
+  "n_rows": 10,
+  "n_errors": 0,
+  "errors": [],
+  "per_adapter": [
+    {
+      "adapter": "agd-graph",
+      "n": 10,
+      "raf_median": 26.09,
+      "raf_p95": 166.31,
+      "raf_mean": 51.45,
+      "function_overlap_mean": 0.758,
+      "file_overlap_mean": 0.9,
+      "line_jaccard_mean": 0.495,
+      "off_target_mean": 0,
+      "tool_calls_mean": 14.5,
+      "loaded_tokens_mean": 10499,
+      "essential_tokens_mean": 324,
+      "total_cost_usd": 1.7069,
+      "elapsed_s_mean": 30.61
+    }
+  ],
+  "raf_cdf": [
+    {
+      "raf_le": 2,
+      "agd-graph": 0.0
+    },
+    {
+      "raf_le": 5,
+      "agd-graph": 0.0
+    },
+    {
+      "raf_le": 10,
+      "agd-graph": 0.0
+    },
+    {
+      "raf_le": 50,
+      "agd-graph": 0.8
+    },
+    {
+      "raf_le": 200,
+      "agd-graph": 0.9
+    }
+  ],
+  "per_task_winners": [
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "winner_adapter": null,
+      "note": "no adapter produced a non-zero function_overlap"
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 10.47,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 44.43,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 22.34,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 16.62,
+      "winner_function_overlap": 0.25
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 26.2,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 224.34,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 12.83,
+      "winner_function_overlap": 1.0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 25.99,
+      "winner_function_overlap": 0.333
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "winner_adapter": "agd-graph",
+      "winner_raf": 35.94,
+      "winner_function_overlap": 1.0
+    }
+  ]
+}

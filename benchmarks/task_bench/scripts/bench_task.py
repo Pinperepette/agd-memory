@@ -70,9 +70,11 @@ def run_one(
     token_budget: int,
     client,
     dry_run: bool,
+    task=None,
 ) -> dict:
     print(f"[task] {instance_id} | adapter={adapter_name} | model={model}")
-    task = load_task(instance_id)
+    if task is None:
+        task = load_task(instance_id)
     assert task.repo_path is not None
 
     print(f"[essential] computing from gold patch ({task.gold_patch.count(chr(10))} lines)")
@@ -167,16 +169,37 @@ def main() -> None:
         client = anthropic.Anthropic()
 
     results = []
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     for iid in ids:
+        # Load the task ONCE per instance — load_task() is expensive
+        # (datasets.filter spawns multiprocessing pools). Reusing across
+        # adapters avoids cumulative semaphore leaks that crashed earlier
+        # 10-task pytest runs after ~28 calls.
+        try:
+            shared_task = load_task(iid)
+        except Exception as e:
+            for aname in adapters:
+                results.append({"instance_id": iid, "adapter": aname,
+                                "error": f"load_task: {type(e).__name__}: {e}"})
+            continue
         for aname in adapters:
             try:
-                row = run_one(iid, aname, args.model, args.token_budget, client, args.dry_run)
+                row = run_one(iid, aname, args.model, args.token_budget,
+                              client, args.dry_run, task=shared_task)
             except Exception as e:
                 row = {"instance_id": iid, "adapter": aname, "error": f"{type(e).__name__}: {e}"}
                 print(f"[error] {iid} {aname}: {e}")
             results.append(row)
+        # Incrementally checkpoint so a mid-run crash doesn't lose data.
+        args.out.write_text(json.dumps({
+            "model": args.model,
+            "token_budget": args.token_budget,
+            "adapters": adapters,
+            "n_instances": len(ids),
+            "results": results,
+            "checkpoint": True,
+        }, indent=2))
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps({
         "model": args.model,
         "token_budget": args.token_budget,
