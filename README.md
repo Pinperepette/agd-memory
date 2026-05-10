@@ -142,10 +142,10 @@ on a 1-block selective fetch; at 10k entries closer to 14x.
 
 ## Local viewer
 
-A bundled single-page viewer renders the memory as a searchable list, a
-live force-directed graph (nodes = blocks, edges = `refs`), and a body
-pane with refs/backlinks navigation. Pure Python `http.server`, no extra
-dependencies, opens the browser automatically.
+A bundled single-page viewer renders the memory as a long-form readable
+notebook with a timeline rail, a `cmd-k` search palette, light/dark
+themes, and a graph view as a toggle. Pure Python `http.server`, no
+extra dependencies, opens the browser automatically.
 
 ```sh
 viewer/run.sh
@@ -157,7 +157,18 @@ That serves the current project's memory at `http://127.0.0.1:8765/`
 `memory-view` skill triggers on phrases like "show me the memory" or
 "open the memory" and starts the server in the background.
 
-Keyboard: `/` focuses the search, `Esc` clears selection.
+What you get:
+
+- **Read mode** (default): blocks rendered in document order as
+  paper-card sections — kind chip, id, date (parsed from id), italic
+  desc, Markdown body in a serif typeface, refs and backlinks inline.
+- **Timeline rail** on the left: a vertical thread of dated dots,
+  one per block, that scroll-spies the reader and lets you jump.
+- **⌘K / `/` search**: floating palette with arrow-key nav, matches
+  id, desc, and body content.
+- **Graph mode**: cytoscape force-directed layout, nodes coloured by
+  kind, click a node to see its body in a side pane.
+- **Light/dark theme** toggle; persists across sessions.
 
 ## Layout
 
