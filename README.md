@@ -30,7 +30,10 @@ disk.
 
 ## Prerequisites
 
-1. **Claude Code** with plugin support enabled.
+1. **Claude Code 2.1.138 or newer**. Older versions reject the
+   marketplace `github` source with `This plugin uses a source type your
+   Claude Code version does not support`. Run `claude update` to upgrade,
+   then `claude --version` to confirm.
 2. **`agd` CLI** (>= v0.3.0):
 
    ```sh
@@ -40,8 +43,9 @@ disk.
    Verify: `agd --version` prints `agd 0.3.0` or newer.
 
 3. **Python 3.10 or newer** (for the MCP server). The plugin auto-creates a
-   private venv at `~/.local/share/agd-memory/venv` on first launch and
-   installs the `mcp` package into it — no manual pip step.
+   private venv under `${CLAUDE_PLUGIN_DATA}/venv` on first launch and
+   installs the `mcp` package into it — no manual pip step. The venv is
+   removed automatically on uninstall.
 
 ## Install
 
