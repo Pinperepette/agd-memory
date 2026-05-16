@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -24,10 +25,13 @@ import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 
 HERE = Path(__file__).resolve().parent
 INDEX_HTML = HERE / "index.html"
 AGD_BIN = Path(os.environ.get("AGD_BIN", str(Path.home() / ".cargo/bin/agd")))
+PROJECTS_DIR = Path.home() / ".claude" / "projects"
+SLUG_RE = re.compile(r"^[A-Za-z0-9._\-]+$")  # nessun `/`, no traversal
 
 
 def memory_path(arg: str | None) -> Path:
@@ -38,6 +42,52 @@ def memory_path(arg: str | None) -> Path:
     cwd = Path(os.environ.get("AGD_MEMORY_PROJECT_CWD", os.getcwd())).resolve()
     sanitized = str(cwd).replace("/", "-")
     return Path.home() / ".claude" / "projects" / sanitized / "memory" / "memory.agd"
+
+
+def slug_to_display(slug: str) -> str:
+    """Sanitized cwd → path leggibile. Convenzione MCP: cwd.replace('/', '-')."""
+    return "/" + slug.lstrip("-").replace("-", "/")
+
+
+def list_projects() -> list[dict]:
+    """Scansiona ~/.claude/projects/*/memory/memory.agd e ritorna metadata."""
+    if not PROJECTS_DIR.is_dir():
+        return []
+    out = []
+    for child in sorted(PROJECTS_DIR.iterdir()):
+        if not child.is_dir() or not SLUG_RE.match(child.name):
+            continue
+        mem = child / "memory" / "memory.agd"
+        if not mem.is_file():
+            continue
+        try:
+            st = mem.stat()
+        except OSError:
+            continue
+        out.append({
+            "slug": child.name,
+            "display": slug_to_display(child.name),
+            "path": str(mem),
+            "bytes": st.st_size,
+            "mtime": st.st_mtime,
+        })
+    out.sort(key=lambda p: p["mtime"], reverse=True)
+    return out
+
+
+def resolve_memory(slug: str | None, fallback: Path) -> Path | None:
+    """Risolve slug → path memoria, con difesa anti path-traversal."""
+    if not slug:
+        return fallback
+    if not SLUG_RE.match(slug):
+        return None
+    candidate = (PROJECTS_DIR / slug / "memory" / "memory.agd").resolve()
+    # difesa: il path risolto deve restare sotto PROJECTS_DIR
+    try:
+        candidate.relative_to(PROJECTS_DIR.resolve())
+    except ValueError:
+        return None
+    return candidate if candidate.is_file() else None
 
 
 def parse_block(b: dict) -> dict:
@@ -125,6 +175,7 @@ def build_payload(mem: Path) -> dict:
 
 class Handler(BaseHTTPRequestHandler):
     mem: Path = Path()  # set per-instance via factory
+    initial_slug: str | None = None
 
     def _send(self, status: int, body: bytes, ctype: str) -> None:
         self.send_response(status)
@@ -135,7 +186,10 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/" or self.path == "/index.html":
+        parsed = urlparse(self.path)
+        path = parsed.path
+        qs = parse_qs(parsed.query)
+        if path == "/" or path == "/index.html":
             try:
                 body = INDEX_HTML.read_bytes()
             except OSError as e:
@@ -143,8 +197,23 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self._send(200, body, "text/html; charset=utf-8")
             return
-        if self.path == "/memory.json":
-            payload = build_payload(self.mem)
+        if path == "/projects.json":
+            payload = {
+                "initial_slug": self.initial_slug,
+                "initial_path": str(self.mem),
+                "projects": list_projects(),
+            }
+            body = json.dumps(payload).encode()
+            self._send(200, body, "application/json; charset=utf-8")
+            return
+        if path == "/memory.json":
+            slug = (qs.get("project") or [None])[0]
+            resolved = resolve_memory(slug, self.mem)
+            if resolved is None:
+                self._send(404, json.dumps({"error": f"project not found: {slug}"}).encode(),
+                           "application/json; charset=utf-8")
+                return
+            payload = build_payload(resolved)
             body = json.dumps(payload).encode()
             self._send(200, body, "application/json; charset=utf-8")
             return
@@ -177,7 +246,19 @@ def main() -> int:
 
     port = find_free_port()
 
-    HandlerClass = type("BoundHandler", (Handler,), {"mem": mem})
+    # initial_slug: se il path iniziale è dentro ~/.claude/projects/<slug>/memory/memory.agd,
+    # ricavalo per pre-selezione nel dropdown.
+    initial_slug = None
+    try:
+        rel = mem.relative_to(PROJECTS_DIR.resolve())
+        parts = rel.parts
+        if len(parts) >= 1:
+            initial_slug = parts[0]
+    except (ValueError, OSError):
+        pass
+
+    HandlerClass = type("BoundHandler", (Handler,),
+                        {"mem": mem, "initial_slug": initial_slug})
     server = ThreadingHTTPServer(("127.0.0.1", port), HandlerClass)
     url = f"http://127.0.0.1:{port}/"
 

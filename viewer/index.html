@@ -501,6 +501,10 @@ body.mode-graph .read-only  { display: none !important; }
   <div class="brand">
     <span class="dot"></span>
     <span>agd-memory</span>
+    <select id="project-picker" title="Switch project" style="
+        margin-left:10px; padding:4px 8px; border:1px solid var(--rule);
+        background:var(--bg-2); color:var(--ink); border-radius:6px;
+        font-size:12px; font-family:inherit; max-width:340px;"></select>
     <span class="path mono" id="filepath"></span>
   </div>
   <div class="spacer"></div>
@@ -603,18 +607,53 @@ function sectionName(s) {
   return t || s.heading.id;
 }
 
-async function load() {
-  const r = await fetch("/memory.json");
+let CURRENT_SLUG = null;
+
+async function load(slug) {
+  const url = slug ? `/memory.json?project=${encodeURIComponent(slug)}` : "/memory.json";
+  const r = await fetch(url);
   const j = await r.json();
   if (j.error) {
     document.getElementById("reader").innerHTML = `<div style="padding:60px;color:#ef4444">${j.error}</div>`;
     return;
   }
   DATA = j;
+  CURRENT_SLUG = slug || CURRENT_SLUG;
   document.getElementById("filepath").textContent = j.path;
   buildSections();
   renderSidebar();
   renderReader();
+}
+
+async function loadProjects() {
+  try {
+    const r = await fetch("/projects.json");
+    const j = await r.json();
+    const sel = document.getElementById("project-picker");
+    sel.innerHTML = "";
+    if (!j.projects || j.projects.length === 0) {
+      const o = document.createElement("option");
+      o.textContent = "(no projects found)";
+      o.disabled = true;
+      sel.appendChild(o);
+      sel.disabled = true;
+      return;
+    }
+    for (const p of j.projects) {
+      const o = document.createElement("option");
+      o.value = p.slug;
+      const kb = Math.round(p.bytes / 1024);
+      o.textContent = `${p.display}  (${kb} KB)`;
+      sel.appendChild(o);
+    }
+    if (j.initial_slug) {
+      sel.value = j.initial_slug;
+      CURRENT_SLUG = j.initial_slug;
+    }
+    sel.addEventListener("change", (ev) => load(ev.target.value));
+  } catch (e) {
+    console.error("loadProjects failed", e);
+  }
 }
 
 function renderSidebar() {
@@ -1009,7 +1048,7 @@ window.addEventListener("keydown", e => {
   }
 });
 
-load();
+(async () => { await loadProjects(); await load(CURRENT_SLUG); })();
 </script>
 </body>
 </html>
