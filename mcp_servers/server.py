@@ -23,6 +23,7 @@ import contextlib
 import fcntl
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -32,6 +33,34 @@ from mcp.types import TextContent, Tool
 
 
 AGD_BIN = Path(os.environ.get("AGD_BIN", str(Path.home() / ".cargo/bin/agd")))
+
+
+# `agd edit` does not validate identifiers or block tags on WRITE (exit 0),
+# but the parser rejects them on every subsequent READ — one bad save makes
+# the whole memory file unreadable. Same grammar as agd's is_valid_ident.
+_VALID_ID = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*\Z")
+_VALID_KIND = re.compile(r"x-[A-Za-z_][A-Za-z0-9_-]*\Z")
+
+
+def _reject_invalid_block(kind: str, block_id: str) -> str | None:
+    """Return None if `kind` and `block_id` are safe to write, else a reason.
+    Offers a sanitized id so the caller can retry without guessing."""
+    if not _VALID_ID.match(block_id):
+        suggestion = re.sub(r"[^A-Za-z0-9_-]+", "-", block_id).strip("-")
+        if not suggestion or not re.match(r"[A-Za-z_]", suggestion):
+            suggestion = "x-" + (suggestion or "entry")
+        return (
+            f"invalid id `{block_id}`: must match [A-Za-z_][A-Za-z0-9_-]* "
+            f"(no dots or other punctuation). Retry with e.g. `{suggestion}`. "
+            "Nothing was written."
+        )
+    if not _VALID_KIND.match(kind):
+        return (
+            f"invalid kind `{kind}`: must be `x-` followed by an identifier "
+            "(e.g. x-project, x-user, x-feedback, x-reference). "
+            "Nothing was written."
+        )
+    return None
 
 
 def _reject_unfencable(content: str) -> str | None:
@@ -293,14 +322,17 @@ async def _call_tool(name: str, arguments: dict | None) -> list[TextContent]:
         block_id = arguments["id"].lstrip("#")
         content = arguments["content"]
 
-        reason = _reject_unfencable(content)
+        reason = _reject_invalid_block(kind, block_id) or _reject_unfencable(content)
         if reason is not None:
             return [TextContent(type="text", text=f"save rejected: {reason}")]
 
         desc = arguments.get("desc")
         attrs = {}
         if desc:
-            attrs["desc"] = desc
+            # A literal newline in a quoted attribute value is written as-is
+            # by `agd edit` and breaks the parse on read ("unterminated
+            # quoted value") — collapse to spaces.
+            attrs["desc"] = re.sub(r"\s*\n\s*", " ", desc).strip()
 
         with _exclusive_lock(mem):
             existing_ids_raw = _run([str(AGD_BIN), "ids", str(mem)]).strip().splitlines()
