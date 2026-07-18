@@ -4,7 +4,7 @@ description: "Per-project persistent memory in AGD format with selective retriev
 license: MIT
 metadata:
   author: pinperepette
-  version: "0.1.0"
+  version: "0.4.1"
   domain: tooling
   triggers: memoria, ricordi, ricorda, what do you remember, recall, context, project facts, AGD memory, blog rules, project history
   role: utility

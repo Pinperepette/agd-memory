@@ -173,7 +173,12 @@ async def _list_tools() -> list[Tool]:
                 "Fetch one or more memory blocks by id in a single call. "
                 "Pass multiple ids to amortise the parse cost across all of "
                 "them — the file is parsed once. Each block is typically "
-                "30-200 tokens. Pass either `id` (single) or `ids` (list)."
+                "30-200 tokens. Pass either `id` (single) or `ids` (list). "
+                "Set `with_backlinks` to also pull every block that points to "
+                "the requested ids (the scoped rule/anchor that cites this "
+                "block), or `follow_refs` (with `depth`) to walk outbound "
+                "`refs=`/`@ref` links — the graph traversal the memory file is "
+                "built for, in one round-trip."
             ),
             inputSchema={
                 "type": "object",
@@ -186,6 +191,25 @@ async def _list_tools() -> list[Tool]:
                         "type": "array",
                         "items": {"type": "string"},
                         "description": "Multiple block ids in one call.",
+                    },
+                    "with_backlinks": {
+                        "type": "boolean",
+                        "description": (
+                            "Also include every block that references the "
+                            "requested ids (inbound edges). Default false."
+                        ),
+                    },
+                    "follow_refs": {
+                        "type": "boolean",
+                        "description": (
+                            "Follow outbound `refs=`/inline `@ref` links up to "
+                            "`depth` hops. Cycle-safe. Default false."
+                        ),
+                    },
+                    "depth": {
+                        "type": "integer",
+                        "description": "Max hops for follow_refs (default 1).",
+                        "minimum": 1,
                     },
                 },
             },
@@ -290,8 +314,16 @@ async def _call_tool(name: str, arguments: dict | None) -> list[TextContent]:
         else:
             return [TextContent(type="text", text="provide either 'id' or 'ids'")]
         cli_ids = [f"#{x.lstrip('#')}" for x in ids]
+        cmd = [str(AGD_BIN), "get", str(mem), *cli_ids]
+        if arguments.get("with_backlinks"):
+            cmd.append("--with-backlinks")
+        if arguments.get("follow_refs"):
+            cmd.append("--follow-refs")
+            depth = arguments.get("depth")
+            if isinstance(depth, int) and depth >= 1:
+                cmd += ["--depth", str(depth)]
         try:
-            out = _run([str(AGD_BIN), "get", str(mem), *cli_ids])
+            out = _run(cmd)
             return [TextContent(type="text", text=out)]
         except subprocess.CalledProcessError as e:
             return [TextContent(
