@@ -1,0 +1,1021 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 10,
+  "results": [
+    {
+      "instance_id": "sphinx-doc__sphinx-7454",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 50.81,
+      "loaded_tokens": 11109,
+      "essential_tokens": 42,
+      "raf": 264.5,
+      "tool_calls": 23,
+      "api": {
+        "input_tokens": 6989,
+        "output_tokens": 2804,
+        "cache_read": 235137,
+        "cache_write": 17771
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "sphinx/ext/autodoc/typehints.py"
+        ],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [
+          "sphinx/ext/autodoc/typehints.py"
+        ],
+        "gold_functions": [
+          "sphinx/domains/python.py::make_xref"
+        ],
+        "model_functions": [
+          "sphinx/ext/autodoc/typehints.py::modify_field_list"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 23,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='autodoc typehints signature None', top_k=10)",
+          "agd_get(ids=['tests-test_ext_autodoc_configs-py--f-test_autodoc_typehint\u2026)",
+          "agd_get(ids=['tests-test_ext_autodoc_configs-py--f-test_autodoc_typehint\u2026)",
+          "agd_toc(file='sphinx/ext/autodoc/__init__.py')",
+          "agd_rank_symbols(query='format type hints annotation code None', top_k=15)",
+          "agd_get(ids=['sphinx-util-inspect-py--c-signature--m-format_annotation'])",
+          "agd_search(query='stringify_annotation')",
+          "agd_get(ids=['sphinx-util-typing-py--f-stringify'])",
+          "agd_toc(file='sphinx/ext/autodoc/typehints.py')",
+          "agd_get(ids=['sphinx-ext-autodoc-typehints-py--f-merge_typehints'])",
+          "agd_get(ids=['sphinx-ext-autodoc-typehints-py--f-modify_field_list'])",
+          "read_window(path='sphinx/ext/autodoc/typehints.py', start_line=78, end_line=130)",
+          "read_window(path='sphinx/ext/autodoc/typehints.py', start_line=1, end_line=150)",
+          "agd_search(query='return annotation None typehints')",
+          "agd_toc(file='tests/test_ext_autodoc_configs.py')",
+          "agd_search(query='test_autodoc_typehints_description')",
+          "agd_get(ids=['tests-test_ext_autodoc_configs-py--f-test_autodoc_typehint\u2026)",
+          "agd_search(query='target.typehints Nothing')",
+          "agd_rank_symbols(query='target typehints module nothing horse', top_k=5)",
+          "agd_toc(file='tests/roots/test-ext-autodoc/target/typehints.py')",
+          "read_window(path='tests/roots/test-ext-autodoc/target/typehints.py')",
+          "read_window(path='sphinx/ext/autodoc/typehints.py', start_line=102, end_line=130)",
+          "submit_patch(diff=\u2026496c)"
+        ]
+      },
+      "patch_first_line": "--- a/sphinx/ext/autodoc/typehints.py",
+      "patch_lines": 9
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7454",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 40.98,
+      "loaded_tokens": 13830,
+      "essential_tokens": 42,
+      "raf": 329.29,
+      "tool_calls": 22,
+      "api": {
+        "input_tokens": 4986,
+        "output_tokens": 2883,
+        "cache_read": 209691,
+        "cache_write": 20209
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [
+          "sphinx/domains/python.py"
+        ],
+        "gold_functions": [
+          "sphinx/domains/python.py::make_xref"
+        ],
+        "model_functions": [
+          "sphinx/domains/python.py::make_xref"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 22,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/sphinx/domains/python.py",
+      "patch_lines": 15
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10466",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 47.31,
+      "loaded_tokens": 7030,
+      "essential_tokens": 71,
+      "raf": 99.01,
+      "tool_calls": 19,
+      "api": {
+        "input_tokens": 7065,
+        "output_tokens": 3097,
+        "cache_read": 137985,
+        "cache_write": 12504
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/builders/gettext.py"
+        ],
+        "model_files": [
+          "sphinx/builders/gettext.py"
+        ],
+        "gold_functions": [
+          "sphinx/builders/gettext.py::__iter__"
+        ],
+        "model_functions": [
+          "sphinx/builders/gettext.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 19,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='Message locations gettext', top_k=10)",
+          "agd_toc(file='sphinx/builders/gettext.py')",
+          "agd_get(ids=['sphinx-builders-gettext-py--c-message', 'sphinx-builders-g\u2026)",
+          "read_window(path='sphinx/builders/gettext.py', start_line=31, end_line=100)",
+          "agd_backlinks(id='sphinx-builders-gettext-py--c-message--m-__init__')",
+          "read_window(path='sphinx/builders/gettext.py', start_line=1, end_line=70)",
+          "agd_search(query='Message(message,')",
+          "agd_search(query='msg.locations')",
+          "agd_search(query='.locations')",
+          "agd_get(ids=['utils-babel_runner-py--c-compile_catalog_plusjs--m-_run_do\u2026)",
+          "agd_search(query='write_po')",
+          "agd_search(query='for message in catalog')",
+          "agd_search(query='write_po catalog')",
+          "agd_get(ids=['sphinx-builders-gettext-py--c-messagecatalogbuilder--m-fin\u2026)",
+          "agd_search(query='message.pot_t')",
+          "read_window(path='sphinx/templates/gettext/message.pot_t')",
+          "read_window(path='sphinx/builders/gettext.py', start_line=58, end_line=63)",
+          "read_window(path='sphinx/builders/gettext.py', start_line=31, end_line=63)",
+          "submit_patch(diff=\u2026874c)"
+        ]
+      },
+      "patch_first_line": "--- a/sphinx/builders/gettext.py",
+      "patch_lines": 22
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10466",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 25.42,
+      "loaded_tokens": 6008,
+      "essential_tokens": 71,
+      "raf": 84.62,
+      "tool_calls": 16,
+      "api": {
+        "input_tokens": 16127,
+        "output_tokens": 2256,
+        "cache_read": 57366,
+        "cache_write": 10073
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.857,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/builders/gettext.py"
+        ],
+        "model_files": [
+          "sphinx/builders/gettext.py"
+        ],
+        "gold_functions": [
+          "sphinx/builders/gettext.py::__iter__"
+        ],
+        "model_functions": [
+          "sphinx/builders/gettext.py::__iter__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 15,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/sphinx/builders/gettext.py",
+      "patch_lines": 24
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7462",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 13.84,
+      "loaded_tokens": 4592,
+      "essential_tokens": 1024,
+      "raf": 4.48,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 5847,
+        "output_tokens": 1157,
+        "cache_read": 17891,
+        "cache_write": 7687
+      },
+      "oracle": {
+        "file_overlap": 0.5,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py",
+          "sphinx/pycode/ast.py"
+        ],
+        "model_files": [
+          "sphinx/domains/python.py"
+        ],
+        "gold_functions": [
+          "sphinx/domains/python.py::unparse",
+          "sphinx/pycode/ast.py::unparse"
+        ],
+        "model_functions": [
+          "sphinx/domains/python.py::unparse"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 6,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='IndexError pop from empty list Tuple unparse python domains\u2026, top_k=10)",
+          "agd_toc(file='sphinx/domains/python.py')",
+          "agd_search(query='def unparse')",
+          "agd_get(ids=['sphinx-domains-python-py--f-_parse_annotation'])",
+          "read_window(path='sphinx/domains/python.py', start_line=80, end_line=134)",
+          "submit_patch(diff=\u20261102c)"
+        ]
+      },
+      "patch_first_line": "--- a/sphinx/domains/python.py",
+      "patch_lines": 26
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7462",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 12.05,
+      "loaded_tokens": 2194,
+      "essential_tokens": 1024,
+      "raf": 2.14,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 9652,
+        "output_tokens": 1180,
+        "cache_read": 0,
+        "cache_write": 4282
+      },
+      "oracle": {
+        "file_overlap": 0.5,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py",
+          "sphinx/pycode/ast.py"
+        ],
+        "model_files": [
+          "sphinx/domains/python.py"
+        ],
+        "gold_functions": [
+          "sphinx/domains/python.py::unparse",
+          "sphinx/pycode/ast.py::unparse"
+        ],
+        "model_functions": [
+          "sphinx/domains/python.py::unparse"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/sphinx/domains/python.py",
+      "patch_lines": 24
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9258",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 31.69,
+      "loaded_tokens": 8819,
+      "essential_tokens": 217,
+      "raf": 40.64,
+      "tool_calls": 18,
+      "api": {
+        "input_tokens": 5667,
+        "output_tokens": 2299,
+        "cache_read": 137935,
+        "cache_write": 13793
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "gold_functions": [
+          "sphinx/domains/python.py::make_xrefs"
+        ],
+        "model_functions": [
+          "sphinx/ext/napoleon/docstring.py::_convert_type_spec"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 18,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='type union specification parsing docstring', top_k=12)",
+          "agd_toc(file='sphinx/ext/napoleon/docstring.py')",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--f-_convert_type_spec'])",
+          "agd_backlinks(id='sphinx-ext-napoleon-docstring-py--f-_convert_type_spec')",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_co\u2026)",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_co\u2026)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=57, end_line=75)",
+          "agd_rank_symbols(query='test napoleon type conversion union', top_k=12)",
+          "agd_search(query='test_ext_napoleon')",
+          "agd_rank_symbols(query='test_ext_napoleon GoogleDocstring', top_k=20)",
+          "agd_get(ids=['tests-test_ext_napoleon_docstring-py--c-googledocstringtes\u2026)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=1, end_line=100)",
+          "agd_search(query='Union | vertical bar pipe')",
+          "agd_search(query='bytes | str')",
+          "read_window(path='tests/test_ext_napoleon_docstring.py', start_line=1, end_line=50)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=259, end_line=290)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=50, end_line=70)",
+          "submit_patch(diff=\u20261215c)"
+        ]
+      },
+      "patch_first_line": "--- a/sphinx/ext/napoleon/docstring.py",
+      "patch_lines": 33
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9258",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 48.88,
+      "loaded_tokens": 13323,
+      "essential_tokens": 217,
+      "raf": 61.4,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 9193,
+        "output_tokens": 2961,
+        "cache_read": 250105,
+        "cache_write": 19430
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/domains/python.py::make_xrefs"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9602",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 28.71,
+      "loaded_tokens": 5890,
+      "essential_tokens": 644,
+      "raf": 9.15,
+      "tool_calls": 10,
+      "api": {
+        "input_tokens": 9697,
+        "output_tokens": 2623,
+        "cache_read": 44910,
+        "cache_write": 10308
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [
+          "sphinx/util/typing.py",
+          "tests/test_util_typing.py"
+        ],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [
+          "sphinx/util/typing.py",
+          "tests/test_util_typing.py"
+        ],
+        "gold_functions": [
+          "sphinx/domains/python.py::unparse"
+        ],
+        "model_functions": [
+          "sphinx/util/typing.py::_restify_py37",
+          "tests/test_util_typing.py::test_restify_type_Literal"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 10,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='Literal annotation type sphinx nitpick', top_k=10)",
+          "agd_toc(file='sphinx/util/typing.py')",
+          "agd_get(ids=['sphinx-util-typing-py--f-restify', 'sphinx-util-typing-py-\u2026)",
+          "agd_get(ids=['tests-test_util_typing-py--f-test_restify_type_literal'])",
+          "read_window(path='sphinx/util/typing.py', start_line=143, end_line=199)",
+          "agd_get(ids=['sphinx-util-typing-py--f-_restify_py36'])",
+          "read_window(path='tests/test_util_typing.py', start_line=138, end_line=140)",
+          "read_window(path='tests/test_util_typing.py', start_line=1, end_line=50)",
+          "read_window(path='tests/test_util_typing.py', start_line=130, end_line=145)",
+          "submit_patch(diff=\u20261183c)"
+        ]
+      },
+      "patch_first_line": "--- a/sphinx/util/typing.py",
+      "patch_lines": 22
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9602",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 45.97,
+      "loaded_tokens": 10557,
+      "essential_tokens": 644,
+      "raf": 16.39,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 13410,
+        "output_tokens": 3598,
+        "cache_read": 205983,
+        "cache_write": 16946
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/domains/python.py::unparse"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8056",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 54.67,
+      "loaded_tokens": 17306,
+      "essential_tokens": 160,
+      "raf": 108.16,
+      "tool_calls": 27,
+      "api": {
+        "input_tokens": 6440,
+        "output_tokens": 3360,
+        "cache_read": 357531,
+        "cache_write": 25302
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/ext/napoleon/docstring.py::_consume_fields",
+          "sphinx/ext/napoleon/docstring.py::_parse_parameters_section"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='docstring parameter rendering numpydoc multiple inputs', top_k=12)",
+          "agd_rank_symbols(query='napoleon docstring parameters optional rendering', top_k=12)",
+          "agd_toc(file='sphinx/ext/napoleon/docstring.py')",
+          "agd_toc(file='tests/test_ext_napoleon_docstring.py')",
+          "agd_get(ids=['tests-test_ext_napoleon_docstring-py--c-numpydocstringtest\u2026)",
+          "agd_search(query='x1, x2 : array_like')",
+          "agd_search(query='multiple parameters same line')",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_fo\u2026)",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_co\u2026)",
+          "agd_search(query='_google_typed_arg_regex')",
+          "agd_search(query='_google_typed_arg_regex = re.compile')",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=1, end_line=100)",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-numpydocstring'])",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=406, end_line=455)",
+          "agd_search(query='param1, param2')",
+          "agd_search(query='x1, x2 : array')",
+          "read_window(path='tests/test_ext_napoleon_docstring.py', start_line=1, end_line=50)",
+          "read_window(path='tests/test_ext_napoleon_docstring.py', start_line=2100, end_line=2250)",
+          "agd_search(query='Parameters ---------- x1, x2')",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=1030, end_line=1060)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_range=406, end_line=434)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=406, end_line=434)",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_co\u2026)",
+          "read_window(path='sphinx/ext/napoleon/docstring.py', start_line=435, end_line=453)",
+          "agd_backlinks(id='sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_for\u2026)",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_pa\u2026)",
+          "agd_get(ids=['sphinx-ext-napoleon-docstring-py--c-googledocstring--m-_fo\u2026)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8056",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 51.92,
+      "loaded_tokens": 9847,
+      "essential_tokens": 160,
+      "raf": 61.54,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 15304,
+        "output_tokens": 3681,
+        "cache_read": 169344,
+        "cache_write": 15515
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "model_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "gold_functions": [
+          "sphinx/ext/napoleon/docstring.py::_consume_fields",
+          "sphinx/ext/napoleon/docstring.py::_parse_parameters_section"
+        ],
+        "model_functions": [
+          "sphinx/ext/napoleon/docstring.py::_format_docutils_params"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/sphinx/ext/napoleon/docstring.py",
+      "patch_lines": 33
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9229",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 41.83,
+      "loaded_tokens": 12411,
+      "essential_tokens": 577,
+      "raf": 21.51,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 3419,
+        "output_tokens": 2660,
+        "cache_read": 306611,
+        "cache_write": 19409
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/autodoc/__init__.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/ext/autodoc/__init__.py::add_content",
+          "sphinx/ext/autodoc/__init__.py::get_doc"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='type alias documentation autodoc', top_k=12)",
+          "agd_rank_symbols(query='alias of overwrite docstring message', top_k=12)",
+          "agd_search(query='alias of')",
+          "agd_toc(file='sphinx/ext/autodoc/__init__.py')",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-documenter--m-add_conten\u2026)",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-genericaliasmixin', 'sph\u2026)",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-newtypemixin', 'sphinx-e\u2026)",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-typevarmixin', 'sphinx-e\u2026)",
+          "agd_search(query='class DataDocumenterMixin')",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-datadocumentermixinbase'\u2026)",
+          "agd_search(query='update_content')",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-datadocumenter--m-add_co\u2026)",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-classdocumenter--m-add_c\u2026)",
+          "agd_search(query='doc_as_attr')",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-classdocumenter'])",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-classdocumenter--m-get_d\u2026)",
+          "agd_search(query='ScaffoldOpts FileContents FileOp')",
+          "agd_search(query='test_autoattribute_typed_variable_in_alias')",
+          "agd_get(ids=['tests-test_ext_autodoc_autoattribute-py--f-test_autoattrib\u2026)",
+          "read_window(path='tests/roots/test-ext-autodoc/target/typed_vars.py')",
+          "agd_search(query='4422')",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=1724, end_line=1735)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=2009, end_line=2020)",
+          "agd_search(query='type alias Union Dict')",
+          "agd_search(query='TypeAliasDocumenter')"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9229",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 53.94,
+      "loaded_tokens": 15030,
+      "essential_tokens": 577,
+      "raf": 26.05,
+      "tool_calls": 24,
+      "api": {
+        "input_tokens": 6320,
+        "output_tokens": 4897,
+        "cache_read": 275970,
+        "cache_write": 22849
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/autodoc/__init__.py"
+        ],
+        "model_files": [
+          "sphinx/ext/autodoc/__init__.py"
+        ],
+        "gold_functions": [
+          "sphinx/ext/autodoc/__init__.py::add_content",
+          "sphinx/ext/autodoc/__init__.py::get_doc"
+        ],
+        "model_functions": [
+          "sphinx/ext/autodoc/__init__.py::update_content"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 22,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/sphinx/ext/autodoc/__init__.py",
+      "patch_lines": 61
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8593",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 61.17,
+      "loaded_tokens": 11899,
+      "essential_tokens": 1281,
+      "raf": 9.29,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 9767,
+        "output_tokens": 3707,
+        "cache_read": 248019,
+        "cache_write": 18872
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/autodoc/__init__.py",
+          "sphinx/ext/autodoc/importer.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/ext/autodoc/__init__.py::<line29>",
+          "sphinx/ext/autodoc/__init__.py::get_object_members",
+          "sphinx/ext/autodoc/importer.py::<line16>",
+          "sphinx/ext/autodoc/importer.py::get_module_members"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='autodoc meta public variables', top_k=12)",
+          "agd_rank_symbols(query='autodoc variable member skip private', top_k=12)",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-documenter--m-filter_mem\u2026, with_backlinks=False)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=662, end_line=810)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=779, end_line=810)",
+          "agd_rank_symbols(query='extract_metadata', top_k=5)",
+          "agd_get(ids=['sphinx-util-docstrings-py--f-extract_metadata'])",
+          "agd_get(ids=['tests-test_ext_autodoc_private_members-py--f-test_private_\u2026)",
+          "read_window(path='tests/roots/test-ext-autodoc/target/private.py')",
+          "agd_search(query=':meta public:')",
+          "agd_rank_symbols(query='getdoc variable comment attribute annotation', top_k=12)",
+          "agd_get(ids=['sphinx-util-inspect-py--f-getdoc'])",
+          "agd_get(ids=['sphinx-pycode-parser-py--c-variablecommentpicker--m-visit_\u2026)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=697, end_line=740)",
+          "agd_rank_symbols(query='find_attr_docs analyzer', top_k=5)",
+          "agd_get(ids=['sphinx-pycode-__init__-py--c-moduleanalyzer--m-find_attr_d\u2026)",
+          "read_window(path='tests/test_ext_autodoc_private_members.py')",
+          "agd_search(query='_foo = None')",
+          "agd_search(query='variable meta public private')",
+          "read_window(path='sphinx/pycode/__init__.py', start_line=1, end_line=50)",
+          "read_window(path='sphinx/pycode/__init__.py', start_line=100, end_line=160)",
+          "read_window(path='sphinx/pycode/__init__.py', start_line=160, end_line=190)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=725, end_line=770)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=711, end_line=740)",
+          "read_window(path='sphinx/ext/autodoc/__init__.py', start_line=1, end_line=50)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8593",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 53.08,
+      "loaded_tokens": 9619,
+      "essential_tokens": 1281,
+      "raf": 7.51,
+      "tool_calls": 26,
+      "api": {
+        "input_tokens": 19589,
+        "output_tokens": 3494,
+        "cache_read": 182031,
+        "cache_write": 15984
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/autodoc/__init__.py",
+          "sphinx/ext/autodoc/importer.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/ext/autodoc/__init__.py::<line29>",
+          "sphinx/ext/autodoc/__init__.py::get_object_members",
+          "sphinx/ext/autodoc/importer.py::<line16>",
+          "sphinx/ext/autodoc/importer.py::get_module_members"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 84.56,
+      "loaded_tokens": 17144,
+      "essential_tokens": 326,
+      "raf": 52.59,
+      "tool_calls": 26,
+      "api": {
+        "input_tokens": 7332,
+        "output_tokens": 7213,
+        "cache_read": 387854,
+        "cache_write": 30108
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/inheritance_diagram.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/ext/inheritance_diagram.py::html_visit_inheritance_diagram"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='inheritance diagram SVG links', top_k=12)",
+          "agd_toc(file='sphinx/ext/inheritance_diagram.py')",
+          "agd_toc(file='sphinx/ext/graphviz.py')",
+          "agd_get(ids=['sphinx-ext-graphviz-py--f-fix_svg_relative_paths', 'sphinx\u2026)",
+          "read_window(path='sphinx/ext/graphviz.py', start_line=220, end_line=248)",
+          "agd_backlinks(id='sphinx-ext-graphviz-py--f-fix_svg_relative_paths')",
+          "agd_get(ids=['sphinx-ext-graphviz-py--f-render_dot'])",
+          "read_window(path='sphinx/ext/inheritance_diagram.py', start_line=398, end_line=428)",
+          "agd_get(ids=['sphinx-ext-graphviz-py--f-render_dot_html'])",
+          "agd_search(query='pending_xref')",
+          "agd_search(query='pending_xref inheritance')",
+          "agd_get(ids=['sphinx-ext-inheritance_diagram-py--c-inheritancediagram--m\u2026)",
+          "agd_search(query='refuri')",
+          "agd_search(query='get_relative_uri refuri')",
+          "agd_rank_symbols(query='python domain resolve_xref class', top_k=10)",
+          "agd_rank_symbols(query='python domain resolve_xref', top_k=5)",
+          "agd_rank_symbols(query='py domain PyTypedomain class', top_k=5)",
+          "agd_toc(file='sphinx/domains/python.py')",
+          "agd_search(query='PyTypedomain resolve_xref')",
+          "read_window(path='sphinx/domains/python.py', start_line=1, end_line=50)",
+          "agd_search(query='refuri =')",
+          "agd_rank_symbols(query='ReferencesResolver resolve xref refuri', top_k=10)",
+          "agd_get(ids=['sphinx-transforms-post_transforms-__init__-py--c-reference\u2026)",
+          "agd_search(query='PyTypedomain resolve_xref fromdocname builder')",
+          "read_window(path='sphinx/domains/python.py', start_line=600, end_line=700)",
+          "agd_search(query='def resolve_xref python')"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 65.57,
+      "loaded_tokens": 12352,
+      "essential_tokens": 326,
+      "raf": 37.89,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 5376,
+        "output_tokens": 5017,
+        "cache_read": 249373,
+        "cache_write": 20508
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/ext/inheritance_diagram.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/ext/inheritance_diagram.py::html_visit_inheritance_diagram"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9320",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 37.25,
+      "loaded_tokens": 7087,
+      "essential_tokens": 1550,
+      "raf": 4.57,
+      "tool_calls": 14,
+      "api": {
+        "input_tokens": 9595,
+        "output_tokens": 3423,
+        "cache_read": 87322,
+        "cache_write": 12741
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/cmd/quickstart.py"
+        ],
+        "model_files": [
+          "sphinx/cmd/quickstart.py"
+        ],
+        "gold_functions": [
+          "sphinx/cmd/quickstart.py::allow_empty",
+          "sphinx/cmd/quickstart.py::ask_user"
+        ],
+        "model_functions": [
+          "sphinx/cmd/quickstart.py::allow_empty",
+          "sphinx/cmd/quickstart.py::ask_user"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 14,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='sphinx-quickstart root path exit prompt', top_k=10)",
+          "agd_toc(file='sphinx/cmd/quickstart.py')",
+          "agd_get(ids=['sphinx-cmd-quickstart-py--f-ask_user', 'sphinx-cmd-quickst\u2026)",
+          "agd_get(ids=['sphinx-cmd-quickstart-py--f-is_path', 'sphinx-cmd-quicksta\u2026)",
+          "agd_get(ids=['sphinx-cmd-quickstart-py--f-allow_empty'])",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=210, end_line=230)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=91, end_line=180)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=218, end_line=235)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=215, end_line=235)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=260, end_line=280)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=280, end_line=305)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=218, end_line=235)",
+          "read_window(path='sphinx/cmd/quickstart.py', start_line=91, end_line=130)",
+          "submit_patch(diff=\u2026767c)"
+        ]
+      },
+      "patch_first_line": "--- a/sphinx/cmd/quickstart.py",
+      "patch_lines": 24
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9320",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 21.78,
+      "loaded_tokens": 5325,
+      "essential_tokens": 1550,
+      "raf": 3.44,
+      "tool_calls": 9,
+      "api": {
+        "input_tokens": 10852,
+        "output_tokens": 1408,
+        "cache_read": 17860,
+        "cache_write": 8123
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.857,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/cmd/quickstart.py"
+        ],
+        "model_files": [
+          "sphinx/cmd/quickstart.py"
+        ],
+        "gold_functions": [
+          "sphinx/cmd/quickstart.py::allow_empty",
+          "sphinx/cmd/quickstart.py::ask_user"
+        ],
+        "model_functions": [
+          "sphinx/cmd/quickstart.py::allow_empty",
+          "sphinx/cmd/quickstart.py::ask_user"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 9,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/sphinx/cmd/quickstart.py",
+      "patch_lines": 23
+    }
+  ]
+}

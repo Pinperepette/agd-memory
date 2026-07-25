@@ -1,0 +1,110 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "sphinx-doc__sphinx-7454",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 47.27,
+      "loaded_tokens": 12885,
+      "essential_tokens": 42,
+      "raf": 306.79,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 7012,
+        "output_tokens": 3221,
+        "cache_read": 269614,
+        "cache_write": 19839
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/domains/python.py::make_xref"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='autodoc typehints None signature', top_k=12)",
+          "agd_toc(file='sphinx/ext/autodoc/typehints.py')",
+          "agd_get(ids=['tests-test_ext_autodoc_configs-py--f-test_autodoc_typehint\u2026)",
+          "agd_get(ids=['sphinx-ext-autodoc-typehints-py--f-merge_typehints', 'sphi\u2026)",
+          "agd_get(ids=['sphinx-ext-autodoc-__init__-py--c-documenter--m-format_sig\u2026)",
+          "agd_search(query='retann')",
+          "agd_get(ids=['sphinx-domains-python-py--c-pyobject--m-handle_signature'])",
+          "agd_rank_symbols(query='_parse_annotation', top_k=5)",
+          "agd_get(ids=['sphinx-domains-python-py--f-_parse_annotation'])",
+          "read_window(path='sphinx/ext/autodoc/typehints.py', start_line=1, end_line=150)",
+          "agd_search(query='reftype class')",
+          "agd_search(query='pending_xref reftarget')",
+          "agd_search(query='object-description-transform')",
+          "agd_rank_symbols(query='python domain transform filter', top_k=5)",
+          "read_window(path='sphinx/domains/python.py', start_line=1, end_line=100)",
+          "agd_search(query='reftype obj data')",
+          "agd_rank_symbols(query='python domain resolve xref', top_k=5)",
+          "agd_rank_symbols(query='intersphinx role', top_k=5)",
+          "agd_rank_symbols(query='python domain ObjType class function', top_k=10)",
+          "agd_get(ids=['sphinx-domains-python-py--c-pythondomain'])",
+          "agd_search(query='None constant builtin')",
+          "agd_search(query='const PyXRefRole')",
+          "agd_rank_symbols(query='intersphinx inventory fetch object type', top_k=5)",
+          "read_window(path='tests/test_ext_autodoc_configs.py', start_line=517, end_line=561)",
+          "read_window(path='sphinx/domains/python.py', start_line=71, end_line=120)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7454",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 38.63,
+      "loaded_tokens": 7956,
+      "essential_tokens": 42,
+      "raf": 189.43,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 18994,
+        "output_tokens": 2613,
+        "cache_read": 146703,
+        "cache_write": 13007
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "sphinx/domains/python.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "sphinx/domains/python.py::make_xref"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns"
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    }
+  ]
+}

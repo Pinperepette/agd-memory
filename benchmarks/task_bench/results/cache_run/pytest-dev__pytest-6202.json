@@ -1,0 +1,104 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 19.57,
+      "loaded_tokens": 3483,
+      "essential_tokens": 129,
+      "raf": 27.0,
+      "tool_calls": 11,
+      "api": {
+        "input_tokens": 14435,
+        "output_tokens": 1506,
+        "cache_read": 32329,
+        "cache_write": 6804
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.875,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/python.py"
+        ],
+        "model_files": [
+          "src/_pytest/python.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ],
+        "model_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 11,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='replace .[ [ headline parametrize test discovery', top_k=10)",
+          "agd_search(query='replace(\".[\", \"[\")')",
+          "agd_search(query='.[')",
+          "agd_rank_symbols(query='getmodpath', top_k=5)",
+          "agd_get(ids=['src-_pytest-python-py--c-pyobjmixin--m-getmodpath'])",
+          "read_window(path='src/_pytest/python.py', start_line=274, end_line=292)",
+          "read_window(path='src/_pytest/python.py', start_line=260, end_line=310)",
+          "agd_rank_symbols(query='test getmodpath parametrize bracket', top_k=10)",
+          "agd_backlinks(id='src-_pytest-python-py--c-pyobjmixin--m-getmodpath')",
+          "agd_search(query='getmodpath()')",
+          "submit_patch(diff=\u2026369c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/python.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6202",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 31.82,
+      "loaded_tokens": 3925,
+      "essential_tokens": 129,
+      "raf": 30.43,
+      "tool_calls": 19,
+      "api": {
+        "input_tokens": 15995,
+        "output_tokens": 2601,
+        "cache_read": 71219,
+        "cache_write": 8180
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.875,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/python.py"
+        ],
+        "model_files": [
+          "src/_pytest/python.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ],
+        "model_functions": [
+          "src/_pytest/python.py::getmodpath"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 19,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/python.py",
+      "patch_lines": 11
+    }
+  ]
+}

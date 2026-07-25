@@ -1,0 +1,101 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 13.93,
+      "loaded_tokens": 3845,
+      "essential_tokens": 123,
+      "raf": 31.26,
+      "tool_calls": 8,
+      "api": {
+        "input_tokens": 10733,
+        "output_tokens": 1074,
+        "cache_read": 13061,
+        "cache_write": 6562
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/compat.py"
+        ],
+        "model_files": [
+          "src/_pytest/compat.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ],
+        "model_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 7,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='num_mock_patch_args mock patch sentinels', top_k=10)",
+          "agd_get(ids=['src-_pytest-compat-py--f-num_mock_patch_args'])",
+          "agd_toc(file='src/_pytest/compat.py')",
+          "agd_toc()",
+          "agd_search(query='num_mock_patch_args')",
+          "read_window(path='src/_pytest/compat.py', start_line=85, end_line=105)",
+          "read_window(path='src/_pytest/compat.py', start_line=1, end_line=150)",
+          "submit_patch(diff=\u2026449c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/compat.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5631",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 9.64,
+      "loaded_tokens": 2217,
+      "essential_tokens": 123,
+      "raf": 18.02,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 10225,
+        "output_tokens": 913,
+        "cache_read": 0,
+        "cache_write": 4126
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.538,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/compat.py"
+        ],
+        "model_files": [
+          "src/_pytest/compat.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ],
+        "model_functions": [
+          "src/_pytest/compat.py::num_mock_patch_args"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 5,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/compat.py",
+      "patch_lines": 10
+    }
+  ]
+}

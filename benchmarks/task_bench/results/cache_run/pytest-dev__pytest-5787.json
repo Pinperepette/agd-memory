@@ -1,0 +1,122 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 62.95,
+      "loaded_tokens": 19751,
+      "essential_tokens": 1152,
+      "raf": 17.14,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 7218,
+        "output_tokens": 4668,
+        "cache_read": 322012,
+        "cache_write": 27660
+      },
+      "oracle": {
+        "file_overlap": 0.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": []
+      },
+      "adapter_notes": {
+        "turns": 25,
+        "stop_reason": "max_turns",
+        "trajectory": [
+          "agd_rank_symbols(query='exception serialization chained', top_k=12)",
+          "agd_rank_symbols(query='exception serialize worker remote', top_k=12)",
+          "agd_rank_symbols(query='excinfo __cause__ __context__', top_k=12)",
+          "agd_toc(file='src/_pytest/_code/code.py')",
+          "agd_search(query='exc_repr_chain_suppression')",
+          "agd_search(query='chained exception')",
+          "agd_rank_symbols(query='ExceptionInfo repr', top_k=12)",
+          "agd_get(ids=['src-_pytest-_code-code-py--c-exceptioninfo', 'src-_pytest-\u2026)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=200, end_line=400)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=360, end_line=550)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=550, end_line=750)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=750, end_line=950)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=883, end_line=1000)",
+          "read_window(path='src/_pytest/_code/code.py', start_range=857, end_line=900)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=857, end_line=920)",
+          "agd_rank_symbols(query='pickle __reduce__ setstate getstate', top_k=12)",
+          "read_window(path='src/_pytest/_code/code.py', start_line='1, 1100')",
+          "read_window(path='src/_pytest/_code/code.py', start_line=1000, end_line=1100)",
+          "agd_search(query='execonly tryshort')",
+          "read_window(path='src/_pytest/_code/code.py', start_line=813, end_line=855)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=883, end_line=910)",
+          "agd_rank_symbols(query='workerinfo gateway exception report', top_k=12)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/reports.py', start_line=250, end_line=400)"
+        ]
+      },
+      "patch_first_line": "",
+      "patch_lines": 0
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 53.63,
+      "loaded_tokens": 13137,
+      "essential_tokens": 1152,
+      "raf": 11.4,
+      "tool_calls": 25,
+      "api": {
+        "input_tokens": 8537,
+        "output_tokens": 4336,
+        "cache_read": 213945,
+        "cache_write": 19848
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.133,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [
+          "src/_pytest/reports.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": [
+          "src/_pytest/reports.py::<line9>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 22,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/reports.py",
+      "patch_lines": 109
+    }
+  ]
+}

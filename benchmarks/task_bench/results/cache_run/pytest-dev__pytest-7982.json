@@ -1,0 +1,116 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 38.83,
+      "loaded_tokens": 19031,
+      "essential_tokens": 107,
+      "raf": 177.86,
+      "tool_calls": 23,
+      "api": {
+        "input_tokens": 15799,
+        "output_tokens": 2907,
+        "cache_read": 266527,
+        "cache_write": 27229
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "model_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ],
+        "model_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 23,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='symlinks follow_symlinks directory collection', top_k=12)",
+          "agd_toc(file='src/_pytest/pathlib.py')",
+          "agd_get(ids=['src-_pytest-pathlib-py--f-visit'])",
+          "agd_search(query='follow_symlinks=False')",
+          "read_window(path='src/_pytest/pathlib.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=200, end_line=350)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=400, end_line=500)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=550, end_line=650)",
+          "read_window(path='testing/test_collection.py', start_line=1, end_line=50)",
+          "read_window(path='testing/test_collection.py', start_line=200, end_line=300)",
+          "read_window(path='testing/test_collection.py', start_line=100, end_line=200)",
+          "read_window(path='testing/test_collection.py', start_line=50, end_line=108)",
+          "read_window(path='testing/test_collection.py', start_line=1000, end_line=1100)",
+          "read_window(path='testing/test_collection.py', start_line=850, end_line=950)",
+          "read_window(path='testing/test_collection.py', start_line=700, end_line=800)",
+          "read_window(path='testing/test_collection.py', start_line=600, end_line=700)",
+          "read_window(path='testing/test_collection.py', start_line=450, end_line=550)",
+          "read_window(path='testing/test_collection.py', start_line=350, end_line=450)",
+          "read_window(path='testing/test_collection.py', start_line=300, end_line=350)",
+          "read_window(path='testing/test_collection.py', start_line=1100, end_line=1200)",
+          "read_window(path='testing/test_collection.py', start_line=1200, end_line=1280)",
+          "read_window(path='src/_pytest/pathlib.py', start_line=548, end_line=565)",
+          "submit_patch(diff=\u2026380c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pathlib.py",
+      "patch_lines": 9
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7982",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 9.96,
+      "loaded_tokens": 1041,
+      "essential_tokens": 107,
+      "raf": 9.73,
+      "tool_calls": 5,
+      "api": {
+        "input_tokens": 7762,
+        "output_tokens": 758,
+        "cache_read": 0,
+        "cache_write": 0
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "model_files": [
+          "src/_pytest/pathlib.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ],
+        "model_functions": [
+          "src/_pytest/pathlib.py::visit"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 4,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/pathlib.py",
+      "patch_lines": 9
+    }
+  ]
+}

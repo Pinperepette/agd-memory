@@ -1,0 +1,118 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 62.88,
+      "loaded_tokens": 18630,
+      "essential_tokens": 218,
+      "raf": 85.46,
+      "tool_calls": 23,
+      "api": {
+        "input_tokens": 94,
+        "output_tokens": 6856,
+        "cache_read": 316179,
+        "cache_write": 30478
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 22,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='xfail marker handling dynamic add_marker', top_k=12)",
+          "agd_rank_symbols(query='xfail handling runtest outcome skip', top_k=12)",
+          "agd_toc(file='src/_pytest/skipping.py')",
+          "agd_toc(file='src/_pytest/skipping.py')",
+          "agd_get(ids=['src-_pytest-skipping-py--f-pytest_runtest_makereport'])",
+          "agd_search(query='pytest_runtest_makereport xfail')",
+          "read_window(path='src/_pytest/skipping.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/skipping.py', start_line=50, end_line=150)",
+          "read_window(path='src/_pytest/skipping.py', start_line=150, end_line=250)",
+          "read_window(path='src/_pytest/skipping.py', start_line=250, end_line=350)",
+          "read_window(path='testing/test_skipping.py', start_line=1, end_line=50)",
+          "agd_search(query='test_mark_xfail_item')",
+          "read_window(path='testing/test_skipping.py', start_line=1, end_line=100)",
+          "read_window(path='testing/test_skipping.py', start_line=100, end_line=200)",
+          "read_window(path='testing/test_skipping.py', start_line=500, end_line=600)",
+          "read_window(path='testing/test_skipping.py', start_line=300, end_line=400)",
+          "read_window(path='testing/test_skipping.py', start_line=400, end_line=450)",
+          "read_window(path='src/_pytest/fixtures.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/fixtures.py', start_line=600, end_line=700)",
+          "read_window(path='src/_pytest/fixtures.py', start_line=400, end_line=500)",
+          "read_window(path='src/_pytest/fixtures.py', start_line=550, end_line=600)",
+          "read_window(path='src/_pytest/skipping.py', start_line=260, end_line=310)",
+          "submit_patch(diff=\u2026624c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 12
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 67.71,
+      "loaded_tokens": 13485,
+      "essential_tokens": 218,
+      "raf": 61.86,
+      "tool_calls": 21,
+      "api": {
+        "input_tokens": 77,
+        "output_tokens": 5493,
+        "cache_read": 294543,
+        "cache_write": 22407
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.029,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 21,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 16
+    }
+  ]
+}

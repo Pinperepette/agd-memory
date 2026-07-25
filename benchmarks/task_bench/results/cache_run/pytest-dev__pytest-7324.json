@@ -1,0 +1,106 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 18.91,
+      "loaded_tokens": 3937,
+      "essential_tokens": 182,
+      "raf": 21.63,
+      "tool_calls": 9,
+      "api": {
+        "input_tokens": 16091,
+        "output_tokens": 1603,
+        "cache_read": 18566,
+        "cache_write": 7269
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.333,
+        "line_jaccard": 0.35,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "model_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/mark/expression.py::__getitem__",
+          "src/_pytest/mark/expression.py::expression",
+          "src/_pytest/mark/expression.py::not_expr"
+        ],
+        "model_functions": [
+          "src/_pytest/mark/expression.py::not_expr"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 9,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='Expression compile False True None', top_k=12)",
+          "agd_toc(file='src/_pytest/mark/expression.py')",
+          "agd_get(ids=['src-_pytest-mark-expression-py--c-expression', 'src-_pytes\u2026)",
+          "agd_search(query='class Expression')",
+          "read_window(path='src/_pytest/mark/expression.py')",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=168)",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=195, end_line=220)",
+          "read_window(path='src/_pytest/mark/expression.py', start_line=155, end_line=166)",
+          "submit_patch(diff=\u2026695c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/mark/expression.py",
+      "patch_lines": 17
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7324",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 20.66,
+      "loaded_tokens": 4475,
+      "essential_tokens": 182,
+      "raf": 24.59,
+      "tool_calls": 12,
+      "api": {
+        "input_tokens": 6407,
+        "output_tokens": 1825,
+        "cache_read": 40163,
+        "cache_write": 7845
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.333,
+        "line_jaccard": 0.286,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "model_files": [
+          "src/_pytest/mark/expression.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/mark/expression.py::__getitem__",
+          "src/_pytest/mark/expression.py::expression",
+          "src/_pytest/mark/expression.py::not_expr"
+        ],
+        "model_functions": [
+          "src/_pytest/mark/expression.py::not_expr"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 11,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/mark/expression.py",
+      "patch_lines": 15
+    }
+  ]
+}

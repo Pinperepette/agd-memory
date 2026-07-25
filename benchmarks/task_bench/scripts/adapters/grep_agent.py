@@ -54,6 +54,25 @@ Strategy:
 Be efficient: typical fix is 1-3 ripgrep calls + 1-3 read_file calls + submit_patch. Do not over-explore."""
 
 
+SYSTEM_BLOCKS = [{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}]
+
+
+def _mark_rolling_cache(messages: list[dict[str, Any]]) -> None:
+    for msg in messages:
+        if msg.get("role") == "user" and isinstance(msg.get("content"), list):
+            for block in msg["content"]:
+                if isinstance(block, dict):
+                    block.pop("cache_control", None)
+    if not messages:
+        return
+    last = messages[-1]
+    if last.get("role") != "user" or not isinstance(last.get("content"), list) or not last["content"]:
+        return
+    tail = last["content"][-1]
+    if isinstance(tail, dict):
+        tail["cache_control"] = {"type": "ephemeral"}
+
+
 TOOLS = [
     {
         "name": "ripgrep_search",
@@ -197,10 +216,11 @@ class GrepAgent(RetrievalAdapter):
         api_in = api_out = api_cw = api_cr = 0
 
         for turn in range(MAX_TURNS):
+            _mark_rolling_cache(messages)
             resp = client.messages.create(
                 model=model,
                 max_tokens=4000,
-                system=SYSTEM,
+                system=SYSTEM_BLOCKS,
                 tools=TOOLS,
                 messages=messages,
             )

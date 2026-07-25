@@ -1,0 +1,101 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 18.8,
+      "loaded_tokens": 3737,
+      "essential_tokens": 443,
+      "raf": 8.44,
+      "tool_calls": 8,
+      "api": {
+        "input_tokens": 15481,
+        "output_tokens": 2036,
+        "cache_read": 10842,
+        "cache_write": 6880
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.24,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 8,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='pytest_runtest_makereport skipping', top_k=5)",
+          "agd_toc(file='src/_pytest/skipping.py')",
+          "agd_search(query='pytest_runtest_makereport skipping.py')",
+          "read_window(path='src/_pytest/skipping.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/skipping.py', start_line=200, end_line=280)",
+          "read_window(path='src/_pytest/skipping.py', start_line=280, end_line=310)",
+          "read_window(path='src/_pytest/skipping.py', start_line=260, end_line=306)",
+          "submit_patch(diff=\u20261810c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 41
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 18.15,
+      "loaded_tokens": 3668,
+      "essential_tokens": 443,
+      "raf": 8.28,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 6191,
+        "output_tokens": 1815,
+        "cache_read": 9376,
+        "cache_write": 6115
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 6,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 18
+    }
+  ]
+}

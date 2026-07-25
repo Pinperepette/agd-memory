@@ -1,0 +1,108 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 28.84,
+      "loaded_tokens": 12364,
+      "essential_tokens": 368,
+      "raf": 33.6,
+      "tool_calls": 15,
+      "api": {
+        "input_tokens": 3522,
+        "output_tokens": 2296,
+        "cache_read": 132533,
+        "cache_write": 18099
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 1.0,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/capture.py"
+        ],
+        "model_files": [
+          "src/_pytest/capture.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/capture.py::__init__"
+        ],
+        "model_functions": [
+          "src/_pytest/capture.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 15,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='capfd readouterr capture fixture carriage return', top_k=12)",
+          "agd_toc(file='src/_pytest/capture.py')",
+          "agd_get(ids=['src-_pytest-capture-py--f-capfd'])",
+          "agd_search(query='carriage return')",
+          "read_window(path='src/_pytest/capture.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/capture.py', start_line=50, end_line=200)",
+          "read_window(path='src/_pytest/capture.py', start_line=193, end_line=350)",
+          "read_window(path='src/_pytest/capture.py', start_line=349, end_line=500)",
+          "read_window(path='src/_pytest/capture.py', start_line=490, end_line=650)",
+          "read_window(path='src/_pytest/capture.py', start_line=650, end_line=800)",
+          "read_window(path='src/_pytest/capture.py', start_line=788, end_line=850)",
+          "read_window(path='src/_pytest/capture.py', start_line=850, end_line=900)",
+          "read_window(path='src/_pytest/capture.py', start_line='(383', end_line=398)",
+          "read_window(path='src/_pytest/capture.py', start_line=383, end_line=398)",
+          "submit_patch(diff=\u2026365c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/capture.py",
+      "patch_lines": 10
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7521",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 31.63,
+      "loaded_tokens": 7713,
+      "essential_tokens": 368,
+      "raf": 20.96,
+      "tool_calls": 18,
+      "api": {
+        "input_tokens": 13766,
+        "output_tokens": 2539,
+        "cache_read": 116964,
+        "cache_write": 12444
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.5,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/capture.py"
+        ],
+        "model_files": [
+          "src/_pytest/capture.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/capture.py::__init__"
+        ],
+        "model_functions": [
+          "src/_pytest/capture.py::__init__"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 18,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/capture.py",
+      "patch_lines": 11
+    }
+  ]
+}

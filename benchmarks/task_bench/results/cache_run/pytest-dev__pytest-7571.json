@@ -1,0 +1,116 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 39.79,
+      "loaded_tokens": 11248,
+      "essential_tokens": 304,
+      "raf": 37.0,
+      "tool_calls": 15,
+      "api": {
+        "input_tokens": 15954,
+        "output_tokens": 2886,
+        "cache_read": 98492,
+        "cache_write": 17336
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.636,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/logging.py"
+        ],
+        "model_files": [
+          "src/_pytest/logging.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ],
+        "model_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 15,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='caplog fixture log level restore', top_k=12)",
+          "agd_get(ids=['src-_pytest-logging-py--c-logcapturefixture--m-_finalize',\u2026)",
+          "agd_toc(file='src/_pytest/logging.py')",
+          "agd_search(query='caplog fixture set_level _finalize')",
+          "read_window(path='src/_pytest/logging.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/logging.py', start_line=200, end_line=400)",
+          "read_window(path='src/_pytest/logging.py', start_line=350, end_line=450)",
+          "read_window(path='src/_pytest/logging.py', start_line=450, end_line=550)",
+          "read_window(path='testing/logging/test_fixture.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/logging.py', start_line=313, end_line=340)",
+          "read_window(path='src/_pytest/logging.py', start_line=526, end_line=630)",
+          "read_window(path='src/_pytest/logging.py', start_line=341, end_line=360)",
+          "read_window(path='src/_pytest/logging.py', start_line=422, end_line=459)",
+          "read_window(path='src/_pytest/logging.py', start_line=341, end_line=475)",
+          "submit_patch(diff=\u20261352c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/logging.py",
+      "patch_lines": 31
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 15.0,
+      "loaded_tokens": 6488,
+      "essential_tokens": 304,
+      "raf": 21.34,
+      "tool_calls": 8,
+      "api": {
+        "input_tokens": 7213,
+        "output_tokens": 1400,
+        "cache_read": 27613,
+        "cache_write": 9601
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.714,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/logging.py"
+        ],
+        "model_files": [
+          "src/_pytest/logging.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ],
+        "model_functions": [
+          "src/_pytest/logging.py::__init__",
+          "src/_pytest/logging.py::_finalize",
+          "src/_pytest/logging.py::set_level"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 8,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/logging.py",
+      "patch_lines": 29
+    }
+  ]
+}

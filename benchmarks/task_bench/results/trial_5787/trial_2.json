@@ -1,0 +1,81 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 58.56,
+      "loaded_tokens": 17780,
+      "essential_tokens": 1152,
+      "raf": 15.43,
+      "tool_calls": 24,
+      "api": {
+        "input_tokens": 7208,
+        "output_tokens": 6036,
+        "cache_read": 274654,
+        "cache_write": 25859
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.5,
+        "line_jaccard": 0.496,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/reports.py"
+        ],
+        "model_files": [
+          "src/_pytest/reports.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/reports.py::<line6>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report",
+          "src/_pytest/reports.py::pytest_report_from_serializable"
+        ],
+        "model_functions": [
+          "src/_pytest/reports.py::<line10>",
+          "src/_pytest/reports.py::_from_json",
+          "src/_pytest/reports.py::disassembled_report"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 24,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='exception serialization chained', top_k=12)",
+          "agd_rank_symbols(query='ExceptionInfo exception chain serialize', top_k=12)",
+          "agd_get(ids=['src-_pytest-_code-code-py--c-exceptionchainrepr'])",
+          "agd_toc(file='src/_pytest/_code/code.py')",
+          "agd_rank_symbols(query='xdist remote worker exception repr', top_k=12)",
+          "agd_search(query='__cause__')",
+          "agd_rank_symbols(query='ExecutionReport exception longrepr', top_k=12)",
+          "agd_toc(file='src/_pytest/reports.py')",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/reports.py', start_line=100, end_line=250)",
+          "read_window(path='src/_pytest/reports.py', start_line=240, end_line=320)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=1, end_line=100)",
+          "agd_search(query='class ReprExceptionInfo')",
+          "read_window(path='src/_pytest/_code/code.py', start_line=600, end_line=750)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=350, end_line=450)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=100, end_line=250)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=800, end_line=950)",
+          "read_window(path='src/_pytest/reports.py', start_line=154, end_line=203)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=30)",
+          "read_window(path='src/_pytest/reports.py', start_line=204, end_line=263)",
+          "read_window(path='src/_pytest/_code/code.py', start_line=939, end_line=990)",
+          "read_window(path='src/_pytest/reports.py', start_line=1, end_line=50)",
+          "read_window(path='src/_pytest/reports.py', start_line=150, end_line=275)",
+          "submit_patch(diff=\u20269753c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/reports.py",
+      "patch_lines": 212
+    }
+  ]
+}

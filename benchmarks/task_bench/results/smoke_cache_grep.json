@@ -1,0 +1,51 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-7490",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 31.88,
+      "loaded_tokens": 11598,
+      "essential_tokens": 218,
+      "raf": 53.2,
+      "tool_calls": 16,
+      "api": {
+        "input_tokens": 59,
+        "output_tokens": 2589,
+        "cache_read": 167095,
+        "cache_write": 17160
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 0.0,
+        "line_jaccard": 0.029,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "model_files": [
+          "src/_pytest/skipping.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_call",
+          "src/_pytest/skipping.py::pytest_runtest_setup"
+        ],
+        "model_functions": [
+          "src/_pytest/skipping.py::pytest_runtest_makereport"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 15,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/skipping.py",
+      "patch_lines": 14
+    }
+  ]
+}

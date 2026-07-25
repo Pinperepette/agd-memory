@@ -1,0 +1,104 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "token_budget": 150000,
+  "adapters": [
+    "agd-graph",
+    "grep-agent"
+  ],
+  "n_instances": 1,
+  "results": [
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "adapter": "agd-graph",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 12.42,
+      "loaded_tokens": 2973,
+      "essential_tokens": 216,
+      "raf": 13.76,
+      "tool_calls": 7,
+      "api": {
+        "input_tokens": 16047,
+        "output_tokens": 893,
+        "cache_read": 4932,
+        "cache_write": 5484
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.636,
+        "off_target_files": [],
+        "gold_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "model_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ],
+        "model_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 7,
+        "stop_reason": "submit_patch",
+        "trajectory": [
+          "agd_rank_symbols(query='pastebin python3 lexer', top_k=10)",
+          "agd_toc(file='src/_pytest/pastebin.py')",
+          "agd_get(ids=['src-_pytest-pastebin-py--f-create_new_paste'])",
+          "agd_search(query='lexer=python3')",
+          "read_window(path='src/_pytest/pastebin.py', start_line=1, end_line=100)",
+          "read_window(path='src/_pytest/pastebin.py', start_line=65, end_line=92)",
+          "submit_patch(diff=\u2026319c)"
+        ]
+      },
+      "patch_first_line": "--- a/src/_pytest/pastebin.py",
+      "patch_lines": 11
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "adapter": "grep-agent",
+      "model": "claude-haiku-4-5-20251001",
+      "elapsed_s": 11.68,
+      "loaded_tokens": 3798,
+      "essential_tokens": 216,
+      "raf": 17.58,
+      "tool_calls": 6,
+      "api": {
+        "input_tokens": 11350,
+        "output_tokens": 1044,
+        "cache_read": 5365,
+        "cache_write": 5998
+      },
+      "oracle": {
+        "file_overlap": 1.0,
+        "function_overlap": 1.0,
+        "line_jaccard": 0.389,
+        "off_target_files": [
+          "testing/test_pastebin.py"
+        ],
+        "gold_files": [
+          "src/_pytest/pastebin.py"
+        ],
+        "model_files": [
+          "src/_pytest/pastebin.py",
+          "testing/test_pastebin.py"
+        ],
+        "gold_functions": [
+          "src/_pytest/pastebin.py::create_new_paste"
+        ],
+        "model_functions": [
+          "src/_pytest/pastebin.py::create_new_paste",
+          "testing/test_pastebin.py::test_create_new_paste"
+        ]
+      },
+      "adapter_notes": {
+        "turns": 6,
+        "stop_reason": "submit_patch"
+      },
+      "patch_first_line": "--- a/src/_pytest/pastebin.py",
+      "patch_lines": 23
+    }
+  ]
+}
