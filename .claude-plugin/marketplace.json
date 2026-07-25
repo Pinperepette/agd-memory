@@ -1,6 +1,6 @@
 {
   "name": "agd-memory",
-  "description": "Per-project persistent memory in AGD format, exposed as a Claude Code skill, SessionStart hook, and MCP server.",
+  "description": "Per-project persistent memory in AGD format, exposed as a Claude Code skill, MCP server, and hooks (SessionStart bootstrap, UserPromptSubmit auto-recall, SessionEnd distiller).",
   "owner": {
     "name": "pinperepette",
     "url": "https://github.com/Pinperepette"
@@ -11,8 +11,8 @@
       "source": {
         "source": "github",
         "repo": "Pinperepette/agd-memory",
-        "commit": "a4583ec40b0f5a107677f1863e425e0d26a9ecc6",
-        "sha": "a4583ec40b0f5a107677f1863e425e0d26a9ecc6"
+        "commit": "0a43f741a65131a0a9886c1f3b15b9237a0d5bc9",
+        "sha": "0a43f741a65131a0a9886c1f3b15b9237a0d5bc9"
       },
       "description": "Per-project persistent memory in AGD format. Skill + SessionStart hook + MCP server, all driven by the agd CLI."
     }
