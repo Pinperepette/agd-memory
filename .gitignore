@@ -7,3 +7,6 @@ __pycache__/
 .officina/
 .claude/
 .pytest_cache/
+
+# corpora benchmark: pesanti, non servono al plugin ne ai test — restano locali
+benchmarks/task_bench/corpora/
