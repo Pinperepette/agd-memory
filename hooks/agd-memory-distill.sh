@@ -116,8 +116,8 @@ STALE_S="${AGD_DISTILL_LOCK_STALE_S:-1800}"
 # would never be released. Verified on 3.2.57.
 (
   # Resolve the memory file the same way every other writer does, so the
-  # key agrees with what will actually be written. Falls back to the cwd
-  # if resolution fails — a slightly coarser key still beats no lock.
+  # key agrees with what will actually be written. If that fails there is
+  # no fallback key — see below for why.
   LOCK_KEY="$(
     AGD_MEMORY_PLUGIN_ROOT="$PLUGIN_ROOT" AGD_MEMORY_PROJECT_CWD="$CWD" python3 -c '
 import hashlib, os, sys

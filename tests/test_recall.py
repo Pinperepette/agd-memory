@@ -272,13 +272,45 @@ def test_fuzzy_hit_scores_below_an_exact_hit(recall):
 
 
 def test_fuzzy_satisfies_the_anchor_requirement(recall):
-    """A cognate landing in desc must count as an anchor match, or the
-    body-only filter would discard everything fuzzy just found."""
+    """Cognates landing in desc count as an anchor match, or the
+    body-only filter would discard everything fuzzy just found.
+
+    Two of them, not one — see `test_a_single_cognate_is_not_enough`.
+    """
     b = _block(recall, id="x", desc="modello commerciale", body="pad " * 100)
     out = recall.top_k_blocks(
-        [b], {"commercial"}, k=1, require_anchor=True, fuzzy=True
+        [b], {"commercial", "model"}, k=1, require_anchor=True, fuzzy=True
     )
     assert [x.id for x in out] == ["x"]
+
+
+def test_a_single_cognate_is_not_enough_on_its_own(recall):
+    """One shared prefix is coincidence. Found by widening the eval's
+    negative set: "category theory" reached a block about `categoria`
+    trucks, "model rocket" one about a `modello commerciale`."""
+    b = _block(recall, id="categoria-trucks", desc="categoria camion DAF")
+    out = recall.top_k_blocks(
+        [b], {"category", "theory"}, k=1, require_anchor=True, fuzzy=True
+    )
+    assert out == []
+
+
+def test_two_cognates_together_do_match(recall):
+    """Two independent cognates are a pattern, not a coincidence."""
+    b = _block(recall, id="modello-commerciale", desc="modello commerciale deciso")
+    out = recall.top_k_blocks(
+        [b], {"commercial", "model"}, k=1, require_anchor=True, fuzzy=True
+    )
+    assert [x.id for x in out] == ["modello-commerciale"]
+
+
+def test_one_cognate_plus_one_exact_match_is_enough(recall):
+    """The rule only gates matches that are *entirely* fuzzy."""
+    b = _block(recall, id="categoria-trucks", desc="categoria camion trucks")
+    out = recall.top_k_blocks(
+        [b], {"category", "trucks"}, k=1, require_anchor=True, fuzzy=True
+    )
+    assert [x.id for x in out] == ["categoria-trucks"]
 
 
 def test_fuzzy_off_by_default_keeps_exact_semantics(recall):

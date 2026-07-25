@@ -61,7 +61,6 @@
       "prompt": "what did the reality test on the real portals reveal?",
       "expect": "lezioni-test-di-realta"
     },
-
     {
       "corpus": "-Users-pinperepette-Desktop-plugin-box",
       "lang": "it",
@@ -98,7 +97,6 @@
       "prompt": "qual e' il modello commerciale deciso?",
       "expect": "modello-commerciale"
     },
-
     {
       "corpus": "-Users-pinperepette-Desktop-plugin-box",
       "lang": "it",
@@ -127,6 +125,54 @@
       "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
       "lang": "en",
       "prompt": "explain the difference between a mutex and a semaphore",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "what is the capital of Portugal",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "how do I configure nginx as a reverse proxy",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "recommend a good book about category theory",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "consigliami un ristorante per stasera",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "what is the production cost of a solar panel",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "explain how a model rocket engine works",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "it",
+      "prompt": "qual e' la differenza fra TCP e UDP",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "write a regex that validates an email address",
       "expect": null
     }
   ]

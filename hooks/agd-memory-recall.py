@@ -62,6 +62,13 @@ DEFAULT_MIN_SCORE = 0.6
 # enough to outrank a literal match.
 FUZZY_PREFIX_LEN = 5
 DEFAULT_FUZZY_WEIGHT = 0.5
+
+# A block matched *only* by cognates needs more than one of them. A
+# single shared prefix is weak evidence and does fire on unrelated
+# prompts: "category theory" reaches a block about `categoria` trucks,
+# "model rocket" reaches one about a `modello commerciale`. Two
+# independent cognates is a pattern; one is a coincidence.
+FUZZY_ANCHOR_MIN = 2
 DEFAULT_MAX_PROMPT_CHARS = 4000
 DEFAULT_CODE_LINE_RATIO = 0.4
 SUBPROCESS_TIMEOUT_S = 3
@@ -588,7 +595,7 @@ def top_k_blocks(
             exact, fuzzy_hits = _field_hits(
                 prompt_tokens, _anchor_token_set(b), prefix_idx
             )
-            if not exact and not fuzzy_hits:
+            if not exact and len(fuzzy_hits) < FUZZY_ANCHOR_MIN:
                 continue
         scored.append((s, b))
     if not scored:

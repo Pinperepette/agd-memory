@@ -46,7 +46,10 @@ tokens** than loading the whole memory file.
   > memory — including the case where two checkouts of one repo map onto
   > one memory file through the git-remote index. A copy that cannot
   > resolve the memory file (no `lib/` alongside it) skips rather than
-  > guessing a key, so it can never diverge into a second run.
+  > guessing a key, so it can never diverge into a second run. The lock
+  > lives under `$CLAUDE_PLUGIN_DATA`, so this holds as long as both
+  > copies see the same value for it — give one a different
+  > `CLAUDE_PLUGIN_DATA` and they lock in separate directories.
   >
   > That lock covers distillers only: a live session writing memory at
   > the same time is serialised by the writer's own flock, which prevents
@@ -135,24 +138,39 @@ pagination/paginazione, production/produzione. No dictionary to curate,
 no model to load; the whole thing is a prefix bucket lookup, and recall
 still runs in ~0.12s on the largest corpus here.
 
-Measured on `tests/eval/` (21 fixed cases against real memory files,
+A single cognate is not enough on its own: a block matched *only* by
+cognates needs two of them. One shared prefix is coincidence, and it
+fires — "category theory" reached a block about `categoria` trucks,
+"model rocket" one about a `modello commerciale`. Both were invisible
+until the eval's negative set was widened from 5 cases to 13, which is
+the honest lesson: a widening feature needs negatives to match.
+
+Measured on `tests/eval/` (29 fixed cases against real memory files,
 `hit@1` = expected block ranked first):
 
 | | exact only | with cognates |
 |---|---:|---:|
 | English prompt → Italian memory | 6/10 | **8/10** |
 | Italian prompt → Italian memory | 5/6 | **6/6** |
-| should inject nothing | 1/5 wrong | **0/5 wrong** |
-| tokens injected | 8,461 | 9,116 |
+| should inject nothing | 0/13 wrong | **0/13 wrong** |
+| tokens injected | 7,405 | 7,829 |
 
 ```sh
 python3 tests/eval/run_eval.py             # current behaviour
 python3 tests/eval/run_eval.py --no-fuzzy  # exact-match baseline
 ```
 
-Set `AGD_RECALL_NO_FUZZY=1` to turn it off. What it still misses are
-true synonyms across languages — *brands* against `marche` shares no
-prefix — which would need an actual dictionary or embeddings.
+Set `AGD_RECALL_NO_FUZZY=1` to turn it off.
+
+**Known limitation, deliberately not fixed.** True synonymy across
+languages is not matched: *brands* against `marche` shares no prefix, so
+no amount of cognate logic reaches it. A built-in synonym table was
+considered and rejected — it would have existed to flip a single eval
+case, and synonyms are not the mirror image of stopwords: stopwords only
+ever narrow matching, synonyms only ever widen it, on every query in
+every project. If this matters for your corpus, the low-risk shape is an
+opt-in per-project synonyms file, so the widening is consented and
+scoped, rather than a built-in list everyone inherits.
 
 ### Language configuration
 
