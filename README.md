@@ -164,7 +164,7 @@ is noise you did not ask for and cannot remove, while a miss is
 recoverable — ask the `memory` skill or the MCP tools and the block is
 there.
 
-Six of the 18 positive cases never reach ranking at all: `should_skip`
+Four of the 18 positive cases never reach ranking at all: `should_skip`
 refuses prompts with fewer than three content words, so "where is the
 catalogue?" is beyond any matcher setting. They stay in the set because
 a metric that quietly excludes what the product refuses measures the

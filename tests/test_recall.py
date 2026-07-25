@@ -546,6 +546,32 @@ def test_main_reads_user_prompt_from_stdin_json(
     assert "#user-blog" in captured.getvalue()
 
 
+def test_main_reads_the_key_claude_code_actually_sends(
+    recall, monkeypatch, fake_agd, tmp_memory
+):
+    """Claude Code sends `prompt`, not `user_prompt` — verified against
+    the CLI bundle (`hook_event_name:"UserPromptSubmit",prompt:e`).
+
+    The hook read only `user_prompt`, so on a real install it saw an
+    empty string and skipped: auto-recall injected nothing, silently.
+    Every test above fed it the wrong key, so none of them caught it.
+    """
+    fake_agd.write_fixture({"blocks": [
+        {"id": "user-blog", "kind": "x-user", "desc": "preferenze blog", "body": ""},
+    ]})
+    stdin = io.StringIO(json.dumps({
+        "session_id": "abc",
+        "hook_event_name": "UserPromptSubmit",
+        "prompt": "ricordi le mie preferenze blog?",
+        "cwd": "/tmp",
+    }))
+    captured = io.StringIO()
+    monkeypatch.setattr("sys.stdout", captured)
+    rc = recall.main(stdin=stdin, env=dict(os.environ))
+    assert rc == 0
+    assert "#user-blog" in captured.getvalue()
+
+
 def test_main_swallows_invalid_stdin_json(recall, monkeypatch, fake_agd, tmp_memory):
     stdin = io.StringIO("this is not json")
     captured = io.StringIO()

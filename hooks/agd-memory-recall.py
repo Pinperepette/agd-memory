@@ -3,7 +3,7 @@
 to the user's prompt.
 
 Pipeline (no args, default mode):
-    1. read the hook's JSON payload from stdin (field `user_prompt`)
+    1. read the hook's JSON payload from stdin (field `prompt`)
     2. resolve memory file + `agd` binary
     3. apply guard rails (length, code-paste, missing deps)
     4. `agd parse <mem> --json` once, score every block against the
@@ -710,7 +710,14 @@ def should_skip(
 
 def _safe_main(stdin: TextIO, env: Mapping[str, str]) -> int:
     payload = read_hook_input(stdin)
-    prompt = payload.get("user_prompt") or ""
+    # Claude Code sends `prompt` (verified against the CLI bundle:
+    # `hook_event_name:"UserPromptSubmit",prompt:e`). This read
+    # `user_prompt` only, so the hook saw an empty string and skipped —
+    # auto-recall injected nothing on a real install, silently. It went
+    # unnoticed because the published plugin registered only
+    # SessionStart, so UserPromptSubmit had never actually fired.
+    # `user_prompt` is kept as a fallback for other harnesses.
+    prompt = payload.get("prompt") or payload.get("user_prompt") or ""
 
     stopwords = resolve_stopwords(env)
 
