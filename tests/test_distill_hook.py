@@ -7,6 +7,7 @@ retry, and the lock that keeps two distillers from racing.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -17,6 +18,11 @@ import pytest
 
 _ROOT = Path(__file__).resolve().parent.parent
 _HOOK = _ROOT / "hooks" / "agd-memory-distill.sh"
+
+
+def _lock_key(cwd: Path) -> str:
+    """Mirror the hook's per-project lock key (sha1 of cwd, first 12)."""
+    return hashlib.sha1(str(cwd).encode()).hexdigest()[:12]
 
 
 def _write_stub(bin_dir: Path, body: str) -> None:
@@ -46,14 +52,16 @@ def hook(tmp_path):
     bin_dir = tmp_path / "bin"
     _write_stub(bin_dir, 'echo "STUB ran $$"\n')
 
-    def fire(session: str, transcript: Path, **extra_env) -> subprocess.CompletedProcess:
+    def fire(
+        session: str, transcript: Path, cwd: Path | None = None, **extra_env
+    ) -> subprocess.CompletedProcess:
         env = dict(os.environ)
         env["PATH"] = f"{bin_dir}:{env['PATH']}"
         env["CLAUDE_PLUGIN_DATA"] = str(state)
         env.update(extra_env)
         payload = json.dumps({
             "transcript_path": str(transcript),
-            "cwd": str(tmp_path),
+            "cwd": str(cwd or tmp_path),
             "session_id": session,
         })
         return subprocess.run(
@@ -128,18 +136,34 @@ def test_only_one_distiller_runs_at_a_time(hook, tmp_path):
     assert hook.log().count("STUB ran") == 1
 
 
+def test_two_different_projects_distil_concurrently(hook, tmp_path):
+    """The lock protects one memory file, not the whole machine. An
+    unrelated repo ending its session must not cancel this one's
+    distillation — that would be the silent loss the retry exists to
+    prevent, caused by a project you weren't even working on."""
+    _write_stub(hook.bin_dir, 'echo "STUB ran $$"\nsleep 3\n')
+    t = _transcript(tmp_path / "t.jsonl", edits=1)
+    other = tmp_path / "other-project"
+    other.mkdir()
+    hook("proj-a", t)
+    hook("proj-b", t, cwd=other)
+    assert _wait_for(lambda: hook.log().count("STUB ran") == 2)
+    assert "holds the lock" not in hook.log()
+
+
 def test_lock_is_released_so_the_next_session_can_distil(hook, tmp_path):
     t = _transcript(tmp_path / "t.jsonl", edits=1)
     hook("first", t)
     assert _wait_for(lambda: "STUB ran" in hook.log())
-    assert _wait_for(lambda: not (hook.state / "distill.lock").exists())
+    lock = hook.state / f"distill-{_lock_key(tmp_path)}.lock"
+    assert _wait_for(lambda: not lock.exists())
     hook("second", t)
     assert _wait_for(lambda: hook.log().count("STUB ran") == 2)
 
 
 def test_stale_lock_is_broken_rather_than_wedging_forever(hook, tmp_path):
     """A run killed before its trap fired must not disable distillation."""
-    lock = hook.state / "distill.lock"
+    lock = hook.state / f"distill-{_lock_key(tmp_path)}.lock"
     lock.mkdir(parents=True)
     os.utime(lock, (0, 0))
     t = _transcript(tmp_path / "t.jsonl", edits=1)

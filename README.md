@@ -32,9 +32,17 @@ tokens** than loading the whole memory file.
 
   > **Upgrading from a hand-installed distiller?** Remove the old
   > `SessionEnd`/`SessionStart` entries pointing at `~/.claude/hooks/`
-  > from `~/.claude/settings.json` — the plugin registers both itself
-  > now, and two copies would fire per session. The hook takes a lock so
-  > they cannot both write, but the duplicate still burns an LLM call.
+  > from `~/.claude/settings.json` — but only *after* the installed
+  > plugin actually carries this version. Claude Code loads the plugin
+  > from `~/.claude/plugins/`, which is a clone of the published
+  > remote, not your working checkout: an older installed copy registers
+  > only `SessionStart`, so removing the local hook first turns
+  > distillation off entirely. Check with
+  > `python3 -c "import json;print(list(json.load(open('$HOME/.claude/plugins/marketplaces/agd-memory/hooks/hooks.json'))['hooks']))"`.
+  > While developing against a checkout that is ahead of the published
+  > plugin, point a local `SessionEnd` entry at your checkout's
+  > `hooks/agd-memory-distill.sh`. The lock keys on the project, so a
+  > local hook and a plugin hook cannot both distil the same memory.
 
   | Var | Default | Purpose |
   | --- | --- | --- |

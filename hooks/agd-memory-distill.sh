@@ -84,7 +84,15 @@ print("go" if (edits > 0 or tooluses >= 4) else "skip")
 [ "$GATE" = "go" ] || exit 0
 
 PROMPT="$(cat "$PROMPT_FILE")"
-LOCK="$STATE_DIR/distill.lock"
+# One distiller per *memory file*, not per machine. A single global lock
+# would let one project's session silently cancel another's — the same
+# silent knowledge loss the retry logic exists to prevent, triggered by
+# an unrelated repo. The project cwd is what selects the memory file, so
+# it is the right key.
+LOCK_KEY="$(printf '%s' "$CWD" | python3 -c \
+  'import hashlib,sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:12])' \
+  2>/dev/null || echo shared)"
+LOCK="$STATE_DIR/distill-$LOCK_KEY.lock"
 STALE_S="${AGD_DISTILL_LOCK_STALE_S:-1800}"
 # A subshell, not a `{ }` group: bash 3.2 (what macOS ships) does not
 # run an EXIT trap set inside an asynchronous brace group, so the lock
