@@ -29,6 +29,20 @@ tokens** than loading the whole memory file.
   transient API failures are retried instead of losing the session's
   knowledge. This is what makes memory accumulate without the user
   having to say `/remember`.
+
+  > **Upgrading from a hand-installed distiller?** Remove the old
+  > `SessionEnd`/`SessionStart` entries pointing at `~/.claude/hooks/`
+  > from `~/.claude/settings.json` — the plugin registers both itself
+  > now, and two copies would fire per session. The hook takes a lock so
+  > they cannot both write, but the duplicate still burns an LLM call.
+
+  | Var | Default | Purpose |
+  | --- | --- | --- |
+  | `AGD_DISTILL_DISABLED` | unset | hard kill switch |
+  | `AGD_DISTILL_MODEL` | `claude-sonnet-4-6` | model for the headless pass |
+  | `AGD_DISTILL_RETRIES` | `3` | attempts before giving up on a transient failure |
+  | `AGD_DISTILL_BACKOFF_S` | `30` | backoff base, grows linearly per attempt |
+  | `AGD_DISTILL_LOCK_STALE_S` | `1800` | age at which a held lock is treated as abandoned |
 - **Skill** (`/agd-memory:memory`) — when the user asks "ricordi…",
   "what do you remember…", or you need project context, the skill
   documents how to read and write the memory.

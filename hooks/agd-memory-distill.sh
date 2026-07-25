@@ -14,6 +14,12 @@
 #  - RETRY: transient API failures (529 Overloaded) used to drop the
 #    session's knowledge silently — measured at 10 of 176 runs on the
 #    live install. We now retry with a backoff before giving up.
+#  - MUTUAL EXCLUSION: only one distiller may run at a time. Two of them
+#    racing is not hypothetical — this plugin registers SessionEnd, and a
+#    user who also kept the older hand-installed hook in
+#    ~/.claude/settings.json gets both firing on the same session, each
+#    spending an LLM call and writing the same memory.agd. The recursion
+#    guard does not help there: sibling hooks both see it unset.
 set -uo pipefail
 
 [ -n "${AGD_DISTILL_GUARD:-}" ] && exit 0
@@ -27,6 +33,7 @@ AGD_BIN="${AGD_BIN:-$HOME/.cargo/bin/agd}"
 MODEL="${AGD_DISTILL_MODEL:-claude-sonnet-4-6}"
 PROMPT_FILE="$PLUGIN_ROOT/hooks/agd-distill-prompt.md"
 RETRIES="${AGD_DISTILL_RETRIES:-3}"
+BACKOFF_S="${AGD_DISTILL_BACKOFF_S:-30}"   # grows linearly per attempt
 
 command -v claude >/dev/null 2>&1 || exit 0
 [ -x "$AGD_BIN" ] || exit 0
@@ -77,7 +84,31 @@ print("go" if (edits > 0 or tooluses >= 4) else "skip")
 [ "$GATE" = "go" ] || exit 0
 
 PROMPT="$(cat "$PROMPT_FILE")"
-{
+LOCK="$STATE_DIR/distill.lock"
+STALE_S="${AGD_DISTILL_LOCK_STALE_S:-1800}"
+# A subshell, not a `{ }` group: bash 3.2 (what macOS ships) does not
+# run an EXIT trap set inside an asynchronous brace group, so the lock
+# would never be released. Verified on 3.2.57.
+(
+  # `mkdir` is atomic on POSIX; macOS has no flock(1), so this is the
+  # portable way to make the lock a real one rather than a check-then-act
+  # race. A lock older than STALE_S belonged to a run that was killed
+  # before its trap fired — break it rather than wedging distillation
+  # forever.
+  if ! mkdir "$LOCK" 2>/dev/null; then
+    lock_age=$(( $(date +%s) - $(stat -f %m "$LOCK" 2>/dev/null || stat -c %Y "$LOCK" 2>/dev/null || echo 0) ))
+    if [ "$lock_age" -gt "$STALE_S" ]; then
+      echo "=== $SESSION: breaking stale lock (${lock_age}s old) ==="
+      rm -rf "$LOCK"
+      mkdir "$LOCK" 2>/dev/null || exit 0
+    else
+      echo "=== $SESSION cwd=$CWD: another distiller holds the lock, skipping ==="
+      exit 0
+    fi
+  fi
+  trap 'rm -rf "$LOCK"' EXIT
+  echo "$$" > "$LOCK/pid" 2>/dev/null || true
+
   echo "=== $SESSION cwd=$CWD $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
   attempt=1
   while [ "$attempt" -le "$RETRIES" ]; do
@@ -92,7 +123,7 @@ PROMPT="$(cat "$PROMPT_FILE")"
     # A 529/overload leaves the session's knowledge unwritten. Back off
     # and try again rather than losing it silently.
     if [ "$attempt" -lt "$RETRIES" ]; then
-      backoff=$((attempt * 30))
+      backoff=$((attempt * BACKOFF_S))
       echo "distiller attempt $attempt failed; retrying in ${backoff}s"
       sleep "$backoff"
     else
@@ -100,7 +131,7 @@ PROMPT="$(cat "$PROMPT_FILE")"
     fi
     attempt=$((attempt + 1))
   done
-} >>"$LOG" 2>&1 &
+) >>"$LOG" 2>&1 &
 
 disown 2>/dev/null || true
 exit 0
