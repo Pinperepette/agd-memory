@@ -41,8 +41,13 @@ tokens** than loading the whole memory file.
   > `python3 -c "import json;print(list(json.load(open('$HOME/.claude/plugins/marketplaces/agd-memory/hooks/hooks.json'))['hooks']))"`.
   > While developing against a checkout that is ahead of the published
   > plugin, point a local `SessionEnd` entry at your checkout's
-  > `hooks/agd-memory-distill.sh`. The lock keys on the project, so a
-  > local hook and a plugin hook cannot both distil the same memory.
+  > `hooks/agd-memory-distill.sh`. The hook locks on the *resolved memory
+  > file*, so a local hook and a plugin hook cannot both distil the same
+  > memory — including the case where two checkouts of one repo map onto
+  > one memory file through the git-remote index. That lock covers
+  > distillers only: a live session writing memory at the same time is
+  > serialised by the writer's own flock, which prevents a corrupt file
+  > but not two independent decisions about what to record.
 
   | Var | Default | Purpose |
   | --- | --- | --- |

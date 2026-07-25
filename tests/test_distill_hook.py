@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -21,8 +22,17 @@ _HOOK = _ROOT / "hooks" / "agd-memory-distill.sh"
 
 
 def _lock_key(cwd: Path) -> str:
-    """Mirror the hook's per-project lock key (sha1 of cwd, first 12)."""
-    return hashlib.sha1(str(cwd).encode()).hexdigest()[:12]
+    """Mirror the hook's lock key: sha1 of the *resolved memory file*.
+
+    Resolved through the same helper the hook and every writer use, so
+    the test cannot drift from the implementation by guessing the path.
+    """
+    sys.path.insert(0, str(_ROOT / "lib"))
+    from agd_memory_paths import project_memory_file
+    env = dict(os.environ, AGD_MEMORY_PROJECT_CWD=str(cwd))
+    env.pop("AGD_MEMORY_FILE", None)
+    mem = project_memory_file(env)
+    return hashlib.sha1(str(mem).encode()).hexdigest()[:12]
 
 
 def _write_stub(bin_dir: Path, body: str) -> None:
@@ -149,6 +159,46 @@ def test_two_different_projects_distil_concurrently(hook, tmp_path):
     hook("proj-b", t, cwd=other)
     assert _wait_for(lambda: hook.log().count("STUB ran") == 2)
     assert "holds the lock" not in hook.log()
+
+
+def test_two_checkouts_of_one_repo_share_the_lock(hook, tmp_path, monkeypatch):
+    """The reason the key is the resolved memory file and not the cwd.
+
+    Two checkouts of one repository sit at different paths but
+    `project_memory_file()` maps them onto the same memory.agd through
+    the git-remote index. A cwd-keyed lock let both distil it, racing
+    the dedup pass and producing duplicate blocks.
+    """
+    home = tmp_path / "home"
+    checkout_a = tmp_path / "a"
+    checkout_b = tmp_path / "b"
+    remote = "https://github.com/example/shared.git"
+    for co in (checkout_a, checkout_b):
+        co.mkdir()
+        subprocess.run(["git", "init", "-q", str(co)], check=True)
+        subprocess.run(
+            ["git", "-C", str(co), "remote", "add", "origin", remote], check=True
+        )
+    # Give checkout A a memory file, so B resolves to it via the index.
+    mem_a = (home / ".claude" / "projects"
+             / str(checkout_a.resolve()).replace("/", "-") / "memory")
+    mem_a.mkdir(parents=True)
+    (mem_a / "memory.agd").write_text("@meta format=agd version=1 [#meta]\n")
+
+    env = {"AGD_MEMORY_HOME": str(home)}
+    sys.path.insert(0, str(_ROOT / "lib"))
+    from agd_memory_paths import project_memory_file
+    resolved_a = project_memory_file(dict(env, AGD_MEMORY_PROJECT_CWD=str(checkout_a)))
+    resolved_b = project_memory_file(dict(env, AGD_MEMORY_PROJECT_CWD=str(checkout_b)))
+    assert resolved_a == resolved_b, "precondition: both checkouts share one memory"
+
+    _write_stub(hook.bin_dir, 'echo "STUB ran $$"\nsleep 3\n')
+    t = _transcript(tmp_path / "t.jsonl", edits=1)
+    hook("checkout-a", t, cwd=checkout_a, **env)
+    hook("checkout-b", t, cwd=checkout_b, **env)
+    assert _wait_for(lambda: "holds the lock" in hook.log())
+    time.sleep(4)
+    assert hook.log().count("STUB ran") == 1
 
 
 def test_lock_is_released_so_the_next_session_can_distil(hook, tmp_path):

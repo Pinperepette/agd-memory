@@ -84,34 +84,55 @@ print("go" if (edits > 0 or tooluses >= 4) else "skip")
 [ "$GATE" = "go" ] || exit 0
 
 PROMPT="$(cat "$PROMPT_FILE")"
-# Best-effort dedupe of distiller runs, keyed per project directory.
+# One distiller at a time per *memory file*.
 #
-# What this lock does NOT do is protect the file: lib/agd_memory_write.py
-# already holds an flock around the whole read-modify-write, so two
-# writers are serialised and cannot corrupt memory.agd whatever happens
-# here. What it saves is a wasted LLM call when two SessionEnd hooks fire
-# for the same session — a plugin install plus a leftover hand-installed
-# one, say.
+# The key has to be the resolved memory path, not the cwd: two checkouts
+# of one repo sit at different cwds but `project_memory_file()` maps them
+# onto the same memory.agd through the git-remote index, and a cwd-keyed
+# lock would let both distil it. A global lock would be wrong in the
+# other direction — one project's session would silently cancel an
+# unrelated project's distillation.
 #
-# It is keyed on cwd rather than on the resolved memory file, which is a
-# real (small) gap: `project_memory_file()` can map two checkouts of one
-# repo, at different cwds, onto the same memory.agd via the git-remote
-# index, and those two would not be deduped. Resolving the memory path
-# here would mean another python3 start on every session teardown to save
-# a rare duplicate call — not worth it while the writer's flock already
-# guarantees the thing that actually matters.
+# Resolution happens inside the backgrounded subshell below, so the
+# `git remote get-url` it performs (2s timeout) never delays session
+# teardown. Acquiring the lock a moment later is not a race: both hooks
+# resolve to the same key and `mkdir` remains the single atomic step, so
+# this is resolve-then-lock, not check-then-act.
 #
-# A global lock, by contrast, would be actively wrong: one project's
-# session would silently cancel an unrelated project's distillation.
-LOCK_KEY="$(printf '%s' "$CWD" | python3 -c \
-  'import hashlib,sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:12])' \
-  2>/dev/null || echo shared)"
-LOCK="$STATE_DIR/distill-$LOCK_KEY.lock"
+# What this buys, precisely: two distillers for the same memory can no
+# longer interleave. That matters because the dedup pass the distiller
+# performs — reading existing ids before deciding what to write — is
+# ordinary LLM work, not covered by any file lock, so two of them racing
+# produce near-duplicate blocks or silently overwrite the same id.
+#
+# What it does NOT cover: a live session's own writes, or a manual `agd
+# edit`, which are serialised only by the flock in lib/agd_memory_write.py
+# (that prevents corruption, not duplicate decisions). Nor does it help
+# if a distil outlives AGD_DISTILL_LOCK_STALE_S and its lock is broken
+# while still running.
 STALE_S="${AGD_DISTILL_LOCK_STALE_S:-1800}"
 # A subshell, not a `{ }` group: bash 3.2 (what macOS ships) does not
 # run an EXIT trap set inside an asynchronous brace group, so the lock
 # would never be released. Verified on 3.2.57.
 (
+  # Resolve the memory file the same way every other writer does, so the
+  # key agrees with what will actually be written. Falls back to the cwd
+  # if resolution fails — a slightly coarser key still beats no lock.
+  LOCK_KEY="$(
+    AGD_MEMORY_PLUGIN_ROOT="$PLUGIN_ROOT" AGD_MEMORY_PROJECT_CWD="$CWD" python3 -c '
+import hashlib, os, sys
+sys.path.insert(0, os.path.join(os.environ["AGD_MEMORY_PLUGIN_ROOT"], "lib"))
+from agd_memory_paths import project_memory_file
+print(hashlib.sha1(str(project_memory_file()).encode()).hexdigest()[:12])
+' 2>/dev/null
+  )"
+  if [ -z "$LOCK_KEY" ]; then
+    LOCK_KEY="$(printf '%s' "$CWD" | python3 -c \
+      'import hashlib,sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:12])' \
+      2>/dev/null || echo shared)"
+  fi
+  LOCK="$STATE_DIR/distill-$LOCK_KEY.lock"
+
   # `mkdir` is atomic on POSIX; macOS has no flock(1), so this is the
   # portable way to make the lock a real one rather than a check-then-act
   # race. A lock older than STALE_S belonged to a run that was killed
