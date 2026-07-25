@@ -75,19 +75,25 @@ def main(argv: list[str] | None = None) -> int:
             corpora[c["corpus"]] = r.load_blocks(agd, mem)
         blocks = corpora[c["corpus"]]
 
-        tokens = set(r.strip_stopwords(r.tokenize(c["prompt"]), stop))
-        chosen = r.top_k_blocks(
-            blocks, tokens, 3,
-            min_score=r.DEFAULT_MIN_SCORE,
-            min_score_ratio=r.DEFAULT_MIN_SCORE_RATIO,
-            require_anchor=True,
-            skip_superseded=True,
-            fuzzy=not args.no_fuzzy,
-            fuzzy_anchor_min=(
-                r.FUZZY_ANCHOR_MIN if args.fuzzy_anchor_min is None
-                else args.fuzzy_anchor_min
-            ),
-        )
+        # Run the hook's own gate first. Skipping it measured the ranker
+        # rather than the product: six cases never reach ranking in
+        # production, two of which were being counted as hits.
+        if r.should_skip(c["prompt"], env, stopwords=stop):
+            chosen = []
+        else:
+            tokens = set(r.strip_stopwords(r.tokenize(c["prompt"]), stop))
+            chosen = r.top_k_blocks(
+                blocks, tokens, 3,
+                min_score=r.DEFAULT_MIN_SCORE,
+                min_score_ratio=r.DEFAULT_MIN_SCORE_RATIO,
+                require_anchor=True,
+                skip_superseded=True,
+                fuzzy=not args.no_fuzzy,
+                fuzzy_anchor_min=(
+                    r.FUZZY_ANCHOR_MIN if args.fuzzy_anchor_min is None
+                    else args.fuzzy_anchor_min
+                ),
+            )
         kept = r.fits_budget(chosen, r.DEFAULT_TOKEN_BUDGET * 4)
         got = [b.id for b in kept]
         cost = sum(len(r._render_one_block(b)) for b in kept) // 4

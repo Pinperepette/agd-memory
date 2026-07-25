@@ -69,6 +69,22 @@ DEFAULT_FUZZY_WEIGHT = 0.5
 # "model rocket" reaches one about a `modello commerciale`. Two
 # independent cognates is a pattern; one is a coincidence.
 FUZZY_ANCHOR_MIN = 2
+
+# ...unless the token it matched is this project's own recurring
+# vocabulary. `catalogo` appears in 11 of 21 blocks — it is what that
+# memory is *about*, so an English "catalogue" almost certainly concerns
+# it. `categoria` appears in 1, so matching it alone is coincidence.
+#
+# Expressed as a document-frequency ratio rather than an idf cutoff on
+# purpose: df/N is scale-free, so "recurs in a fifth of my memory" means
+# the same at 15 blocks and at 200, whereas any absolute idf threshold
+# silently reclassifies the same word as a corpus grows. The floor on
+# absolute df plugs the small-corpus hole where 1-of-5 would qualify.
+#
+# These two numbers are a prior — "recurring domain vocabulary" — that
+# the measured cases fail to contradict, not a boundary fitted to them.
+FUZZY_DOMAIN_DF_RATIO = 0.20
+FUZZY_DOMAIN_DF_MIN = 3
 DEFAULT_MAX_PROMPT_CHARS = 4000
 DEFAULT_CODE_LINE_RATIO = 0.4
 SUBPROCESS_TIMEOUT_S = 3
@@ -445,6 +461,15 @@ def _block_token_set(block: Block) -> set[str]:
     return toks
 
 
+def compute_df(blocks: list[Block]) -> dict[str, int]:
+    """How many blocks each token appears in."""
+    df: dict[str, int] = {}
+    for b in blocks:
+        for t in _block_token_set(b):
+            df[t] = df.get(t, 0) + 1
+    return df
+
+
 def compute_idf(blocks: list[Block]) -> dict[str, float]:
     """Smoothed inverse document frequency over the block corpus. A token in
     every block carries no signal; a token in a single block is distinctive.
@@ -454,11 +479,28 @@ def compute_idf(blocks: list[Block]) -> dict[str, float]:
     n = len(blocks)
     if n == 0:
         return {}
-    df: dict[str, int] = {}
-    for b in blocks:
-        for t in _block_token_set(b):
-            df[t] = df.get(t, 0) + 1
-    return {t: math.log((n + 1) / (c + 1)) + 1.0 for t, c in df.items()}
+    return {
+        t: math.log((n + 1) / (c + 1)) + 1.0
+        for t, c in compute_df(blocks).items()
+    }
+
+
+def _is_domain_vocabulary(
+    anchor_tokens: set[str],
+    prefix_idx: dict[str, set[str]] | None,
+    df: dict[str, int],
+    n_blocks: int,
+) -> bool:
+    """True if a cognate landed on a token this memory uses habitually."""
+    if not prefix_idx or n_blocks <= 0:
+        return False
+    for tok in anchor_tokens:
+        if len(tok) < FUZZY_PREFIX_LEN or not prefix_idx.get(tok[:FUZZY_PREFIX_LEN]):
+            continue
+        count = df.get(tok, 0)
+        if count >= FUZZY_DOMAIN_DF_MIN and count / n_blocks >= FUZZY_DOMAIN_DF_RATIO:
+            return True
+    return False
 
 
 def _prefix_index(tokens: Iterable[str]) -> dict[str, set[str]]:
@@ -583,7 +625,11 @@ def top_k_blocks(
     Ties break on recency first: two equally relevant blocks are not
     equally good answers if one of them is a year older.
     """
-    idf = compute_idf(blocks)
+    df = compute_df(blocks)
+    n_blocks = len(blocks)
+    idf = {
+        t: math.log((n_blocks + 1) / (c + 1)) + 1.0 for t, c in df.items()
+    } if n_blocks else {}
     prefix_idx = _prefix_index(prompt_tokens) if fuzzy else None
     scored = []
     for b in blocks:
@@ -597,7 +643,9 @@ def top_k_blocks(
                 prompt_tokens, _anchor_token_set(b), prefix_idx
             )
             if not exact and len(fuzzy_hits) < fuzzy_anchor_min:
-                continue
+                anchors = _anchor_token_set(b)
+                if not _is_domain_vocabulary(anchors, prefix_idx, df, n_blocks):
+                    continue
         scored.append((s, b))
     if not scored:
         return []

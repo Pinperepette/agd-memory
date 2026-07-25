@@ -139,36 +139,43 @@ pagination/paginazione, production/produzione. No dictionary to curate,
 no model to load; the whole thing is a prefix bucket lookup, and recall
 still runs in ~0.12s on the largest corpus here.
 
-A single cognate is not enough on its own: by default a block matched
-*only* by cognates needs two of them. One shared prefix is coincidence,
-and it fires — "category theory" reached a block about `categoria`
-trucks, "model rocket" one about a `modello commerciale`. Both were
-invisible until the eval's negative set was widened from 5 cases to 13.
+A single cognate is usually not enough on its own — one shared prefix is
+coincidence, and it fires: "category theory" reached a block about
+`categoria` trucks, "model rocket" one about a `modello commerciale`.
+By default a cognate-only match needs two of them.
 
-Measured on `tests/eval/` (31 fixed cases against real memory files).
-`hit@1` = expected block ranked first; `recall@3` = expected block
-injected at all:
+The exception is **recurring domain vocabulary**. If `catalogo` appears
+in 11 of a memory's 21 blocks, that memory is *about* catalogues and an
+English "catalogue" almost certainly concerns it; `categoria` appears in
+1, so matching it alone is a coincidence. So one cognate suffices when
+the matched token appears in at least 20% of blocks (minimum 3). The
+test is a document-frequency *ratio*, not an `idf` cutoff, because df/N
+is scale-free: "recurs in a fifth of my memory" means the same at 15
+blocks and at 200, where any absolute threshold would silently
+reclassify the same word as the corpus grows. Those two numbers are a
+prior the measured cases fail to contradict — not a boundary fitted to
+them.
 
-| `FUZZY_ANCHOR_MIN` | hit@1 | recall@3 | false injections | tokens |
+Measured on `tests/eval/` (31 fixed cases against real memory files),
+**through the hook's own gate**, so cases the hook refuses before
+ranking count as retrieving nothing. `hit@1` = expected block ranked
+first; `recall@3` = expected block injected at all:
+
+| variant | hit@1 | recall@3 | false injections | tokens |
 |---|---:|---:|---:|---:|
-| cognates off | 11/18 | 13/18 | 0/13 | 7,405 |
-| `1` (recall-favouring) | **15/18** | **17/18** | 2/13 → ~15 per 100 | 11,520 |
-| `2` (default) | 14/18 | 14/18 | **0/13** | 7,829 |
+| cognates off | 9/18 | 11/18 | 0/13 | 6,216 |
+| `FUZZY_ANCHOR_MIN=1` | 12/18 | 13/18 | 2/13 → ~15 per 100 | 8,458 |
+| **default** (2 + domain escape) | **12/18** | **13/18** | **0/13** | 7,696 |
 
-**Why the default favours precision.** The two costs are asymmetric in
-kind, not just size. This hook fires unattended on every prompt in every
-project, so a false injection is noise you cannot remove and did not ask
-for; a missed retrieval is recoverable — ask the `memory` skill or the
-MCP tools directly and the block is there. Three points of `recall@3`
-are worth more to give up than fifteen unwanted injections per hundred
-dead-end prompts. If your corpus disagrees, set
-`AGD_RECALL_FUZZY_ANCHOR_MIN=1`.
+The default reaches the recall-favouring setting's numbers without its
+false injections, and for fewer tokens.
 
-No lexical feature separates the two classes, which is why this is a
-knob and not a cleverer rule: on the five decisive cases the *score*
-does not separate them (worst false positive 1.35 beats best true
-positive 1.30), the shared-prefix length does not (7 vs 7), and `idf` is
-inverted — the false positives match the *rarer* token.
+Six of the 31 cases never reach ranking at all: `should_skip` refuses
+prompts with fewer than three content words, so "where is the
+catalogue?" is out of reach of any matcher setting. They are kept in the
+set because a metric that quietly excludes what the product refuses is
+measuring the ranker, not the product — which is exactly how an earlier
+`recall@3` regression here went unnoticed.
 
 ```sh
 python3 tests/eval/run_eval.py                      # current default
