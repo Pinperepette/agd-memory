@@ -127,9 +127,15 @@ print(hashlib.sha1(str(project_memory_file()).encode()).hexdigest()[:12])
 ' 2>/dev/null
   )"
   if [ -z "$LOCK_KEY" ]; then
-    LOCK_KEY="$(printf '%s' "$CWD" | python3 -c \
-      'import hashlib,sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:12])' \
-      2>/dev/null || echo shared)"
+    # Fail closed. Falling back to some other key — the cwd, or a fixed
+    # constant — does not help: the healthy copy still computes the real
+    # key, so the two diverge and both distil, which is precisely the
+    # duplicate this lock exists to prevent. And a copy that cannot
+    # import lib/ cannot resolve the memory file at all, so it could not
+    # distil correctly even alone. Skipping costs one session's capture;
+    # running would corrupt the record with duplicate decisions.
+    echo "=== $SESSION cwd=$CWD: cannot resolve the memory file (lib/ missing?), skipping ==="
+    exit 0
   fi
   LOCK="$STATE_DIR/distill-$LOCK_KEY.lock"
 

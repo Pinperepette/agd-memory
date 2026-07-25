@@ -44,10 +44,13 @@ tokens** than loading the whole memory file.
   > `hooks/agd-memory-distill.sh`. The hook locks on the *resolved memory
   > file*, so a local hook and a plugin hook cannot both distil the same
   > memory — including the case where two checkouts of one repo map onto
-  > one memory file through the git-remote index. That lock covers
-  > distillers only: a live session writing memory at the same time is
-  > serialised by the writer's own flock, which prevents a corrupt file
-  > but not two independent decisions about what to record.
+  > one memory file through the git-remote index. A copy that cannot
+  > resolve the memory file (no `lib/` alongside it) skips rather than
+  > guessing a key, so it can never diverge into a second run.
+  >
+  > That lock covers distillers only: a live session writing memory at
+  > the same time is serialised by the writer's own flock, which prevents
+  > a corrupt file but not two independent decisions about what to record.
 
   | Var | Default | Purpose |
   | --- | --- | --- |

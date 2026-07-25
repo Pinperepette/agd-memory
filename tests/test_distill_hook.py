@@ -63,11 +63,19 @@ def hook(tmp_path):
     _write_stub(bin_dir, 'echo "STUB ran $$"\n')
 
     def fire(
-        session: str, transcript: Path, cwd: Path | None = None, **extra_env
+        session: str,
+        transcript: Path,
+        cwd: Path | None = None,
+        hook_path: Path | None = None,
+        **extra_env,
     ) -> subprocess.CompletedProcess:
         env = dict(os.environ)
         env["PATH"] = f"{bin_dir}:{env['PATH']}"
         env["CLAUDE_PLUGIN_DATA"] = str(state)
+        # Hermetic: the hook honours AGD_MEMORY_FILE, so an ambient value
+        # would silently redirect resolution and make results depend on
+        # the developer's shell rather than on the code under test.
+        env.pop("AGD_MEMORY_FILE", None)
         env.update(extra_env)
         payload = json.dumps({
             "transcript_path": str(transcript),
@@ -75,7 +83,7 @@ def hook(tmp_path):
             "session_id": session,
         })
         return subprocess.run(
-            ["bash", str(_HOOK)], input=payload, text=True,
+            ["bash", str(hook_path or _HOOK)], input=payload, text=True,
             capture_output=True, env=env, timeout=60,
         )
 
@@ -199,6 +207,28 @@ def test_two_checkouts_of_one_repo_share_the_lock(hook, tmp_path, monkeypatch):
     assert _wait_for(lambda: "holds the lock" in hook.log())
     time.sleep(4)
     assert hook.log().count("STUB ran") == 1
+
+
+def test_unresolvable_memory_file_skips_instead_of_falling_back(hook, tmp_path):
+    """Fail closed when the memory file cannot be resolved.
+
+    A copy of the hook whose PLUGIN_ROOT has no lib/ cannot resolve the
+    memory path. Falling back to any other key would diverge from the
+    healthy copy's key and let both distil — the very duplicate the lock
+    exists to stop. It also could not distil correctly on its own.
+    """
+    orphan_root = tmp_path / "orphan"
+    (orphan_root / "hooks").mkdir(parents=True)
+    hook_copy = orphan_root / "hooks" / "agd-memory-distill.sh"
+    hook_copy.write_text(_HOOK.read_text())
+    (orphan_root / "hooks" / "agd-distill-prompt.md").write_text("prompt")
+    assert not (orphan_root / "lib").exists()
+
+    t = _transcript(tmp_path / "t.jsonl", edits=1)
+    hook("orphan", t, hook_path=hook_copy)
+    assert _wait_for(lambda: "cannot resolve the memory file" in hook.log())
+    time.sleep(1.0)
+    assert "STUB ran" not in hook.log()
 
 
 def test_lock_is_released_so_the_next_session_can_distil(hook, tmp_path):
