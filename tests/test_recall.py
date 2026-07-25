@@ -313,6 +313,20 @@ def test_one_cognate_plus_one_exact_match_is_enough(recall):
     assert [x.id for x in out] == ["categoria-trucks"]
 
 
+def test_fuzzy_anchor_min_is_tunable_down_to_one(recall):
+    """The precision/recall balance is a knob, not a verdict: no lexical
+    feature separates a good single cognate from a bad one."""
+    b = _block(recall, id="catalogo-unico", desc="creato il catalogo unico")
+    assert recall.top_k_blocks(
+        [b], {"catalogue"}, k=1, require_anchor=True, fuzzy=True
+    ) == []
+    out = recall.top_k_blocks(
+        [b], {"catalogue"}, k=1, require_anchor=True, fuzzy=True,
+        fuzzy_anchor_min=1,
+    )
+    assert [x.id for x in out] == ["catalogo-unico"]
+
+
 def test_fuzzy_off_by_default_keeps_exact_semantics(recall):
     b = _block(recall, id="catalogo", desc="catalogo unico")
     assert recall.top_k_blocks([b], {"catalogue"}, k=1) == []

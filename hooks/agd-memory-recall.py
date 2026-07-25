@@ -565,6 +565,7 @@ def top_k_blocks(
     require_anchor: bool = False,
     skip_superseded: bool = False,
     fuzzy: bool = False,
+    fuzzy_anchor_min: int = FUZZY_ANCHOR_MIN,
 ) -> list[Block]:
     """Rank blocks and keep at most `k`, subject to four relevance filters.
 
@@ -595,7 +596,7 @@ def top_k_blocks(
             exact, fuzzy_hits = _field_hits(
                 prompt_tokens, _anchor_token_set(b), prefix_idx
             )
-            if not exact and len(fuzzy_hits) < FUZZY_ANCHOR_MIN:
+            if not exact and len(fuzzy_hits) < fuzzy_anchor_min:
                 continue
         scored.append((s, b))
     if not scored:
@@ -729,6 +730,9 @@ def _safe_main(stdin: TextIO, env: Mapping[str, str]) -> int:
             env, "AGD_RECALL_MIN_SCORE_RATIO", DEFAULT_MIN_SCORE_RATIO
         ),
         require_anchor=not env.get("AGD_RECALL_ALLOW_BODY_ONLY"),
+        fuzzy_anchor_min=_env_int(
+            env, "AGD_RECALL_FUZZY_ANCHOR_MIN", FUZZY_ANCHOR_MIN
+        ),
         skip_superseded=not env.get("AGD_RECALL_ALLOW_SUPERSEDED"),
         fuzzy=not env.get("AGD_RECALL_NO_FUZZY"),
     )

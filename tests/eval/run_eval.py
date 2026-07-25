@@ -5,9 +5,15 @@ Reports three numbers that pull in different directions, so a change has
 to be judged on all of them at once:
 
   * hit@1     — the expected block ranked first (higher is better)
+  * recall@3  — the expected block injected at all (higher is better)
   * false-inj — something injected when the answer was "nothing"
                 (lower is better)
   * tokens    — total injected across the set (lower is better)
+
+hit@1 alone is not enough to judge a change: tightening the matcher can
+drop a block from rank 2 to absent without moving hit@1 at all. That is
+exactly how a recall regression slipped through once already, so both
+numbers are printed side by side.
 
 Run against the real memory files named in the case file:
 
@@ -42,6 +48,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-fuzzy", action="store_true",
                     help="disable cross-lingual cognate matching")
+    ap.add_argument("--fuzzy-anchor-min", type=int, default=None,
+                    help="cognates required when nothing matches exactly")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args(argv)
 
@@ -55,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
 
     corpora: dict[str, list] = {}
     stats: dict[str, dict[str, int]] = defaultdict(
-        lambda: {"n": 0, "hit": 0, "tokens": 0, "false": 0}
+        lambda: {"n": 0, "hit": 0, "recall": 0, "tokens": 0, "false": 0}
     )
     misses = []
 
@@ -75,6 +83,10 @@ def main(argv: list[str] | None = None) -> int:
             require_anchor=True,
             skip_superseded=True,
             fuzzy=not args.no_fuzzy,
+            fuzzy_anchor_min=(
+                r.FUZZY_ANCHOR_MIN if args.fuzzy_anchor_min is None
+                else args.fuzzy_anchor_min
+            ),
         )
         kept = r.fits_budget(chosen, r.DEFAULT_TOKEN_BUDGET * 4)
         got = [b.id for b in kept]
@@ -88,28 +100,40 @@ def main(argv: list[str] | None = None) -> int:
             if got:
                 s["false"] += 1
                 misses.append((c["prompt"], "expected nothing", got))
-        elif got and got[0] == c["expect"]:
-            s["hit"] += 1
         else:
-            misses.append((c["prompt"], c["expect"], got))
+            if c["expect"] in got:
+                s["recall"] += 1
+            if got and got[0] == c["expect"]:
+                s["hit"] += 1
+            else:
+                misses.append((c["prompt"], c["expect"], got))
 
         if args.verbose:
             print(f"  {c['lang']:2s} {c['prompt'][:44]:46s} -> {got}")
 
-    print(f"\n{'bucket':10s} {'n':>3s} {'hit@1':>7s} {'false-inj':>10s} {'tokens':>8s}")
+    print(f"\n{'bucket':10s} {'n':>3s} {'hit@1':>7s} {'recall@3':>9s} "
+          f"{'false-inj':>10s} {'tokens':>8s}")
     for bucket in ("en", "it", "negative"):
-        s = stats[bucket]
-        if not s["n"]:
+        st = stats[bucket]
+        if not st["n"]:
             continue
-        rate = "—" if bucket == "negative" else f"{s['hit']}/{s['n']}"
-        print(f"{bucket:10s} {s['n']:3d} {rate:>7s} "
-              f"{s['false']:>7d}/{s['n']:<2d} {s['tokens']:>8d}")
-    total = sum(s["tokens"] for s in stats.values())
+        hit = "—" if bucket == "negative" else f"{st['hit']}/{st['n']}"
+        rec = "—" if bucket == "negative" else f"{st['recall']}/{st['n']}"
+        print(f"{bucket:10s} {st['n']:3d} {hit:>7s} {rec:>9s} "
+              f"{st['false']:>7d}/{st['n']:<2d} {st['tokens']:>8d}")
+    total = sum(st["tokens"] for st in stats.values())
     hits = stats["en"]["hit"] + stats["it"]["hit"]
+    recs = stats["en"]["recall"] + stats["it"]["recall"]
     n_pos = stats["en"]["n"] + stats["it"]["n"]
-    print(f"{'TOTAL':10s} {sum(s['n'] for s in stats.values()):3d} "
-          f"{hits}/{n_pos:<5d} {sum(s['false'] for s in stats.values()):>7d}/"
-          f"{stats['negative']['n']:<2d} {total:>8d}")
+    n_neg = stats["negative"]["n"]
+    falses = sum(st["false"] for st in stats.values())
+    print(f"{'TOTAL':10s} {sum(st['n'] for st in stats.values()):3d} "
+          f"{hits}/{n_pos:<5d} {recs}/{n_pos:<7d} {falses:>7d}/{n_neg:<2d} {total:>8d}")
+    if n_neg:
+        # The hook fires unattended on every prompt, so a false-injection
+        # rate compounds across a working day in a way a fraction hides.
+        print(f"\n≈ {100 * falses / n_neg:.0f} unwanted injections per 100 "
+              f"prompts that memory cannot answer")
 
     if misses:
         print("\nmisses:")

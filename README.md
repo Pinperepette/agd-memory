@@ -97,6 +97,7 @@ per session (SessionStart TOC ~750 + recall ~1.2k).
 | `AGD_RECALL_ALLOW_SUPERSEDED` | unset | set to recall blocks a later entry replaced |
 | `AGD_RECALL_NO_GLOBAL` | unset | set to score the project layer only |
 | `AGD_RECALL_NO_FUZZY` | unset | set to disable cross-lingual cognate matching |
+| `AGD_RECALL_FUZZY_ANCHOR_MIN` | `2` | cognates required when nothing matches exactly; `1` favours recall over precision |
 | `AGD_RECALL_CODE_LINE_RATIO` | `0.4` | indented-line ratio that flags a prompt as code |
 | `AGD_RECALL_DEBUG` | unset | log skip reasons and chosen ids to stderr |
 | `AGD_RECALL_LANGS` | unset | comma-separated stopwords languages, overrides the persistent config (e.g. `it,en`) |
@@ -138,29 +139,44 @@ pagination/paginazione, production/produzione. No dictionary to curate,
 no model to load; the whole thing is a prefix bucket lookup, and recall
 still runs in ~0.12s on the largest corpus here.
 
-A single cognate is not enough on its own: a block matched *only* by
-cognates needs two of them. One shared prefix is coincidence, and it
-fires — "category theory" reached a block about `categoria` trucks,
-"model rocket" one about a `modello commerciale`. Both were invisible
-until the eval's negative set was widened from 5 cases to 13, which is
-the honest lesson: a widening feature needs negatives to match.
+A single cognate is not enough on its own: by default a block matched
+*only* by cognates needs two of them. One shared prefix is coincidence,
+and it fires — "category theory" reached a block about `categoria`
+trucks, "model rocket" one about a `modello commerciale`. Both were
+invisible until the eval's negative set was widened from 5 cases to 13.
 
-Measured on `tests/eval/` (29 fixed cases against real memory files,
-`hit@1` = expected block ranked first):
+Measured on `tests/eval/` (31 fixed cases against real memory files).
+`hit@1` = expected block ranked first; `recall@3` = expected block
+injected at all:
 
-| | exact only | with cognates |
-|---|---:|---:|
-| English prompt → Italian memory | 6/10 | **8/10** |
-| Italian prompt → Italian memory | 5/6 | **6/6** |
-| should inject nothing | 0/13 wrong | **0/13 wrong** |
-| tokens injected | 7,405 | 7,829 |
+| `FUZZY_ANCHOR_MIN` | hit@1 | recall@3 | false injections | tokens |
+|---|---:|---:|---:|---:|
+| cognates off | 11/18 | 13/18 | 0/13 | 7,405 |
+| `1` (recall-favouring) | **15/18** | **17/18** | 2/13 → ~15 per 100 | 11,520 |
+| `2` (default) | 14/18 | 14/18 | **0/13** | 7,829 |
+
+**Why the default favours precision.** The two costs are asymmetric in
+kind, not just size. This hook fires unattended on every prompt in every
+project, so a false injection is noise you cannot remove and did not ask
+for; a missed retrieval is recoverable — ask the `memory` skill or the
+MCP tools directly and the block is there. Three points of `recall@3`
+are worth more to give up than fifteen unwanted injections per hundred
+dead-end prompts. If your corpus disagrees, set
+`AGD_RECALL_FUZZY_ANCHOR_MIN=1`.
+
+No lexical feature separates the two classes, which is why this is a
+knob and not a cleverer rule: on the five decisive cases the *score*
+does not separate them (worst false positive 1.35 beats best true
+positive 1.30), the shared-prefix length does not (7 vs 7), and `idf` is
+inverted — the false positives match the *rarer* token.
 
 ```sh
-python3 tests/eval/run_eval.py             # current behaviour
-python3 tests/eval/run_eval.py --no-fuzzy  # exact-match baseline
+python3 tests/eval/run_eval.py                      # current default
+python3 tests/eval/run_eval.py --fuzzy-anchor-min 1 # recall-favouring
+python3 tests/eval/run_eval.py --no-fuzzy           # exact-match baseline
 ```
 
-Set `AGD_RECALL_NO_FUZZY=1` to turn it off.
+Set `AGD_RECALL_NO_FUZZY=1` to turn cognates off entirely.
 
 **Known limitation, deliberately not fixed.** True synonymy across
 languages is not matched: *brands* against `marche` shares no prefix, so
