@@ -534,7 +534,6 @@ def test_config_disable_removes_lang(recall, capsys):
     recall.run_config(["enable", "it"], env)
     capsys.readouterr()  # clear
     rc = recall.run_config(["disable", "en"], env)
-    out = capsys.readouterr().out
     assert rc == 0
     langs = recall.resolve_langs(env)
     assert "en" not in langs

@@ -26,8 +26,6 @@ pytest.importorskip("mcp")
 def server_module(fake_agd, monkeypatch):
     repo_root = Path(__file__).resolve().parent.parent
     monkeypatch.syspath_prepend(str(repo_root / "mcp_servers"))
-    import importlib
-
     if "server" in list(__import__("sys").modules):
         import sys as _sys
         del _sys.modules["server"]

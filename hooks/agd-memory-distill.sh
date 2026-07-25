@@ -84,11 +84,25 @@ print("go" if (edits > 0 or tooluses >= 4) else "skip")
 [ "$GATE" = "go" ] || exit 0
 
 PROMPT="$(cat "$PROMPT_FILE")"
-# One distiller per *memory file*, not per machine. A single global lock
-# would let one project's session silently cancel another's — the same
-# silent knowledge loss the retry logic exists to prevent, triggered by
-# an unrelated repo. The project cwd is what selects the memory file, so
-# it is the right key.
+# Best-effort dedupe of distiller runs, keyed per project directory.
+#
+# What this lock does NOT do is protect the file: lib/agd_memory_write.py
+# already holds an flock around the whole read-modify-write, so two
+# writers are serialised and cannot corrupt memory.agd whatever happens
+# here. What it saves is a wasted LLM call when two SessionEnd hooks fire
+# for the same session — a plugin install plus a leftover hand-installed
+# one, say.
+#
+# It is keyed on cwd rather than on the resolved memory file, which is a
+# real (small) gap: `project_memory_file()` can map two checkouts of one
+# repo, at different cwds, onto the same memory.agd via the git-remote
+# index, and those two would not be deduped. Resolving the memory path
+# here would mean another python3 start on every session teardown to save
+# a rare duplicate call — not worth it while the writer's flock already
+# guarantees the thing that actually matters.
+#
+# A global lock, by contrast, would be actively wrong: one project's
+# session would silently cancel an unrelated project's distillation.
 LOCK_KEY="$(printf '%s' "$CWD" | python3 -c \
   'import hashlib,sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:12])' \
   2>/dev/null || echo shared)"
