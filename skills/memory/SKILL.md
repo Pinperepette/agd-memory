@@ -4,7 +4,7 @@ description: "Per-project persistent memory in AGD format with selective retriev
 license: MIT
 metadata:
   author: pinperepette
-  version: "0.4.1"
+  version: "0.5.0"
   domain: tooling
   triggers: memoria, ricordi, ricorda, what do you remember, recall, context, project facts, AGD memory, blog rules, project history
   role: utility
@@ -167,9 +167,36 @@ Reason: regola globale del progetto, perduta se la dimentichi.
 ```
 
 The `desc` attribute is used by the TOC to make selective retrieval
-self-explanatory. The `refs` attribute is optional; add it when the
-block has a meaningful target (the rule applies to a user-fact, the
-fact comes from another fact, the reference points to a project).
+self-explanatory. The `refs` attribute is rarely worth setting by hand:
+any `#block-id` you mention in the body is lifted into a real edge on
+save, so just cite it in prose.
+
+## Two layers
+
+Reads span both layers by default. The **project** layer holds facts
+about this codebase; the **global** layer holds what is true of the user
+everywhere — preferences, prose style, standing rules. Pass
+`scope: "project"` or `scope: "global"` to narrow a read.
+
+Writes go to the project layer unless you pass `scope: "global"`. Save
+globally only for something that would still be true in an unrelated
+repo. When in doubt, keep it project-scoped.
+
+## Lifecycle — use the attributes, not prose
+
+`created` and `updated` are stamped automatically. Never write a date
+into `desc`; it is already queryable.
+
+- `status: "open" | "done"` instead of "FATTO"/"TODO" in the text.
+- `supersedes: ["old-id"]` when an entry replaces an older one. The old
+  block is flagged and stops being auto-recalled, so a stale fact stops
+  resurfacing as current. Prefer this over silently contradicting it.
+- `agd_memory_toc(status="open")` — what is still pending.
+- `agd_memory_toc(since="2026-07-01")` — what changed recently.
+
+**Prefer updating over appending.** Reusing an existing id replaces that
+block. If you are refining something already in memory, reuse its id
+rather than adding a near-duplicate.
 
 ## Token economy
 

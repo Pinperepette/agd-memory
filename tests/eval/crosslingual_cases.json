@@ -1,0 +1,133 @@
+{
+  "_comment": "Retrieval eval for auto-recall. `expect` is the block id that should rank first; null means nothing should be injected at all. Prompts were written against the real memory files named in `corpus`, without looking at the scorer.",
+  "cases": [
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "how many images did we upload to the server?",
+      "expect": "catalizzatori-immagini-server-upload"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "which category did we create for trucks?",
+      "expect": "catalizzatori-categoria-trucks"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "what happened to the invalid brands?",
+      "expect": "catalizzatori-marca-altro"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "what did we swap in production?",
+      "expect": "catalizzatori-produzione-swap"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "how did we remove the background from the images?",
+      "expect": "catalizzatori-immagini-nobg"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "why was the browser slow during collection?",
+      "expect": "box4metal-devtools-perf"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "tell me about the unified catalogue we built",
+      "expect": "catalizzatori-catalogo-unico"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "what is the commercial model for selling this?",
+      "expect": "modello-commerciale"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "how does the API pagination work in the scraper?",
+      "expect": "scraper-api-pagination"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "what did the reality test on the real portals reveal?",
+      "expect": "lezioni-test-di-realta"
+    },
+
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "quante immagini abbiamo caricato sul server?",
+      "expect": "catalizzatori-immagini-server-upload"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "aggiungi DAF alla categoria camion",
+      "expect": "catalizzatori-categoria-trucks"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "perche' il browser e' lento quando raccolgo i dati?",
+      "expect": "box4metal-devtools-perf"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "che stato ha la produzione?",
+      "expect": "catalizzatori-produzione-swap"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "it",
+      "prompt": "com'e' fatta la paginazione delle API nello scraper?",
+      "expect": "scraper-api-pagination"
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "it",
+      "prompt": "qual e' il modello commerciale deciso?",
+      "expect": "modello-commerciale"
+    },
+
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "scrivimi una funzione python che ordina una lista",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "en",
+      "prompt": "write me a python function that sorts a list",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-plugin-box",
+      "lang": "it",
+      "prompt": "ciao come stai oggi",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "what is the weather like tomorrow",
+      "expect": null
+    },
+    {
+      "corpus": "-Users-pinperepette-Desktop-test-laboratorio-bandiradar",
+      "lang": "en",
+      "prompt": "explain the difference between a mutex and a semaphore",
+      "expect": null
+    }
+  ]
+}

@@ -19,12 +19,10 @@ The `agd` CLI binary is located via $AGD_BIN, defaulting to
 from __future__ import annotations
 
 import asyncio
-import contextlib
-import fcntl
 import json
 import os
-import re
 import subprocess
+import sys
 from pathlib import Path
 
 from mcp.server import Server
@@ -35,75 +33,30 @@ from mcp.types import TextContent, Tool
 AGD_BIN = Path(os.environ.get("AGD_BIN", str(Path.home() / ".cargo/bin/agd")))
 
 
-# `agd edit` does not validate identifiers or block tags on WRITE (exit 0),
-# but the parser rejects them on every subsequent READ — one bad save makes
-# the whole memory file unreadable. Same grammar as agd's is_valid_ident.
-_VALID_ID = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*\Z")
-_VALID_KIND = re.compile(r"x-[A-Za-z_][A-Za-z0-9_-]*\Z")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from agd_memory_paths import global_memory_file, project_memory_file  # noqa: E402
+from agd_memory_write import (  # noqa: E402
+    SaveRejected,
+    VALID_STATUS,
+    bootstrap_memory_file,
+    reject_invalid_block,
+    reject_unfencable,
+    save_block,
+    toc_entries,
+)
+
+# Kept under their old private names: the tests and the historical call
+# sites address them this way, and the guard rails they encode are the
+# reason this module exists.
+_reject_invalid_block = reject_invalid_block
+_reject_unfencable = reject_unfencable
+_VALID_STATUS = VALID_STATUS
 
 
-def _reject_invalid_block(kind: str, block_id: str) -> str | None:
-    """Return None if `kind` and `block_id` are safe to write, else a reason.
-    Offers a sanitized id so the caller can retry without guessing."""
-    if not _VALID_ID.match(block_id):
-        suggestion = re.sub(r"[^A-Za-z0-9_-]+", "-", block_id).strip("-")
-        if not suggestion or not re.match(r"[A-Za-z_]", suggestion):
-            suggestion = "x-" + (suggestion or "entry")
-        return (
-            f"invalid id `{block_id}`: must match [A-Za-z_][A-Za-z0-9_-]* "
-            f"(no dots or other punctuation). Retry with e.g. `{suggestion}`. "
-            "Nothing was written."
-        )
-    if not _VALID_KIND.match(kind):
-        return (
-            f"invalid kind `{kind}`: must be `x-` followed by an identifier "
-            "(e.g. x-project, x-user, x-feedback, x-reference). "
-            "Nothing was written."
-        )
-    return None
-
-
-def _reject_unfencable(content: str) -> str | None:
-    """Return None if `content` is safe to embed in a `~~~`-fenced AGD body.
-    Otherwise return a human-readable reason. The AGD format closes a fence
-    at the first line equal exactly to `~~~`, so any standalone `~~~` line
-    inside the body would corrupt the file on round-trip."""
-    for i, line in enumerate(content.split("\n"), start=1):
-        if line == "~~~":
-            return (
-                f"content contains a standalone `~~~` line (line {i}) which "
-                "would close the fence prematurely and corrupt the file. "
-                "Reword the body so no line is exactly `~~~` (e.g. add "
-                "leading whitespace, or use a different separator)."
-            )
-    return None
-
-
-@contextlib.contextmanager
-def _exclusive_lock(path: Path):
-    """Hold an exclusive flock on a sibling lockfile for the duration of
-    the read-modify-write cycle. Prevents lost updates when several MCP
-    server processes (one per Claude Code session) call save() at once."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lockfile = path.with_suffix(path.suffix + ".lock")
-    fd = os.open(str(lockfile), os.O_RDWR | os.O_CREAT, 0o644)
-    try:
-        fcntl.flock(fd, fcntl.LOCK_EX)
-        yield
-    finally:
-        try:
-            fcntl.flock(fd, fcntl.LOCK_UN)
-        finally:
-            os.close(fd)
-
-
-def memory_path() -> Path:
-    override = os.environ.get("AGD_MEMORY_FILE")
-    if override:
-        return Path(override)
-    cwd = Path(os.environ.get("AGD_MEMORY_PROJECT_CWD", os.getcwd())).resolve()
-    sanitized = str(cwd).replace("/", "-")
-    return Path.home() / ".claude" / "projects" / sanitized / "memory" / "memory.agd"
+def memory_path(scope: str = "project") -> Path:
+    if scope == "global":
+        return global_memory_file()
+    return project_memory_file()
 
 
 def _run(args: list[str], stdin: str | None = None) -> str:
@@ -112,31 +65,29 @@ def _run(args: list[str], stdin: str | None = None) -> str:
     ).stdout
 
 
-def _ensure_memory_file() -> Path | None:
-    p = memory_path()
+def _ensure_memory_file(scope: str = "project") -> Path | None:
+    p = memory_path(scope)
     return p if p.is_file() else None
 
 
-_SCAFFOLD = """\
-@meta format=agd version=1 [#meta]
+def _memory_files(scope: str) -> list[Path]:
+    """Existing memory files for a read, project layer first.
 
-@h1 Memoria di sessione [#root]
-
-@h2 User [#h-user]
-
-@h2 Feedback [#h-feedback]
-
-@h2 Project [#h-project]
-
-@h2 Reference [#h-reference]
-"""
+    Reads default to both layers: a standing user preference is as much
+    an answer to "what do you know" as a project fact, and keeping them
+    invisible from inside a project is what forced them to be re-learned
+    per repo in the first place.
+    """
+    scopes = ("project", "global") if scope == "all" else (scope,)
+    return [p for s in scopes if (p := _ensure_memory_file(s)) is not None]
 
 
-def _bootstrap_memory_file() -> Path:
-    p = memory_path()
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(_SCAFFOLD)
-    return p
+def _bootstrap_memory_file(scope: str = "project") -> Path:
+    return bootstrap_memory_file(memory_path(scope))
+
+
+def _toc_entries(mem: Path, **kw) -> list[dict]:
+    return toc_entries(AGD_BIN, mem, **kw)
 
 
 server = Server("agd-memory")
@@ -163,6 +114,31 @@ async def _list_tools() -> list[Tool]:
                             "x-feedback, x-project, x-reference."
                         ),
                         "enum": ["x-user", "x-feedback", "x-project", "x-reference"],
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": list(_VALID_STATUS),
+                        "description": (
+                            "Filter by lifecycle state — e.g. `open` to list "
+                            "what is still pending."
+                        ),
+                    },
+                    "since": {
+                        "type": "string",
+                        "description": (
+                            "ISO date (YYYY-MM-DD). Keep only entries updated "
+                            "on or after it — answers 'what changed this week'."
+                        ),
+                    },
+                    "scope": {
+                        "type": "string",
+                        "enum": ["all", "project", "global"],
+                        "description": (
+                            "Which layer to read. `all` (default) covers both "
+                            "the project's memory and the global one holding "
+                            "standing user preferences; `project` or `global` "
+                            "restrict it."
+                        ),
                     },
                 },
             },
@@ -211,6 +187,16 @@ async def _list_tools() -> list[Tool]:
                         "description": "Max hops for follow_refs (default 1).",
                         "minimum": 1,
                     },
+                    "scope": {
+                        "type": "string",
+                        "enum": ["all", "project", "global"],
+                        "description": (
+                            "Which layer to read. `all` (default) covers both "
+                            "the project's memory and the global one holding "
+                            "standing user preferences; `project` or `global` "
+                            "restrict it."
+                        ),
+                    },
                 },
             },
         ),
@@ -239,6 +225,16 @@ async def _list_tools() -> list[Tool]:
                         "enum": ["x-user", "x-feedback", "x-project", "x-reference"],
                         "description": "Restrict search to blocks of this kind.",
                     },
+                    "scope": {
+                        "type": "string",
+                        "enum": ["all", "project", "global"],
+                        "description": (
+                            "Which layer to read. `all` (default) covers both "
+                            "the project's memory and the global one holding "
+                            "standing user preferences; `project` or `global` "
+                            "restrict it."
+                        ),
+                    },
                 },
                 "required": ["query"],
             },
@@ -248,7 +244,10 @@ async def _list_tools() -> list[Tool]:
             description=(
                 "Add a new memory entry, or replace an existing one with the "
                 "same id. The body is stored verbatim inside a fence so it "
-                "round-trips losslessly."
+                "round-trips losslessly. Any `#other-block-id` you mention in "
+                "the body is automatically recorded as a graph edge, so "
+                "writing 'builds on #earlier-decision' in prose is enough to "
+                "make it traversable by agd_memory_get(follow_refs=true)."
             ),
             inputSchema={
                 "type": "object",
@@ -273,6 +272,47 @@ async def _list_tools() -> list[Tool]:
                             "the desc too — keeps the TOC honest."
                         ),
                     },
+                    "refs": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": (
+                            "Optional explicit outbound edges to other block "
+                            "ids. Usually unnecessary: ids cited in the body "
+                            "are picked up automatically. Ids that don't "
+                            "exist in the file are dropped."
+                        ),
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": list(_VALID_STATUS),
+                        "description": (
+                            "Lifecycle state. Use `done` for work that "
+                            "finished and `open` for something still "
+                            "pending, instead of writing 'FATTO'/'TODO' into "
+                            "the desc. `created`/`updated` dates are stamped "
+                            "automatically — don't put them in the text."
+                        ),
+                    },
+                    "supersedes": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": (
+                            "Ids this entry replaces. Each one is flagged "
+                            "`status=superseded` so stale facts stop being "
+                            "recalled as if current. Use this instead of "
+                            "silently contradicting an older block."
+                        ),
+                    },
+                    "scope": {
+                        "type": "string",
+                        "enum": ["project", "global"],
+                        "description": (
+                            "Where to write. Defaults to `project`. Use "
+                            "`global` only for facts true of the user "
+                            "everywhere — preferences, prose style, standing "
+                            "rules — not for anything about this codebase."
+                        ),
+                    },
                 },
                 "required": ["kind", "id", "content"],
             },
@@ -283,135 +323,119 @@ async def _list_tools() -> list[Tool]:
 @server.call_tool()
 async def _call_tool(name: str, arguments: dict | None) -> list[TextContent]:
     arguments = arguments or {}
-    mem = _ensure_memory_file()
-    if mem is None:
-        if name == "agd_memory_save":
-            mem = _bootstrap_memory_file()
-        else:
+    scope = arguments.get("scope") or ("project" if name == "agd_memory_save" else "all")
+    files: list[Path] = []
+
+    if name == "agd_memory_save":
+        mem = _ensure_memory_file(scope) or _bootstrap_memory_file(scope)
+    else:
+        files = _memory_files(scope)
+        if not files:
             return [TextContent(
                 type="text",
                 text=(
-                    f"No AGD memory file for this project at {memory_path()}. "
+                    f"No AGD memory file for scope '{scope}' "
+                    f"(project: {memory_path()}). "
                     "Save a first entry via agd_memory_save to bootstrap one."
                 ),
             )]
 
     if name == "agd_memory_toc":
-        kind = arguments.get("kind")
-        cmd = [str(AGD_BIN), "ids", str(mem), "--json"]
-        if kind:
-            cmd += ["--kind", kind]
-        out = _run(cmd)
-        return [TextContent(type="text", text=out.strip())]
+        entries = []
+        global_file = memory_path("global")
+        for path in files:
+            is_global = path == global_file
+            for e in _toc_entries(
+                path,
+                kind=arguments.get("kind"),
+                status=arguments.get("status"),
+                since=arguments.get("since"),
+            ):
+                if is_global:
+                    # Every layer carries the same `@h2 User/Feedback/...`
+                    # scaffold; listing it twice is pure noise.
+                    if not e["kind"].startswith("x-"):
+                        continue
+                    e["scope"] = "global"
+                entries.append(e)
+        return [TextContent(
+            type="text",
+            text=json.dumps(entries, ensure_ascii=False, separators=(",", ":")),
+        )]
 
     if name == "agd_memory_get":
         # Accept either `id` (single, legacy) or `ids` (list).
         ids: list[str] = []
-        if "ids" in arguments and arguments["ids"]:
+        if arguments.get("ids"):
             ids = list(arguments["ids"])
-        elif "id" in arguments and arguments["id"]:
+        elif arguments.get("id"):
             ids = [arguments["id"]]
         else:
             return [TextContent(type="text", text="provide either 'id' or 'ids'")]
         cli_ids = [f"#{x.lstrip('#')}" for x in ids]
-        cmd = [str(AGD_BIN), "get", str(mem), *cli_ids]
+        flags = []
         if arguments.get("with_backlinks"):
-            cmd.append("--with-backlinks")
+            flags.append("--with-backlinks")
         if arguments.get("follow_refs"):
-            cmd.append("--follow-refs")
+            flags.append("--follow-refs")
             depth = arguments.get("depth")
             if isinstance(depth, int) and depth >= 1:
-                cmd += ["--depth", str(depth)]
-        try:
-            out = _run(cmd)
-            return [TextContent(type="text", text=out)]
-        except subprocess.CalledProcessError as e:
-            return [TextContent(
-                type="text",
-                text=f"get failed: {e.stderr.strip()}",
-            )]
+                flags += ["--depth", str(depth)]
+        # An id lives in exactly one layer, and `agd get` fails the whole
+        # call on an unknown id — so ask each layer and keep what answers.
+        chunks, errors = [], []
+        for path in files:
+            try:
+                chunks.append(_run([str(AGD_BIN), "get", str(path), *cli_ids, *flags]))
+            except subprocess.CalledProcessError as e:
+                errors.append((e.stderr or "").strip())
+        if chunks:
+            return [TextContent(type="text", text="\n".join(chunks))]
+        return [TextContent(type="text", text=f"get failed: {'; '.join(errors)}")]
 
     if name == "agd_memory_search":
-        query = arguments["query"]
-        ignore_case = arguments.get("ignore_case", True)
-        kind = arguments.get("kind")
-        cmd = [str(AGD_BIN), "search", str(mem), query, "--json"]
-        if ignore_case:
-            cmd.append("-i")
-        if kind:
-            cmd += ["--kind", kind]
-        try:
-            out = _run(cmd)
-            return [TextContent(type="text", text=out.strip() or "[]")]
-        except subprocess.CalledProcessError as e:
+        hits, errors = [], []
+        for path in files:
+            cmd = [str(AGD_BIN), "search", str(path), arguments["query"], "--json"]
+            if arguments.get("ignore_case", True):
+                cmd.append("-i")
+            if arguments.get("kind"):
+                cmd += ["--kind", arguments["kind"]]
+            try:
+                out = _run(cmd).strip()
+                if out:
+                    parsed = json.loads(out)
+                    if isinstance(parsed, list):
+                        hits.extend(parsed)
+            except (subprocess.CalledProcessError, json.JSONDecodeError) as e:
+                errors.append(str(getattr(e, "stderr", e) or e).strip())
+        if hits or not errors:
             return [TextContent(
                 type="text",
-                text=f"search failed: {e.stderr.strip()}",
+                text=json.dumps(hits, ensure_ascii=False, separators=(",", ":")),
             )]
+        return [TextContent(type="text", text=f"search failed: {'; '.join(errors)}")]
 
     if name == "agd_memory_save":
-        kind = arguments["kind"]
-        block_id = arguments["id"].lstrip("#")
-        content = arguments["content"]
-
-        reason = _reject_invalid_block(kind, block_id) or _reject_unfencable(content)
-        if reason is not None:
-            return [TextContent(type="text", text=f"save rejected: {reason}")]
-
-        desc = arguments.get("desc")
-        attrs = {}
-        if desc:
-            # A literal newline in a quoted attribute value is written as-is
-            # by `agd edit` and breaks the parse on read ("unterminated
-            # quoted value") — collapse to spaces.
-            attrs["desc"] = re.sub(r"\s*\n\s*", " ", desc).strip()
-
-        with _exclusive_lock(mem):
-            existing_ids_raw = _run([str(AGD_BIN), "ids", str(mem)]).strip().splitlines()
-            existing_ids = [line.split("\t", 1)[0] for line in existing_ids_raw]
-
-            if block_id in existing_ids and not desc:
-                try:
-                    existing_json = _run([str(AGD_BIN), "get", str(mem), f"#{block_id}", "--json"])
-                    existing_block = json.loads(existing_json)
-                    if isinstance(existing_block, list) and existing_block:
-                        existing_block = existing_block[0]
-                    old_desc = (existing_block.get("attrs") or {}).get("desc")
-                    if old_desc:
-                        attrs["desc"] = old_desc
-                except Exception:
-                    pass
-
-            block = {
-                "kind": kind,
-                "attrs": attrs,
-                "id": block_id,
-                "content": {"type": "fenced", "value": content},
-            }
-
-            if block_id in existing_ids:
-                op = {"op": "replace", "id": block_id, "with": block}
-                verb = "updated"
-            else:
-                kind_short = kind.removeprefix("x-")
-                heading_id = f"h-{kind_short}"
-                if heading_id in existing_ids:
-                    op = {"op": "insert_after", "id": heading_id, "block": block}
-                else:
-                    op = {"op": "insert_after", "id": "root", "block": block}
-                verb = "added"
-
-            try:
-                _run([str(AGD_BIN), "edit", str(mem), "--op", json.dumps(op), "-i"])
-                return [TextContent(
-                    type="text",
-                    text=f"{verb} #{block_id} ({kind}) in {mem.name}",
-                )]
-            except subprocess.CalledProcessError as e:
-                return [TextContent(
-                    type="text",
-                    text=f"save failed: {e.stderr.strip()}",
-                )]
+        try:
+            result = save_block(
+                AGD_BIN,
+                mem,
+                arguments["kind"],
+                arguments["id"],
+                arguments["content"],
+                desc=arguments.get("desc"),
+                refs=arguments.get("refs"),
+                status=arguments.get("status"),
+                supersedes=arguments.get("supersedes"),
+            )
+        except SaveRejected as e:
+            return [TextContent(type="text", text=f"save rejected: {e}")]
+        except subprocess.CalledProcessError as e:
+            return [TextContent(
+                type="text", text=f"save failed: {(e.stderr or '').strip()}",
+            )]
+        return [TextContent(type="text", text=result)]
 
     return [TextContent(type="text", text=f"unknown tool: {name}")]
 
