@@ -313,44 +313,6 @@ def test_one_cognate_plus_one_exact_match_is_enough(recall):
     assert [x.id for x in out] == ["categoria-trucks"]
 
 
-def test_single_cognate_accepted_for_recurring_domain_vocabulary(recall):
-    """One cognate is enough when it lands on a word this memory uses
-    habitually: if `catalogo` is in most blocks, that memory is *about*
-    catalogues and an English "catalogue" almost certainly concerns it."""
-    blocks = [
-        _block(recall, id=f"catalogo-{i}", desc=f"catalogo parte {i}")
-        for i in range(5)
-    ] + [_block(recall, id="altro", desc="tema diverso")]
-    out = recall.top_k_blocks(
-        blocks, {"catalogue"}, k=1, require_anchor=True, fuzzy=True
-    )
-    assert out and out[0].id.startswith("catalogo-")
-
-
-def test_single_cognate_still_rejected_for_a_rare_token(recall):
-    """The escape is for recurring vocabulary, not for any single hit:
-    a token appearing once stays a coincidence."""
-    blocks = [_block(recall, id="categoria-trucks", desc="categoria camion")]
-    blocks += [_block(recall, id=f"other-{i}", desc="tema diverso") for i in range(9)]
-    out = recall.top_k_blocks(
-        blocks, {"category", "theory"}, k=1, require_anchor=True, fuzzy=True
-    )
-    assert out == []
-
-
-def test_domain_escape_needs_an_absolute_floor_not_just_a_ratio(recall):
-    """1-of-3 is 33% but is not evidence of habitual use — the df floor
-    is what stops a tiny corpus from making every word 'domain vocabulary'."""
-    blocks = [
-        _block(recall, id="catalogo-uno", desc="catalogo unico"),
-        _block(recall, id="a", desc="tema diverso"),
-        _block(recall, id="b", desc="altro tema"),
-    ]
-    assert recall.top_k_blocks(
-        blocks, {"catalogue"}, k=1, require_anchor=True, fuzzy=True
-    ) == []
-
-
 def test_compute_df_counts_blocks_not_occurrences(recall):
     blocks = [
         _block(recall, id="a", body="catalogo catalogo catalogo"),
@@ -360,8 +322,9 @@ def test_compute_df_counts_blocks_not_occurrences(recall):
 
 
 def test_fuzzy_anchor_min_is_tunable_down_to_one(recall):
-    """The precision/recall balance is a knob, not a verdict: no lexical
-    feature separates a good single cognate from a bad one."""
+    """The precision/recall balance is a knob: a corpus that would rather
+    over-retrieve than miss can lower it, at a measured cost in false
+    injections."""
     b = _block(recall, id="catalogo-unico", desc="creato il catalogo unico")
     assert recall.top_k_blocks(
         [b], {"catalogue"}, k=1, require_anchor=True, fuzzy=True

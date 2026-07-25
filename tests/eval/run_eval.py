@@ -67,6 +67,20 @@ def main(argv: list[str] | None = None) -> int:
     )
     misses = []
 
+    # A negative is only evidence against the corpus it was run on. Tying
+    # each to one corpus hid a real false positive: "production cost of a
+    # solar panel" was silent against the corpus it was filed under and
+    # fired against the other one. Negatives are therefore expanded to
+    # every corpus in the set — it costs nothing and it is what caught it.
+    all_corpora = sorted({c["corpus"] for c in cases})
+    expanded = []
+    for c in cases:
+        if c["expect"] is None:
+            expanded.extend(dict(c, corpus=k) for k in all_corpora)
+        else:
+            expanded.append(c)
+    cases = expanded
+
     for c in cases:
         mem = Path(os.path.expanduser(
             f"~/.claude/projects/{c['corpus']}/memory/memory.agd"
